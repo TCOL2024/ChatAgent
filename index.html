@@ -25,9 +25,15 @@
             try {
                 const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
                 const response = await fetch(webhookUrl + "?message=" + encodeURIComponent(userInput));
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP-Fehler! Status: ${response.status}`);
+                }
+                
                 const data = await response.json();
-                responseElement.innerHTML = "Antwort: " + data.response;
+                responseElement.innerHTML = "Antwort: " + (data.response || "Keine Antwort erhalten.");
             } catch (error) {
+                console.error("Fehler:", error);
                 responseElement.innerHTML = "Fehler beim Abrufen der Antwort.";
             }
         }
