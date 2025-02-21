@@ -7,7 +7,7 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
         input, button { padding: 10px; margin: 10px; }
-        #response { margin-top: 20px; font-weight: bold; }
+        #response { margin-top: 20px; font-weight: bold; white-space: pre-line; text-align: left; display: inline-block; }
     </style>
 </head>
 <body>
@@ -20,7 +20,14 @@
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value;
             const responseElement = document.getElementById("response");
-            responseElement.innerHTML = "Lädt...";
+            
+            if (!userInput) {
+                responseElement.innerHTML = "Bitte eine Nachricht eingeben!";
+                return;
+            }
+
+            // Zeige die Nutzer-Eingabe an und setze eine Ladeanzeige
+            responseElement.innerHTML = `<strong>Du:</strong> ${userInput}\nLädt...`;
             
             try {
                 const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
@@ -29,12 +36,14 @@
                 if (!response.ok) {
                     throw new Error(`HTTP-Fehler! Status: ${response.status}`);
                 }
-                
+
                 const data = await response.json();
-                responseElement.innerHTML = "Antwort: " + (data.response || "Keine Antwort erhalten.");
+                
+                // Zeige die Antwort des Bots an
+                responseElement.innerHTML += `\n<strong>Bot:</strong> ${data.response || "Keine Antwort erhalten."}`;
             } catch (error) {
                 console.error("Fehler:", error);
-                responseElement.innerHTML = "Fehler beim Abrufen der Antwort.";
+                responseElement.innerHTML += "\n<strong>Fehler:</strong> Antwort konnte nicht geladen werden.";
             }
         }
     </script>
