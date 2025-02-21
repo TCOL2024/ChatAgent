@@ -23,7 +23,7 @@
             responseElement.innerHTML = "Lädt...";
             
             try {
-                const webhookUrl = „https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
+                const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
                 const response = await fetch(webhookUrl + "?message=" + encodeURIComponent(userInput));
                 const data = await response.json();
                 responseElement.innerHTML = "Antwort: " + data.response;
