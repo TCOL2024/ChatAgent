@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot mit Sprachausgabe</title>
+    <title>Chatbot ohne Sprachausgabe</title>
     <style>
         body {
             font-family: Helvetica, Arial, sans-serif;
@@ -47,7 +47,6 @@
             font-size: 14px;
             line-height: 1.4;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            position: relative;
         }
         .user-message {
             background-color: #00529b;
@@ -93,14 +92,6 @@
             height: 16px;
             fill: white;
         }
-        .speaking-icon {
-            position: absolute;
-            right: -20px;
-            top: 5px;
-            font-size: 16px;
-            color: #00529b;
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -124,7 +115,6 @@
             setTimeout(() => {
                 let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
                 addMessage("bot", welcomeMessage);
-                speakText(welcomeMessage);
             }, 500);
         });
 
@@ -146,7 +136,6 @@
                 let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
                 setTimeout(() => {
                     addMessage("bot", greeting);
-                    speakText(greeting);
                 }, 500);
                 return;
             }
@@ -170,17 +159,14 @@
                     const data = JSON.parse(text);
                     let botResponse = data.response || "Keine Antwort erhalten.";
                     addMessage("bot", botResponse);
-                    speakText(botResponse);
                 } catch (jsonError) {
                     addMessage("bot", text || "Fehler beim Verarbeiten der Antwort.");
-                    speakText(text);
                 }
 
             } catch (error) {
                 console.error("Fehler:", error);
                 let errorMessage = "Es gab ein Problem bei der Kommunikation mit dem Server.";
                 addMessage("bot", errorMessage);
-                speakText(errorMessage);
             }
         }
 
@@ -189,34 +175,8 @@
             const message = document.createElement("div");
             message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
             message.textContent = text;
-
-            if (sender === "bot") {
-                const icon = document.createElement("span");
-                icon.classList.add("speaking-icon");
-                icon.textContent = "🗣️";
-                message.appendChild(icon);
-            }
-
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function speakText(text) {
-            const synth = window.speechSynthesis;
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = "de-DE";
-            utterance.rate = 1;
-            utterance.pitch = 1;
-
-            // Lautsprecher-Icon anzeigen
-            const lastBotMessage = document.querySelector(".bot-message:last-child .speaking-icon");
-            if (lastBotMessage) lastBotMessage.style.display = "inline";
-
-            utterance.onend = () => {
-                if (lastBotMessage) lastBotMessage.style.display = "none";
-            };
-
-            synth.speak(utterance);
         }
     </script>
 </body>
