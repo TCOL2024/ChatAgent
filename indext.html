@@ -1,216 +1,42 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Chat</title>
-    <style>
-        * {
-            font-family: Arial, sans-serif;
-            box-sizing: border-box;
-        }
+async function sendToWebhook(data) {
+    try {
+        console.log("📨 Sende Daten an Webhook:", data);
 
-        .chat-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 320px;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
+        const response = await fetch(webhookURL, {
+            method: "POST",
+            headers: {
+                "Accept": "application/json, text/plain",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        });
 
-        .chat-header {
-            background: #1e3a8a;
-            color: white;
-            padding: 12px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-header button {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .chat-body {
-            padding: 15px;
-        }
-
-        .chat-body label {
-            font-weight: bold;
-            display: block;
-            margin-top: 10px;
-        }
-
-        .chat-body input {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .chat-body button {
-            width: 100%;
-            background: #1e3a8a;
-            color: white;
-            padding: 10px;
-            border: none;
-            margin-top: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .chat-box {
-            display: none;
-            height: 250px;
-            overflow-y: auto;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            background: #f9f9f9;
-        }
-
-        .chat-input {
-            display: none;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            display: flex;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .chat-input button {
-            background: #1e3a8a;
-            color: white;
-            border: none;
-            padding: 8px;
-            margin-left: 5px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-
-<div class="chat-container">
-    <div class="chat-header">
-        Live Chat
-        <button onclick="toggleChat()">−</button>
-    </div>
-    <div class="chat-body" id="chat-form">
-        <p><strong>Bitte sag uns, wer du bist.</strong></p>
-        <label>Name</label>
-        <input type="text" id="userName" placeholder="Wie heißt du?">
-        <label>Email Adresse</label>
-        <input type="email" id="userEmail" placeholder="Was ist deine E-Mail?">
-        <button onclick="startChat()">CHATTE MIT UNS!</button>
-    </div>
-    <div class="chat-box" id="chat-box">
-        <div id="messages"></div>
-    </div>
-    <div class="chat-input" id="chat-input">
-        <input type="text" id="userMessage" placeholder="Schreibe eine Nachricht...">
-        <button onclick="sendMessage()">➤</button>
-    </div>
-</div>
-
-<script>
-    const webhookURL = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-
-    function toggleChat() {
-        let chat = document.querySelector('.chat-container');
-        chat.classList.toggle('chat-hidden');
-    }
-
-    async function sendToWebhook(data) {
-        try {
-            console.log("📨 Sende Daten an Webhook:", data);
-            const response = await fetch(webhookURL, {
-                method: "POST",
-                headers: {
-                    "Accept": "application/json",
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(data)
-            });
-
-            if (!response.ok) {
-                console.error(`❌ Fehler beim Webhook: ${response.status} ${response.statusText}`);
-                addMessage("⚠️ Fehler: Keine Antwort vom Server.");
-                return;
-            }
-
-            const responseData = await response.json();
-            console.log("✅ Webhook-Antwort erhalten:", responseData);
-
-            if (responseData.reply) {
-                addMessage("🤖 Bot: " + responseData.reply);
-            } else {
-                addMessage("🤖 Bot: Antwort nicht erkannt.");
-            }
-
-        } catch (error) {
-            console.error("❌ Fehler beim Senden an Webhook:", error);
-            addMessage("⚠️ Netzwerkfehler! Bitte versuche es später erneut.");
-        }
-    }
-
-    function startChat() {
-        let name = document.getElementById("userName").value;
-        let email = document.getElementById("userEmail").value;
-
-        if (!name || !email) {
-            alert("Bitte fülle beide Felder aus.");
+        if (!response.ok) {
+            console.error(`❌ Fehler beim Webhook: ${response.status} ${response.statusText}`);
+            addMessage("⚠️ Fehler: Keine gültige Antwort vom Server.");
             return;
         }
 
-        document.getElementById("chat-form").style.display = "none";
-        document.getElementById("chat-box").style.display = "block";
-        document.getElementById("chat-input").style.display = "flex";
+        let responseText = await response.text();
+        console.log("✅ Rohantwort vom Webhook:", responseText);
 
-        addMessage("👋 Hallo " + name + "! Wie kann ich dir helfen?");
+        // Prüfen, ob die Antwort JSON ist oder nur Text
+        let responseData;
+        try {
+            responseData = JSON.parse(responseText);
+        } catch (error) {
+            console.warn("⚠️ Webhook-Antwort ist kein JSON, wird als Text behandelt.");
+            responseData = { reply: responseText }; // Wandelt die Antwort in eine nutzbare Form um
+        }
 
-        sendToWebhook({
-            type: "start_chat",
-            name: name,
-            email: email
-        });
+        if (responseData.reply) {
+            addMessage("🤖 Bot: " + responseData.reply);
+        } else {
+            addMessage("🤖 Bot: Antwort nicht erkannt.");
+        }
+
+    } catch (error) {
+        console.error("❌ Fehler beim Senden an Webhook:", error);
+        addMessage("⚠️ Netzwerkfehler! Bitte versuche es später erneut.");
     }
-
-    function sendMessage() {
-        let message = document.getElementById("userMessage").value.trim();
-        if (message === "") return;
-
-        addMessage("🧑‍💻 Du: " + message);
-        document.getElementById("userMessage").value = "";
-
-        sendToWebhook({
-            type: "message",
-            message: message
-        });
-    }
-
-    function addMessage(text) {
-        let messageBox = document.getElementById("messages");
-        let messageElement = document.createElement("p");
-        messageElement.innerHTML = text;
-        messageBox.appendChild(messageElement);
-        messageBox.scrollTop = messageBox.scrollHeight;
-    }
-</script>
-
-</body>
-</html>
+}
