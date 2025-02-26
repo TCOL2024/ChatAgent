@@ -6,26 +6,26 @@
     <title>Chatbot mit Make.com</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: Helvetica, Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #f0f8ff;
+            background-color: #f5f5f5;
             margin: 0;
         }
         .chat-container {
             width: 400px;
             max-width: 100%;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
         .chat-header {
-            background: #007bff;
+            background: #00529b;
             color: white;
             padding: 15px;
             text-align: center;
@@ -37,7 +37,7 @@
             padding: 15px;
             display: flex;
             flex-direction: column;
-            background-color: #e3f2fd;
+            background-color: #eaf2f8;
         }
         .message {
             padding: 12px;
@@ -49,7 +49,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .user-message {
-            background-color: #007bff;
+            background-color: #00529b;
             color: white;
             align-self: flex-end;
         }
@@ -74,7 +74,7 @@
         }
         .input-container button {
             padding: 10px 15px;
-            background: #007bff;
+            background: #00529b;
             color: white;
             border: none;
             border-radius: 50%;
@@ -85,7 +85,7 @@
             justify-content: center;
         }
         .input-container button:hover {
-            background: #0056b3;
+            background: #003d73;
         }
         .send-icon {
             width: 16px;
@@ -96,7 +96,7 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">💬 Dein Chatbot</div>
+        <div class="chat-header">💬 Dein persönlicher Assistent</div>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
             <input type="text" id="userInput" placeholder="Schreibe eine Nachricht...">
@@ -109,6 +109,14 @@
     </div>
 
     <script>
+        let userName = "";
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                addMessage("bot", "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.");
+            }, 500);
+        });
+
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value;
             if (!userInput) return;
@@ -116,10 +124,19 @@
             addMessage("user", userInput);
             document.getElementById("userInput").value = "";
 
+            if (!userName) {
+                userName = userInput;
+                setTimeout(() => {
+                    addMessage("bot", `Hallo ${userName}, nun stelle mir Deine Frage.`);
+                }, 500);
+                return;
+            }
+
             try {
                 const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
                 const response = await fetch(webhookUrl + 
-                    "?message=" + encodeURIComponent(userInput) + 
+                    "?name=" + encodeURIComponent(userName) + 
+                    "&message=" + encodeURIComponent(userInput) + 
                     "&status=ok"
                 );
 
