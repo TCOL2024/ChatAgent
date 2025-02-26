@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chatbot mit Make.com</title>
+    <title>Chatbot mit Sprachausgabe</title>
     <style>
         body {
             font-family: Helvetica, Arial, sans-serif;
@@ -113,7 +113,9 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
-                addMessage("bot", "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.");
+                let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
+                addMessage("bot", welcomeMessage);
+                speakText(welcomeMessage);
             }, 500);
         });
 
@@ -132,8 +134,10 @@
 
             if (!userName) {
                 userName = userInput;
+                let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
                 setTimeout(() => {
-                    addMessage("bot", `Hallo ${userName}, nun stelle mir Deine Frage.`);
+                    addMessage("bot", greeting);
+                    speakText(greeting);
                 }, 500);
                 return;
             }
@@ -155,14 +159,19 @@
 
                 try {
                     const data = JSON.parse(text);
-                    addMessage("bot", data.response || "Keine Antwort erhalten.");
+                    let botResponse = data.response || "Keine Antwort erhalten.";
+                    addMessage("bot", botResponse);
+                    speakText(botResponse);
                 } catch (jsonError) {
                     addMessage("bot", text || "Fehler beim Verarbeiten der Antwort.");
+                    speakText(text);
                 }
 
             } catch (error) {
                 console.error("Fehler:", error);
-                addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
+                let errorMessage = "Es gab ein Problem bei der Kommunikation mit dem Server.";
+                addMessage("bot", errorMessage);
+                speakText(errorMessage);
             }
         }
 
@@ -173,6 +182,15 @@
             message.textContent = text;
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function speakText(text) {
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = "de-DE"; // Deutsche Sprache
+            utterance.rate = 1; // Geschwindigkeit normal
+            utterance.pitch = 1; // Stimme auf normaler Tonhöhe
+            synth.speak(utterance);
         }
     </script>
 </body>
