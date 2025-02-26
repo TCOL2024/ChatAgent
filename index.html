@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modern Chatbot</title>
+    <title>Modern Chatbot mit dynamischen Prompts</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -99,6 +99,28 @@
             height: 18px;
             fill: white;
         }
+        .prompt-buttons {
+            display: none; /* Standardmäßig ausgeblendet */
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-bottom: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        .prompt-buttons button {
+            padding: 8px 12px;
+            background: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+            flex: 1 1 auto;
+        }
+        .prompt-buttons button:hover {
+            background: #00529b;
+        }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -111,6 +133,11 @@
 <body>
     <div class="chat-container">
         <div class="chat-header">💬 Dein persönlicher Assistent</div>
+        <div class="prompt-buttons" id="promptButtons">
+            <button onclick="usePrompt('Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.')">Persönliche Eignung (BBIG)</button>
+            <button onclick="usePrompt('Welche Bedeutung hat die Prüfungsordnung?')">Bedeutung der Prüfungsordnung</button>
+            <button onclick="usePrompt('Welche Voraussetzungen gelten für die Zulassung zur Prüfung?')">Zulassungsvoraussetzungen</button>
+        </div>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
             <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
@@ -138,6 +165,11 @@
             }
         }
 
+        function usePrompt(promptText) {
+            document.getElementById("userInput").value = promptText;
+            sendMessage();
+        }
+
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value.trim();
             if (!userInput) return;
@@ -150,6 +182,8 @@
                 let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
                 setTimeout(() => {
                     addMessage("bot", greeting);
+                    // Zeige die Prompt-Buttons an, sobald der Name eingegeben wurde
+                    document.getElementById("promptButtons").style.display = "flex";
                 }, 500);
                 return;
             }
