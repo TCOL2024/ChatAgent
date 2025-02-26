@@ -133,7 +133,12 @@
             
             try {
                 const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-                const response = await fetch(webhookUrl + "?name=" + encodeURIComponent(userName) + "&message=" + encodeURIComponent(userInput));
+                const response = await fetch(webhookUrl + 
+    "?name=" + encodeURIComponent(userName) + 
+    "&message=" + encodeURIComponent(userInput) + 
+    "&status=ok"
+);
+
                 
                 if (!response.ok) {
                     throw new Error(`HTTP-Fehler! Status: ${response.status}`);
