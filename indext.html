@@ -10,7 +10,6 @@
             box-sizing: border-box;
         }
 
-        /* Chat-Container */
         .chat-container {
             position: fixed;
             bottom: 20px;
@@ -23,7 +22,6 @@
             border: 1px solid #ddd;
         }
 
-        /* Header */
         .chat-header {
             background: #1e3a8a;
             color: white;
@@ -42,7 +40,6 @@
             cursor: pointer;
         }
 
-        /* Eingabeformular */
         .chat-body {
             padding: 15px;
         }
@@ -72,7 +69,6 @@
             border-radius: 5px;
         }
 
-        /* Chatbox */
         .chat-box {
             display: none;
             height: 250px;
@@ -151,10 +147,24 @@
                 body: JSON.stringify(data)
             });
 
-            const responseData = await response.text();
-            console.log("✅ Webhook-Antwort:", responseData);
+            if (!response.ok) {
+                console.error(`❌ Fehler beim Webhook: ${response.status} ${response.statusText}`);
+                addMessage("⚠️ Fehler: Keine Antwort vom Server.");
+                return;
+            }
+
+            const responseData = await response.json();
+            console.log("✅ Webhook-Antwort erhalten:", responseData);
+
+            if (responseData.reply) {
+                addMessage("🤖 Bot: " + responseData.reply);
+            } else {
+                addMessage("🤖 Bot: Antwort nicht erkannt.");
+            }
+
         } catch (error) {
             console.error("❌ Fehler beim Senden an Webhook:", error);
+            addMessage("⚠️ Netzwerkfehler! Bitte versuche es später erneut.");
         }
     }
 
@@ -191,10 +201,6 @@
             type: "message",
             message: message
         });
-
-        setTimeout(() => {
-            addMessage("🤖 Bot: Ich habe deine Nachricht erhalten!");
-        }, 1000);
     }
 
     function addMessage(text) {
