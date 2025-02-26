@@ -99,7 +99,7 @@
         <div class="chat-header">💬 Dein persönlicher Assistent</div>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
-            <input type="text" id="userInput" placeholder="Schreibe eine Nachricht...">
+            <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
             <button onclick="sendMessage()">
                 <svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path d="M3.4 20.6L21 12 3.4 3.4 3 10l12 2-12 2z"/>
@@ -117,8 +117,14 @@
             }, 500);
         });
 
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        }
+
         async function sendMessage() {
-            const userInput = document.getElementById("userInput").value;
+            const userInput = document.getElementById("userInput").value.trim();
             if (!userInput) return;
 
             addMessage("user", userInput);
