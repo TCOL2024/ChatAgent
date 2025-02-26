@@ -139,62 +139,67 @@
         chat.classList.toggle('chat-hidden');
     }
 
-    function startChat() {
-        let name = document.getElementById('userName').value;
-        let email = document.getElementById('userEmail').value;
-
-        if (name && email) {
-            document.getElementById('chat-form').style.display = 'none';
-            document.getElementById('chat-box').style.display = 'block';
-            document.getElementById('chat-input').style.display = 'flex';
-
-            addMessage("👋 Hallo " + name + "! Wie kann ich dir helfen?");
-
-            // Sende Nutzerdaten an Webhook
-            fetch(webhookURL, {
+    async function sendToWebhook(data) {
+        try {
+            console.log("📨 Sende Daten an Webhook:", data);
+            const response = await fetch(webhookURL, {
                 method: "POST",
                 headers: {
+                    "Accept": "application/json",
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({
-                    type: "start_chat",
-                    name: name,
-                    email: email
-                })
+                body: JSON.stringify(data)
             });
-        } else {
-            alert("Bitte fülle beide Felder aus.");
+
+            const responseData = await response.text();
+            console.log("✅ Webhook-Antwort:", responseData);
+        } catch (error) {
+            console.error("❌ Fehler beim Senden an Webhook:", error);
         }
+    }
+
+    function startChat() {
+        let name = document.getElementById("userName").value;
+        let email = document.getElementById("userEmail").value;
+
+        if (!name || !email) {
+            alert("Bitte fülle beide Felder aus.");
+            return;
+        }
+
+        document.getElementById("chat-form").style.display = "none";
+        document.getElementById("chat-box").style.display = "block";
+        document.getElementById("chat-input").style.display = "flex";
+
+        addMessage("👋 Hallo " + name + "! Wie kann ich dir helfen?");
+
+        sendToWebhook({
+            type: "start_chat",
+            name: name,
+            email: email
+        });
     }
 
     function sendMessage() {
-        let message = document.getElementById('userMessage').value;
-        if (message.trim() !== "") {
-            addMessage("🧑‍💻 Du: " + message);
-            document.getElementById('userMessage').value = "";
+        let message = document.getElementById("userMessage").value.trim();
+        if (message === "") return;
 
-            // Nachricht an Webhook senden
-            fetch(webhookURL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    type: "message",
-                    message: message
-                })
-            });
+        addMessage("🧑‍💻 Du: " + message);
+        document.getElementById("userMessage").value = "";
 
-            // Simulierte Antwort vom Bot
-            setTimeout(() => {
-                addMessage("🤖 Bot: Ich habe deine Nachricht erhalten!");
-            }, 1000);
-        }
+        sendToWebhook({
+            type: "message",
+            message: message
+        });
+
+        setTimeout(() => {
+            addMessage("🤖 Bot: Ich habe deine Nachricht erhalten!");
+        }, 1000);
     }
 
     function addMessage(text) {
-        let messageBox = document.getElementById('messages');
-        let messageElement = document.createElement('p');
+        let messageBox = document.getElementById("messages");
+        let messageElement = document.createElement("p");
         messageElement.innerHTML = text;
         messageBox.appendChild(messageElement);
         messageBox.scrollTop = messageBox.scrollHeight;
