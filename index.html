@@ -47,6 +47,7 @@
             font-size: 14px;
             line-height: 1.4;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
         .user-message {
             background-color: #00529b;
@@ -91,6 +92,14 @@
             width: 16px;
             height: 16px;
             fill: white;
+        }
+        .speaking-icon {
+            position: absolute;
+            right: -20px;
+            top: 5px;
+            font-size: 16px;
+            color: #00529b;
+            display: none;
         }
     </style>
 </head>
@@ -180,6 +189,14 @@
             const message = document.createElement("div");
             message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
             message.textContent = text;
+
+            if (sender === "bot") {
+                const icon = document.createElement("span");
+                icon.classList.add("speaking-icon");
+                icon.textContent = "🗣️";
+                message.appendChild(icon);
+            }
+
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
@@ -187,9 +204,18 @@
         function speakText(text) {
             const synth = window.speechSynthesis;
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = "de-DE"; // Deutsche Sprache
-            utterance.rate = 1; // Geschwindigkeit normal
-            utterance.pitch = 1; // Stimme auf normaler Tonhöhe
+            utterance.lang = "de-DE";
+            utterance.rate = 1;
+            utterance.pitch = 1;
+
+            // Lautsprecher-Icon anzeigen
+            const lastBotMessage = document.querySelector(".bot-message:last-child .speaking-icon");
+            if (lastBotMessage) lastBotMessage.style.display = "inline";
+
+            utterance.onend = () => {
+                if (lastBotMessage) lastBotMessage.style.display = "none";
+            };
+
             synth.speak(utterance);
         }
     </script>
