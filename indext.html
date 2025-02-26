@@ -3,162 +3,203 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
+    <title>Live Chat</title>
     <style>
-        body {
+        * {
             font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f0f8ff;
-            margin: 0;
+            box-sizing: border-box;
         }
+
+        /* Chat-Container */
         .chat-container {
-            width: 400px;
-            max-width: 100%;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 320px;
             background: white;
-            border-radius: 15px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            border: 1px solid #ddd;
         }
+
+        /* Header */
         .chat-header {
-            background: #007bff;
+            background: #1e3a8a;
             color: white;
-            padding: 15px;
-            text-align: center;
-            font-weight: bold;
-        }
-        .chat-box {
-            height: 400px;
-            overflow-y: auto;
-            padding: 15px;
-            display: flex;
-            flex-direction: column;
-            background-color: #e3f2fd;
-        }
-        .message {
             padding: 12px;
-            border-radius: 18px;
-            margin-bottom: 10px;
-            max-width: 75%;
-            font-size: 14px;
-            line-height: 1.4;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .user-message {
-            background-color: #007bff;
-            color: white;
-            align-self: flex-end;
-        }
-        .bot-message {
-            background-color: white;
-            color: black;
-            align-self: flex-start;
-        }
-        .input-container {
+            font-weight: bold;
             display: flex;
-            border-top: 1px solid #ddd;
-            padding: 10px;
-            background: white;
-        }
-        .input-container input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-radius: 20px;
-            outline: none;
-            background-color: #f4f4f4;
-        }
-        .input-container button {
-            padding: 10px 15px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            margin-left: 10px;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
         }
-        .input-container button:hover {
-            background: #0056b3;
+
+        .chat-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
         }
-        .send-icon {
-            width: 16px;
-            height: 16px;
-            fill: white;
+
+        /* Eingabeformular */
+        .chat-body {
+            padding: 15px;
+        }
+
+        .chat-body label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .chat-body input {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .chat-body button {
+            width: 100%;
+            background: #1e3a8a;
+            color: white;
+            padding: 10px;
+            border: none;
+            margin-top: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        /* Chatbox */
+        .chat-box {
+            display: none;
+            height: 250px;
+            overflow-y: auto;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            background: #f9f9f9;
+        }
+
+        .chat-input {
+            display: none;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            display: flex;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .chat-input button {
+            background: #1e3a8a;
+            color: white;
+            border: none;
+            padding: 8px;
+            margin-left: 5px;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">💬 Dein persönlicher Assistent</div>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="Schreibe eine Nachricht...">
-            <button onclick="sendMessage()">
-                <svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3.4 20.6L21 12 3.4 3.4 3 10l12 2-12 2z"/>
-                </svg>
-            </button>
-        </div>
+
+<div class="chat-container">
+    <div class="chat-header">
+        Live Chat
+        <button onclick="toggleChat()">−</button>
     </div>
+    <div class="chat-body" id="chat-form">
+        <p><strong>Bitte sag uns, wer du bist.</strong></p>
+        <label>Name</label>
+        <input type="text" id="userName" placeholder="Wie heißt du?">
+        <label>Email Adresse</label>
+        <input type="email" id="userEmail" placeholder="Was ist deine E-Mail?">
+        <button onclick="startChat()">CHATTE MIT UNS!</button>
+    </div>
+    <div class="chat-box" id="chat-box">
+        <div id="messages"></div>
+    </div>
+    <div class="chat-input" id="chat-input">
+        <input type="text" id="userMessage" placeholder="Schreibe eine Nachricht...">
+        <button onclick="sendMessage()">➤</button>
+    </div>
+</div>
 
-    <script>
-        let userName = "";
+<script>
+    const webhookURL = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
 
-        document.addEventListener("DOMContentLoaded", function() {
+    function toggleChat() {
+        let chat = document.querySelector('.chat-container');
+        chat.classList.toggle('chat-hidden');
+    }
+
+    function startChat() {
+        let name = document.getElementById('userName').value;
+        let email = document.getElementById('userEmail').value;
+
+        if (name && email) {
+            document.getElementById('chat-form').style.display = 'none';
+            document.getElementById('chat-box').style.display = 'block';
+            document.getElementById('chat-input').style.display = 'flex';
+
+            addMessage("👋 Hallo " + name + "! Wie kann ich dir helfen?");
+
+            // Sende Nutzerdaten an Webhook
+            fetch(webhookURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: "start_chat",
+                    name: name,
+                    email: email
+                })
+            });
+        } else {
+            alert("Bitte fülle beide Felder aus.");
+        }
+    }
+
+    function sendMessage() {
+        let message = document.getElementById('userMessage').value;
+        if (message.trim() !== "") {
+            addMessage("🧑‍💻 Du: " + message);
+            document.getElementById('userMessage').value = "";
+
+            // Nachricht an Webhook senden
+            fetch(webhookURL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    type: "message",
+                    message: message
+                })
+            });
+
+            // Simulierte Antwort vom Bot
             setTimeout(() => {
-                addMessage("bot", "Hallo! Wie möchtest du angesprochen werden?");
-            }, 500);
-        });
-
-        async function sendMessage() {
-            const userInput = document.getElementById("userInput").value;
-            const chatBox = document.getElementById("chatBox");
-            if (!userInput) return;
-            
-            addMessage("user", userInput);
-            document.getElementById("userInput").value = "";
-            
-            if (!userName) {
-                userName = userInput;
-                addMessage("bot", `Schön dich kennenzulernen, ${userName}! Wie kann ich dir helfen?`);
-                return;
-            }
-            
-            try {
-                const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-                const response = await fetch(webhookUrl + 
-    "?name=" + encodeURIComponent(userName) + 
-    "&message=" + encodeURIComponent(userInput) + 
-    "&status=ok"
-);
-
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                addMessage("bot", data.response || "Keine Antwort erhalten.");
-            } catch (error) {
-                console.error("Fehler:", error);
-            }
+                addMessage("🤖 Bot: Ich habe deine Nachricht erhalten!");
+            }, 1000);
         }
+    }
 
-        function addMessage(sender, text) {
-            const chatBox = document.getElementById("chatBox");
-            const message = document.createElement("div");
-            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-            message.textContent = text;
-            chatBox.appendChild(message);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
+    function addMessage(text) {
+        let messageBox = document.getElementById('messages');
+        let messageElement = document.createElement('p');
+        messageElement.innerHTML = text;
+        messageBox.appendChild(messageElement);
+        messageBox.scrollTop = messageBox.scrollHeight;
+    }
+</script>
+
 </body>
 </html>
