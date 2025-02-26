@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
+    <title>Chatbot mit Make.com</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -96,7 +96,7 @@
 </head>
 <body>
     <div class="chat-container">
-        <div class="chat-header">💬 Dein persönlicher Assistent</div>
+        <div class="chat-header">💬 Dein Chatbot</div>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
             <input type="text" id="userInput" placeholder="Schreibe eine Nachricht...">
@@ -109,40 +109,37 @@
     </div>
 
     <script>
-        let userName = "";
-
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                addMessage("bot", "Hallo! Wie möchtest du angesprochen werden?");
-            }, 500);
-        });
-
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value;
-            const chatBox = document.getElementById("chatBox");
             if (!userInput) return;
-            
+
             addMessage("user", userInput);
             document.getElementById("userInput").value = "";
-            
-            if (!userName) {
-                userName = userInput;
-                addMessage("bot", `Schön dich kennenzulernen, ${userName}! Wie kann ich dir helfen?`);
-                return;
-            }
-            
+
             try {
                 const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-                const response = await fetch(webhookUrl + "?name=" + encodeURIComponent(userName) + "&message=" + encodeURIComponent(userInput));
-                
+                const response = await fetch(webhookUrl + 
+                    "?message=" + encodeURIComponent(userInput) + 
+                    "&status=ok"
+                );
+
                 if (!response.ok) {
                     throw new Error(`HTTP-Fehler! Status: ${response.status}`);
                 }
-                
-                const data = await response.json();
-                addMessage("bot", data.response || "Keine Antwort erhalten.");
+
+                const text = await response.text();
+                console.log("Antwort von Make:", text);
+
+                try {
+                    const data = JSON.parse(text);
+                    addMessage("bot", data.response || "Keine Antwort erhalten.");
+                } catch (jsonError) {
+                    addMessage("bot", text || "Fehler beim Verarbeiten der Antwort.");
+                }
+
             } catch (error) {
                 console.error("Fehler:", error);
+                addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
             }
         }
 
