@@ -63,28 +63,6 @@
             color: #333;
             align-self: flex-start;
         }
-        .prompt-message {
-            background-color: #f1f1f1;
-            color: #333;
-            align-self: flex-start;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .prompt-button {
-            padding: 8px 12px;
-            background: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: background 0.3s ease;
-            text-align: left;
-        }
-        .prompt-button:hover {
-            background: #00529b;
-        }
         .input-container {
             display: flex;
             border-top: 1px solid #ddd;
@@ -96,7 +74,6 @@
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 25px;
-            outline: none;
             background-color: #f9f9f9;
             font-size: 14px;
         }
@@ -111,22 +88,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.3s ease;
-        }
-        .input-container button:hover {
-            background: #00529b;
-        }
-        .send-icon {
-            width: 18px;
-            height: 18px;
-            fill: white;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message {
-            animation: fadeIn 0.3s ease;
         }
     </style>
 </head>
@@ -136,56 +97,13 @@
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
             <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">
-                <svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M3.4 20.6L21 12 3.4 3.4 3 10l12 2-12 2z"/>
-                </svg>
-            </button>
+            <button onclick="sendMessage()">Senden</button>
         </div>
     </div>
 
     <script>
-        let userName = "";
-
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
-                addMessage("bot", welcomeMessage);
-            }, 500);
-        });
-
         function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        }
-
-        function usePrompt(promptText) {
-            document.getElementById("userInput").value = promptText;
-            sendMessage();
-        }
-
-        function showPrompts() {
-            const prompts = [
-                "Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.",
-                "Welche Bedeutung hat die Prüfungsordnung?",
-                "Welche Voraussetzungen gelten für die Zulassung zur Prüfung?"
-            ];
-
-            const promptMessage = document.createElement("div");
-            promptMessage.classList.add("message", "prompt-message");
-
-            prompts.forEach(prompt => {
-                const button = document.createElement("button");
-                button.classList.add("prompt-button");
-                button.textContent = prompt;
-                button.onclick = () => usePrompt(prompt);
-                promptMessage.appendChild(button);
-            });
-
-            const chatBox = document.getElementById("chatBox");
-            chatBox.appendChild(promptMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            if (event.key === "Enter") sendMessage();
         }
 
         async function sendMessage() {
@@ -195,43 +113,20 @@
             addMessage("user", userInput);
             document.getElementById("userInput").value = "";
 
-            if (!userName) {
-                userName = userInput;
-                let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
-                setTimeout(() => {
-                    addMessage("bot", greeting);
-                    showPrompts(); // Zeige die Prompts nach der Begrüßung an
-                }, 500);
-                return;
-            }
-
             try {
-                const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-                const response = await fetch(webhookUrl + 
-                    "?name=" + encodeURIComponent(userName) + 
-                    "&message=" + encodeURIComponent(userInput) + 
-                    "&status=ok"
-                );
+                const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ query: userInput })
+                });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                }
-
-                const text = await response.text();
-                console.log("Antwort von Make:", text);
-
-                try {
-                    const data = JSON.parse(text);
-                    let botResponse = data.response || "Keine Antwort erhalten.";
-                    addMessage("bot", botResponse);
-                } catch (jsonError) {
-                    addMessage("bot", text || "Fehler beim Verarbeiten der Antwort.");
-                }
-
+                if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
+                const result = await response.text();
+                addMessage("bot", result || "Keine Antwort erhalten.");
             } catch (error) {
                 console.error("Fehler:", error);
-                let errorMessage = "Es gab ein Problem bei der Kommunikation mit dem Server.";
-                addMessage("bot", errorMessage);
+                addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
             }
         }
 
