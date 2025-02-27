@@ -1,42 +1,248 @@
-async function sendToWebhook(data) {
-    try {
-        console.log("📨 Sende Daten an Webhook:", data);
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dein persönlicher Assistent - AI-Lösungen gemeinsam testen</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            background: linear-gradient(135deg, #0078d7, #00bcf2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #333;
+        }
+        .chat-container {
+            width: 450px;
+            max-width: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        .chat-header {
+            background: linear-gradient(135deg, #00529b, #0078d7);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 18px;
+            margin-bottom: 12px;
+            max-width: 75%;
+            font-size: 14px;
+            line-height: 1.4;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .user-message {
+            background-color: #0078d7;
+            color: white;
+            align-self: flex-end;
+        }
+        .bot-message {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-start;
+        }
+        .prompt-message {
+            background-color: #f1f1f1;
+            color: #333;
+            align-self: flex-start;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .prompt-button {
+            padding: 8px 12px;
+            background: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: background 0.3s ease;
+            text-align: left;
+        }
+        .prompt-button:hover {
+            background: #00529b;
+        }
+        .input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+            padding: 15px;
+            background: white;
+        }
+        .input-container input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            outline: none;
+            background-color: #f9f9f9;
+            font-size: 14px;
+        }
+        .input-container button {
+            padding: 12px;
+            background: #0078d7;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-left: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease;
+        }
+        .input-container button:hover {
+            background: #00529b;
+        }
+        .send-icon {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message {
+            animation: fadeIn 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <div class="chat-header">💬 Dein persönlicher Assistent</div>
+        <div class="chat-box" id="chatBox"></div>
+        <div class="input-container">
+            <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
+            <button onclick="sendMessage()">
+                <svg class="send-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.4 20.6L21 12 3.4 3.4 3 10l12 2-12 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
 
-        const response = await fetch(webhookURL, {
-            method: "POST",
-            headers: {
-                "Accept": "application/json, text/plain",
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
+    <script>
+        let userName = "";
+
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
+                addMessage("bot", welcomeMessage);
+            }, 500);
         });
 
-        if (!response.ok) {
-            console.error(`❌ Fehler beim Webhook: ${response.status} ${response.statusText}`);
-            addMessage("⚠️ Fehler: Keine gültige Antwort vom Server.");
-            return;
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
         }
 
-        let responseText = await response.text();
-        console.log("✅ Rohantwort vom Webhook:", responseText);
-
-        // Prüfen, ob die Antwort JSON ist oder nur Text
-        let responseData;
-        try {
-            responseData = JSON.parse(responseText);
-        } catch (error) {
-            console.warn("⚠️ Webhook-Antwort ist kein JSON, wird als Text behandelt.");
-            responseData = { reply: responseText }; // Wandelt die Antwort in eine nutzbare Form um
+        function usePrompt(promptText) {
+            document.getElementById("userInput").value = promptText;
+            sendMessage();
         }
 
-        if (responseData.reply) {
-            addMessage("🤖 Bot: " + responseData.reply);
-        } else {
-            addMessage("🤖 Bot: Antwort nicht erkannt.");
+        function showPrompts() {
+            const prompts = [
+                "Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.",
+                "Welche Bedeutung hat die Prüfungsordnung?",
+                "Welche Voraussetzungen gelten für die Zulassung zur Prüfung?"
+            ];
+
+            const promptMessage = document.createElement("div");
+            promptMessage.classList.add("message", "prompt-message");
+
+            prompts.forEach(prompt => {
+                const button = document.createElement("button");
+                button.classList.add("prompt-button");
+                button.textContent = prompt;
+                button.onclick = () => usePrompt(prompt);
+                promptMessage.appendChild(button);
+            });
+
+            const chatBox = document.getElementById("chatBox");
+            chatBox.appendChild(promptMessage);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-    } catch (error) {
-        console.error("❌ Fehler beim Senden an Webhook:", error);
-        addMessage("⚠️ Netzwerkfehler! Bitte versuche es später erneut.");
-    }
-}
+        async function sendMessage() {
+            const userInput = document.getElementById("userInput").value.trim();
+            if (!userInput) return;
+
+            addMessage("user", userInput);
+            document.getElementById("userInput").value = "";
+
+            if (!userName) {
+                userName = userInput;
+                let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
+                setTimeout(() => {
+                    addMessage("bot", greeting);
+                    showPrompts(); // Zeige die Prompts nach der Begrüßung an
+                }, 500);
+                return;
+            }
+
+            try {
+                const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
+                const response = await fetch(webhookUrl + 
+                    "?name=" + encodeURIComponent(userName) + 
+                    "&message=" + encodeURIComponent(userInput) + 
+                    "&status=ok"
+                );
+
+                if (!response.ok) {
+                    throw new Error(`HTTP-Fehler! Status: ${response.status}`);
+                }
+
+                const text = await response.text();
+                console.log("Antwort von Make:", text);
+
+                try {
+                    const data = JSON.parse(text);
+                    let botResponse = data.response || "Keine Antwort erhalten.";
+                    addMessage("bot", botResponse);
+                } catch (jsonError) {
+                    addMessage("bot", text || "Fehler beim Verarbeiten der Antwort.");
+                }
+
+            } catch (error) {
+                console.error("Fehler:", error);
+                let errorMessage = "Es gab ein Problem bei der Kommunikation mit dem Server.";
+                addMessage("bot", errorMessage);
+            }
+        }
+
+        function addMessage(sender, text) {
+            const chatBox = document.getElementById("chatBox");
+            const message = document.createElement("div");
+            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+            message.textContent = text;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
+</body>
+</html>
