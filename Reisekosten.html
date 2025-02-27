@@ -5,61 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reisekostenabrechnung</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            max-width: 600px;
-            background-color: #f4f4f4;
-        }
-        form {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        label {
-            font-weight: bold;
-            margin-top: 10px;
-            display: block;
-        }
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            background-color: #28a745;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: auto; background-color: #f4f4f4; padding: 20px; }
+        form { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        label { font-weight: bold; display: block; margin-top: 10px; }
+        input, select, button { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; }
+        button { background-color: #28a745; color: white; font-size: 16px; cursor: pointer; }
+        button:hover { background-color: #218838; }
     </style>
 </head>
 <body>
     <h2>Reisekostenabrechnung</h2>
-    <form action="/upload" method="post" enctype="multipart/form-data">
+    <form id="reisekostenForm">
         <label for="name">Name:</label>
         <input type="text" id="name" name="name" required>
-        
+
         <label for="datum">Reisedatum:</label>
         <input type="date" id="datum" name="datum" required>
-        
+
         <label for="zweck">Reisezweck:</label>
         <input type="text" id="zweck" name="zweck" required>
-        
+
         <label for="strecke">Gefahrene Kilometer:</label>
         <input type="number" id="strecke" name="strecke" min="0" required>
-        
+
         <label for="beleg">Beleg hochladen:</label>
         <input type="file" id="beleg" name="beleg" accept="image/*,application/pdf">
-        
+
         <button type="submit">Absenden</button>
     </form>
+
+    <script>
+        document.getElementById("reisekostenForm").addEventListener("submit", async function(event) {
+            event.preventDefault(); // Verhindert das Neuladen der Seite
+
+            let formData = new FormData(this);
+            let json = {};
+            formData.forEach((value, key) => { json[key] = value; });
+
+            let response = await fetch("https://hook.us2.make.com/li6favexqr1bdhv154nydx9ybyz7kpio", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(json)
+            });
+
+            if (response.ok) {
+                alert("Reisekosten wurden erfolgreich gesendet!");
+            } else {
+                alert("Fehler beim Senden der Daten.");
+            }
+        });
+    </script>
 </body>
 </html>
