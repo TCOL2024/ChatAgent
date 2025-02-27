@@ -7,7 +7,7 @@
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin: 0;a
+            margin: 0;
             padding: 0;
             height: 100vh;
             background: linear-gradient(135deg, #0078d7, #00bcf2);
@@ -69,13 +69,16 @@
             padding: 15px;
             background: white;
         }
-        .input-container input {
+        .input-container textarea {
             flex: 1;
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 25px;
+            border-radius: 12px;
             background-color: #f9f9f9;
             font-size: 14px;
+            resize: none;
+            height: 50px;
+            overflow-y: auto;
         }
         .input-container button {
             padding: 12px;
@@ -96,7 +99,7 @@
         <div class="chat-header">💬 Dein persönlicher Assistent</div>
         <div class="chat-box" id="chatBox"></div>
         <div class="input-container">
-            <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
+            <textarea id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)"></textarea>
             <button onclick="sendMessage()">Senden</button>
         </div>
     </div>
@@ -114,7 +117,10 @@
         });
 
         function handleKeyPress(event) {
-            if (event.key === "Enter") sendMessage();
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
 
         async function sendMessage() {
@@ -144,18 +150,8 @@
                 });
 
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-                let botMessage = "";
-                let botMessageElement = addMessage("bot", "...");
-
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const textChunk = decoder.decode(value, { stream: true });
-                    botMessage += textChunk;
-                    botMessageElement.textContent = botMessage;
-                }
+                const result = await response.json();
+                addMessage("bot", result.response || "Keine Antwort erhalten.");
             } catch (error) {
                 console.error("Fehler:", error);
                 addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
@@ -169,7 +165,6 @@
             message.textContent = text;
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
-            return message;
         }
     </script>
 </body>
