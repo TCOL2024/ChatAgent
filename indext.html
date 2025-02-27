@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent v2205</title>
+    <title>Dein persönlicher Assistent v2213</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -137,12 +137,17 @@
 
             try {
                 const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 60000);
+
                 const response = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ query: userInput })
+                    body: JSON.stringify({ query: userInput }),
+                    signal: controller.signal
                 });
 
+                clearTimeout(timeoutId);
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
                 const result = await response.json();
                 addMessage("bot", result.response || "Keine Antwort erhalten.");
