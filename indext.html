@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent v22151</title>
+    <title>Dein persönlicher Assistent v2205</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -89,38 +89,6 @@
             align-items: center;
             justify-content: center;
         }
-        .feedback-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        .feedback-buttons button {
-            background: none;
-            border: none;
-            cursor: pointer;
-            font-size: 24px;
-        }
-        .feedback-text {
-            display: none;
-            margin-top: 10px;
-        }
-        .feedback-text textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 12px;
-            font-size: 14px;
-        }
-        .feedback-text button {
-            margin-top: 10px;
-            padding: 8px 16px;
-            background: #0078d7;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -169,21 +137,25 @@
 
             try {
                 const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 60000);
-
                 const response = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ query: userInput }),
-                    signal: controller.signal
+                    body: JSON.stringify({ query: userInput })
                 });
 
-                clearTimeout(timeoutId);
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const result = await response.json();
-                addMessage("bot", result.response || "Keine Antwort erhalten.");
-                addFeedbackButtons();
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let botMessage = "";
+                let botMessageElement = addMessage("bot", "...");
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    const textChunk = decoder.decode(value, { stream: true });
+                    botMessage += textChunk;
+                    botMessageElement.textContent = botMessage;
+                }
             } catch (error) {
                 console.error("Fehler:", error);
                 addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
@@ -197,59 +169,7 @@
             message.textContent = text;
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function addFeedbackButtons() {
-            const chatBox = document.getElementById("chatBox");
-            const feedbackButtons = document.createElement("div");
-            feedbackButtons.classList.add("feedback-buttons");
-
-            const thumbsUp = document.createElement("button");
-            thumbsUp.textContent = "👍";
-            thumbsUp.onclick = () => sendFeedback("positive");
-
-            const thumbsDown = document.createElement("button");
-            thumbsDown.textContent = "👎";
-            thumbsDown.onclick = () => showFeedbackText();
-
-            feedbackButtons.appendChild(thumbsUp);
-            feedbackButtons.appendChild(thumbsDown);
-            chatBox.appendChild(feedbackButtons);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        function showFeedbackText() {
-            const chatBox = document.getElementById("chatBox");
-            const feedbackText = document.createElement("div");
-            feedbackText.classList.add("feedback-text");
-
-            const textarea = document.createElement("textarea");
-            textarea.placeholder = "Bitte beschreibe, was wir verbessern können...";
-
-            const submitButton = document.createElement("button");
-            submitButton.textContent = "Feedback senden";
-            submitButton.onclick = () => sendFeedback("negative", textarea.value);
-
-            feedbackText.appendChild(textarea);
-            feedbackText.appendChild(submitButton);
-            chatBox.appendChild(feedbackText);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-
-        async function sendFeedback(type, text = "") {
-            const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
-            await fetch(webhookUrl, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ feedback: type, feedbackText: text })
-            });
-
-            const chatBox = document.getElementById("chatBox");
-            const feedbackMessage = document.createElement("div");
-            feedbackMessage.classList.add("message", "bot-message");
-            feedbackMessage.textContent = "Vielen Dank für dein Feedback!";
-            chatBox.appendChild(feedbackMessage);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            return message;
         }
     </script>
 </body>
