@@ -102,21 +102,6 @@
     </div>
 
     <script>
-        let userName = "";
-        let askedForName = false;
-
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst und künstliche Intelligenz im Alltag nutzen möchtest. Darf ich Dich mit Vornamen ansprechen?";
-                addMessage("bot", welcomeMessage);
-                askedForName = true;
-            }, 500);
-        });
-
-        function handleKeyPress(event) {
-            if (event.key === "Enter") sendMessage();
-        }
-
         async function sendMessage() {
             const userInput = document.getElementById("userInput").value.trim();
             if (!userInput) return;
@@ -124,42 +109,38 @@
             addMessage("user", userInput);
             document.getElementById("userInput").value = "";
 
-            if (askedForName && !userName) {
-                if (userInput.toLowerCase() === "nein") {
-                    addMessage("bot", "Wie kann ich behilflich sein?");
-                } else {
-                    userName = userInput;
-                    addMessage("bot", `Vielen Dank, ${userName}, dass ich Dich persönlich ansprechen darf. Wie kann ich Dir weiterhelfen? Formuliere Deine Anfrage so exakt wie möglich.`);
-                }
-                askedForName = false;
-                return;
-            }
-
             try {
-                const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
-                const response = await fetch(webhookUrl, {
+                const response = await fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ query: userInput })
                 });
 
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const text = await response.text();
-                console.log("Antwort von Make:", text);
 
-                let botResponse;
-                try {
-                    const data = JSON.parse(text);
-                    botResponse = data.response || "Keine Antwort erhalten.";
-                } catch (jsonError) {
-                    botResponse = text;
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder("utf-8");
+                let botMessage = "";
+                addMessage("bot", "");
+                let botMessageElement = document.querySelector(".bot-message:last-child");
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+
+                    const textChunk = decoder.decode(value, { stream: true });
+                    botMessage += textChunk;
+                    botMessageElement.textContent = botMessage;
                 }
 
-                addMessage("bot", botResponse);
             } catch (error) {
                 console.error("Fehler:", error);
                 addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
             }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") sendMessage();
         }
 
         function addMessage(sender, text) {
