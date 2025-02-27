@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent - AI-Lösungen gemeinsam testen</title>
+    <title>Dein persönlicher Assistent</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -107,7 +107,7 @@
 
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
-                let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst und künstliche Intelligenz im Alltag nutzen möchtest. Frage? Darf ich Dich mit Vornamen ansprechen?";
+                let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst und künstliche Intelligenz im Alltag nutzen möchtest. Darf ich Dich mit Vornamen ansprechen?";
                 addMessage("bot", welcomeMessage);
                 askedForName = true;
             }, 500);
@@ -144,10 +144,18 @@
                 });
 
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const result = await response.json();
-                console.log("Antwort von Make:", result);
+                const text = await response.text();
+                console.log("Antwort von Make:", text);
 
-                addMessage("bot", result.response || "Keine Antwort erhalten.");
+                let botResponse;
+                try {
+                    const data = JSON.parse(text);
+                    botResponse = data.response || "Keine Antwort erhalten.";
+                } catch (jsonError) {
+                    botResponse = text;
+                }
+
+                addMessage("bot", botResponse);
             } catch (error) {
                 console.error("Fehler:", error);
                 addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
