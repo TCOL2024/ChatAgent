@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent v01032025_1</title>
+    <title>Dein persönlicher Assistent v01032025_2</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -106,6 +106,7 @@
         let userId = generateUserId(); // Zufällige User-ID
         let askedForName = false;
         let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
 
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
@@ -139,7 +140,6 @@
             }
 
             try {
-                const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
                 const response = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -147,16 +147,29 @@
                         user_id: userId,
                         name: userName || "Unbekannt",
                         question: userInput,
-                        last_answer: lastBotAnswer // Vorherige Antwort für Kontext
+                        last_answer: lastBotAnswer
                     })
                 });
 
-                if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const jsonResponse = await response.json();
+                const textResponse = await response.text();
+                console.log("📩 Serverantwort:", textResponse);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
+                }
+
+                let jsonResponse;
+                try {
+                    jsonResponse = JSON.parse(textResponse);
+                } catch (jsonError) {
+                    throw new Error("Fehler beim Parsen der JSON-Antwort. Server sendete: " + textResponse);
+                }
 
                 if (jsonResponse.answer) {
-                    lastBotAnswer = jsonResponse.answer; // Speichert Antwort für Kontext
+                    lastBotAnswer = jsonResponse.answer;
                     addMessage("bot", jsonResponse.answer);
+                } else {
+                    addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
                 }
 
                 if (jsonResponse.follow_up_question) {
@@ -164,8 +177,8 @@
                 }
 
             } catch (error) {
-                console.error("Fehler:", error);
-                addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
+                console.error("❌ Fehler:", error);
+                addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
             }
         }
 
@@ -176,11 +189,10 @@
             message.textContent = text;
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
-            return message;
         }
 
         function generateUserId() {
-            return "user-" + Math.random().toString(36).substr(2, 9); // Zufällige ID generieren
+            return "user-" + Math.random().toString(36).substr(2, 9);
         }
     </script>
 </body>
