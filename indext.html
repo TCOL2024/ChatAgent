@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent v23001</title>
+    <title>Dein persönlicher Assistent v01032025_1</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            margin: 0;a
+            margin: 0;
             padding: 0;
             height: 100vh;
             background: linear-gradient(135deg, #0078d7, #00bcf2);
@@ -103,11 +103,13 @@
 
     <script>
         let userName = "";
+        let userId = generateUserId(); // Zufällige User-ID
         let askedForName = false;
+        let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
 
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
-                let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst und künstliche Intelligenz im Alltag nutzen möchtest. Darf ich Dich mit Vornamen ansprechen?";
+                let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
                 addMessage("bot", welcomeMessage);
                 askedForName = true;
             }, 500);
@@ -124,12 +126,13 @@
             addMessage("user", userInput);
             document.getElementById("userInput").value = "";
 
+            // Falls Name noch nicht erfasst wurde
             if (askedForName && !userName) {
                 if (userInput.toLowerCase() === "nein") {
                     addMessage("bot", "Wie kann ich behilflich sein?");
                 } else {
                     userName = userInput;
-                    addMessage("bot", `Vielen Dank, ${userName}, dass ich Dich persönlich ansprechen darf. Wie kann ich Dir weiterhelfen? Formuliere Deine Anfrage so exakt wie möglich.`);
+                    addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
                 }
                 askedForName = false;
                 return;
@@ -140,22 +143,26 @@
                 const response = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ query: userInput })
+                    body: JSON.stringify({
+                        user_id: userId,
+                        name: userName || "Unbekannt",
+                        question: userInput,
+                        last_answer: lastBotAnswer // Vorherige Antwort für Kontext
+                    })
                 });
 
                 if (!response.ok) throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-                const reader = response.body.getReader();
-                const decoder = new TextDecoder("utf-8");
-                let botMessage = "";
-                let botMessageElement = addMessage("bot", "...");
+                const jsonResponse = await response.json();
 
-                while (true) {
-                    const { done, value } = await reader.read();
-                    if (done) break;
-                    const textChunk = decoder.decode(value, { stream: true });
-                    botMessage += textChunk;
-                    botMessageElement.textContent = botMessage;
+                if (jsonResponse.answer) {
+                    lastBotAnswer = jsonResponse.answer; // Speichert Antwort für Kontext
+                    addMessage("bot", jsonResponse.answer);
                 }
+
+                if (jsonResponse.follow_up_question) {
+                    addMessage("bot", jsonResponse.follow_up_question);
+                }
+
             } catch (error) {
                 console.error("Fehler:", error);
                 addMessage("bot", "Es gab ein Problem bei der Kommunikation mit dem Server.");
@@ -170,6 +177,10 @@
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
             return message;
+        }
+
+        function generateUserId() {
+            return "user-" + Math.random().toString(36).substr(2, 9); // Zufällige ID generieren
         }
     </script>
 </body>
