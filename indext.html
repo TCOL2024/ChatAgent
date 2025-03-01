@@ -139,7 +139,8 @@
                 return;
             }
 
-            try {
+            <script>
+    try {
         const response = await fetch(webhookUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -159,11 +160,18 @@
         }
 
         let jsonResponse;
-        try {
-            jsonResponse = JSON.parse(textResponse);
-        } catch (jsonError) {
-            console.warn("⚠️ JSON-Fehler:", jsonError);
-            jsonResponse = { answer: textResponse }; // Nutzt den Text als Antwort, falls JSON fehlschlägt
+
+        // **Prüfung: Ist die Antwort ein gültiges JSON?**
+        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
+            try {
+                jsonResponse = JSON.parse(textResponse);
+            } catch (jsonError) {
+                console.warn("⚠️ Fehler beim Parsen der JSON-Antwort. Fallback auf Text.");
+                jsonResponse = { answer: textResponse }; // **Fallback auf Text**
+            }
+        } else {
+            console.warn("⚠️ Serverantwort ist kein JSON. Nutze Text direkt.");
+            jsonResponse = { answer: textResponse }; // **Verwendet Text als Antwort**
         }
 
         if (jsonResponse.answer) {
