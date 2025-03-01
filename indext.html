@@ -140,60 +140,47 @@
             }
 
             try {
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        name: userName || "Unbekannt",
-                        question: userInput,
-                        last_answer: lastBotAnswer
-                    })
-                });
+        const response = await fetch(webhookUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                user_id: userId,
+                name: userName || "Unbekannt",
+                question: userInput,
+                last_answer: lastBotAnswer
+            })
+        });
 
-                const textResponse = await response.text();
-                console.log("📩 Serverantwort:", textResponse);
+        const textResponse = await response.text();
+        console.log("📩 Serverantwort (raw):", textResponse);
 
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
-                }
-
-                let jsonResponse;
-                try {
-                    jsonResponse = JSON.parse(textResponse);
-                } catch (jsonError) {
-                    throw new Error("Fehler beim Parsen der JSON-Antwort. Server sendete: " + textResponse);
-                }
-
-                if (jsonResponse.answer) {
-                    lastBotAnswer = jsonResponse.answer;
-                    addMessage("bot", jsonResponse.answer);
-                } else {
-                    addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
-                }
-
-                if (jsonResponse.follow_up_question) {
-                    addMessage("bot", jsonResponse.follow_up_question);
-                }
-
-            } catch (error) {
-                console.error("❌ Fehler:", error);
-                addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
-            }
+        if (!response.ok) {
+            throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
         }
 
-        function addMessage(sender, text) {
-            const chatBox = document.getElementById("chatBox");
-            const message = document.createElement("div");
-            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-            message.textContent = text;
-            chatBox.appendChild(message);
-            chatBox.scrollTop = chatBox.scrollHeight;
+        let jsonResponse;
+        try {
+            jsonResponse = JSON.parse(textResponse);
+        } catch (jsonError) {
+            console.warn("⚠️ JSON-Fehler:", jsonError);
+            jsonResponse = { answer: textResponse }; // Nutzt den Text als Antwort, falls JSON fehlschlägt
         }
 
-        function generateUserId() {
-            return "user-" + Math.random().toString(36).substr(2, 9);
+        if (jsonResponse.answer) {
+            lastBotAnswer = jsonResponse.answer;
+            addMessage("bot", jsonResponse.answer);
+        } else {
+            addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
         }
-    </script>
+
+        if (jsonResponse.follow_up_question) {
+            addMessage("bot", jsonResponse.follow_up_question);
+        }
+
+    } catch (error) {
+        console.error("❌ Fehler:", error);
+        addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
+    }
+</script>
 </body>
 </html>
