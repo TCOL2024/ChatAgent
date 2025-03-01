@@ -181,7 +181,8 @@
             addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
         }
 
-        if (jsonResponse.follow_up_question) {
+        if (jsonResponse.follow_up_question) 
+{
             addMessage("bot", jsonResponse.follow_up_question);
         }
 
