@@ -120,46 +120,25 @@
             }, 500);
         });
 
-         function handleKeyPress(event) {
+    function handleKeyPress(event) {
         if (event.key === "Enter") sendMessage();
     }
 
-        async function sendMessage() {
-            const userInput = document.getElementById("userInput").value.trim();
-            if (!userInput) return;
+    function sendMessage() {
+        console.log("✅ sendMessage wurde aufgerufen!");
+    }
 
-            addMessage("user", userInput);
-            document.getElementById("userInput").value = "";
+    function addMessage(sender, text) {
+        const chatBox = document.getElementById("chatBox");
+        const message = document.createElement("div");
+        message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+        message.textContent = text;
+        chatBox.appendChild(message);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
-            // Falls Name noch nicht erfasst wurde
-            if (askedForName && !userName) {
-                if (userInput.toLowerCase() === "nein") {
-                    addMessage("bot", "Wie kann ich behilflich sein?");
-                } else {
-                    userName = userInput;
-                    addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
-                }
-                askedForName = false;
-                return;
-            }
+    console.log("🚀 JavaScript erfolgreich geladen!");
 
-            try {
-                const response = await fetch(webhookUrl, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        user_id: userId,
-                        name: userName || "Unbekannt",
-                        question: userInput,
-                        last_answer: lastBotAnswer
-                    })
-                });
-
-                const textResponse = await response.text();
-                console.log("📩 Serverantwort (raw):", textResponse);
-
-                if (!response.ok) {
-                    throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
                 }
 
                 let jsonResponse;
@@ -202,7 +181,4 @@
             chatBox.appendChild(message);
             chatBox.scrollTop = chatBox.scrollHeight;
         }
-    <script>
-    console.log("Script geladen!");
-</script>
 </body>
