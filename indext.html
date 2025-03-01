@@ -108,6 +108,10 @@
         let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
         const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
 
+        function generateUserId() {
+            return "user-" + Math.random().toString(36).substr(2, 9);
+        }
+
         document.addEventListener("DOMContentLoaded", function() {
             setTimeout(() => {
                 let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
@@ -139,57 +143,65 @@
                 return;
             }
 
-            <script>
-    try {
-        const response = await fetch(webhookUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                user_id: userId,
-                name: userName || "Unbekannt",
-                question: userInput,
-                last_answer: lastBotAnswer
-            })
-        });
-
-        const textResponse = await response.text();
-        console.log("📩 Serverantwort (raw):", textResponse);
-
-        if (!response.ok) {
-            throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
-        }
-
-        let jsonResponse;
-
-        // **Prüfung: Ist die Antwort ein gültiges JSON?**
-        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
             try {
-                jsonResponse = JSON.parse(textResponse);
-            } catch (jsonError) {
-                console.warn("⚠️ Fehler beim Parsen der JSON-Antwort. Fallback auf Text.");
-                jsonResponse = { answer: textResponse }; // **Fallback auf Text**
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        name: userName || "Unbekannt",
+                        question: userInput,
+                        last_answer: lastBotAnswer
+                    })
+                });
+
+                const textResponse = await response.text();
+                console.log("📩 Serverantwort (raw):", textResponse);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
+                }
+
+                let jsonResponse;
+
+                // Prüfen, ob die Antwort JSON ist
+                if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
+                    try {
+                        jsonResponse = JSON.parse(textResponse);
+                    } catch (jsonError) {
+                        console.warn("⚠️ Fehler beim Parsen der JSON-Antwort. Fallback auf Text.");
+                        jsonResponse = { answer: textResponse };
+                    }
+                } else {
+                    console.warn("⚠️ Serverantwort ist kein JSON. Nutze Text direkt.");
+                    jsonResponse = { answer: textResponse };
+                }
+
+                if (jsonResponse.answer) {
+                    lastBotAnswer = jsonResponse.answer;
+                    addMessage("bot", jsonResponse.answer);
+                } else {
+                    addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
+                }
+
+                if (jsonResponse.follow_up_question) {
+                    addMessage("bot", jsonResponse.follow_up_question);
+                }
+
+            } catch (error) {
+                console.error("❌ Fehler:", error);
+                addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
             }
-        } else {
-            console.warn("⚠️ Serverantwort ist kein JSON. Nutze Text direkt.");
-            jsonResponse = { answer: textResponse }; // **Verwendet Text als Antwort**
         }
 
-        if (jsonResponse.answer) {
-            lastBotAnswer = jsonResponse.answer;
-            addMessage("bot", jsonResponse.answer);
-        } else {
-            addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
+        function addMessage(sender, text) {
+            const chatBox = document.getElementById("chatBox");
+            const message = document.createElement("div");
+            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+            message.textContent = text;
+            chatBox.appendChild(message);
+            chatBox.scrollTop = chatBox.scrollHeight;
         }
-
-        if (jsonResponse.follow_up_question) 
-{
-            addMessage("bot", jsonResponse.follow_up_question);
-        }
-
-    } catch (error) {
-        console.error("❌ Fehler:", error);
-        addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
-    }
-</script>
+    </script>
 </body>
 </html>
