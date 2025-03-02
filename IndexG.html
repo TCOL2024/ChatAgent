@@ -8,7 +8,7 @@
         body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
         input, button { margin-top: 10px; padding: 10px; }
         #chat { max-width: 600px; margin: auto; text-align: left; }
-        .message { padding: 8px; margin: 5px; border-radius: 5px; }
+        .message { padding: 8px; margin: 5px; border-radius: 5px; word-wrap: break-word; white-space: pre-wrap; }
         .user { background-color: #d1e7dd; text-align: right; }
         .bot { background-color: #f8d7da; text-align: left; }
         .error { background-color: #f8d7da; color: red; }
@@ -16,7 +16,7 @@
 </head>
 <body>
     <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-    <p>Stelle mir nun Deine Frage - ich freue mich Dir helfen zu können.</p>
+    <p>Stelle mir nun Deine Frage - ich freue mich Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich.</p>
     
     <div id="chat"></div>
     
@@ -40,11 +40,6 @@
                     
                     // Markdown-Formatierung in HTML umwandeln
                     let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
-                    
-                    // Antwort auf max. 300 Zeichen kürzen
-                    if (formattedResponse.length > 300) {
-                        formattedResponse = formattedResponse.substring(0, 300) + "...";
-                    }
                     
                     chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
                 })
