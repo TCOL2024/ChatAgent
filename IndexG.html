@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Chat Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        input, button { margin-top: 10px; padding: 10px; }
+        #chat { max-width: 600px; margin: auto; text-align: left; }
+        .message { padding: 8px; margin: 5px; border-radius: 5px; }
+        .user { background-color: #d1e7dd; text-align: right; }
+        .bot { background-color: #f8d7da; text-align: left; }
+    </style>
+</head>
+<body>
+    <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
+    <p>Stelle mir nun Deine Frage.</p>
+    
+    <div id="chat"></div>
+    
+    <input type="text" id="question" placeholder="Deine Frage hier...">
+    <button onclick="sendQuestion()">Senden</button>
+    
+    <script>
+        let lastResponse = "";  // Speichert die letzte Antwort
+
+        function sendQuestion() {
+            let question = document.getElementById("question").value;
+            if (!question) return;
+            
+            let chat = document.getElementById("chat");
+            chat.innerHTML += `<div class='message user'>${question}</div>`;
+            
+            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(question)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+                .then(response => response.text())
+                .then(data => {
+                    lastResponse = data; // Speichere die Antwort für die nächste Anfrage
+                    chat.innerHTML += `<div class='message bot'>${data}</div>`;
+                })
+                .catch(error => {
+                    chat.innerHTML += `<div class='message bot'>Fehler: ${error}</div>`;
+                });
+            
+            document.getElementById("question").value = "";
+        }
+    </script>
+</body>
+</html>
