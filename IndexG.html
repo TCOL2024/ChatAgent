@@ -5,29 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KI Chat Interface</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
-        input, button { margin-top: 10px; padding: 10px; }
-        #chat { max-width: 600px; margin: auto; text-align: left; }
-        .message { padding: 8px; margin: 5px; border-radius: 5px; word-wrap: break-word; white-space: pre-wrap; }
-        .user { background-color: #d1e7dd; text-align: right; }
-        .bot { background-color: #f8d7da; text-align: left; }
-        .error { background-color: #f8d7da; color: red; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f7f9;
+        }
+        #chat-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #0057B8;
+            outline: none;
+        }
+        input {
+            width: 70%;
+            padding-left: 10px;
+        }
+        button {
+            background-color: #0057B8;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003E75;
+        }
+        #chat {
+            max-width: 800px;
+            margin: auto;
+            text-align: left;
+        }
+        .message {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        .user {
+            background-color: #D4E6F1;
+            text-align: right;
+        }
+        .bot {
+            background-color: #E8F0FE;
+            text-align: left;
+        }
+        .error {
+            background-color: #F8D7DA;
+            color: red;
+        }
     </style>
 </head>
 <body>
-    <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-    <p>Stelle mir nun Deine Frage - ich freue mich Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich.</p>
-    
-    <div id="chat"></div>
-    
-    <input type="text" id="question" placeholder="Deine Frage hier...">
-    <button onclick="sendQuestion()">Senden</button>
+    <div id="chat-container">
+        <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
+        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich. Bist Du beispielsweise ein Wirtschaftsfachwirt, so schreibe: Ich bin ein Wirtschaftsfachwirt und bereite mich auf die Prüfung im Fach VWL vor, da möchte ich die Frage geklärt haben, wie sich das BIP vom BNE unterscheidet.</p>
+        
+        <div id="chat"></div>
+        
+        <input type="text" id="question" placeholder="Deine Frage hier...">
+        <button onclick="sendQuestion()">Senden</button>
+    </div>
     
     <script>
         let lastResponse = "";  // Speichert die letzte Antwort
+        let inputField = document.getElementById("question");
+        
+        inputField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendQuestion();
+            }
+        });
 
         function sendQuestion() {
-            let question = document.getElementById("question").value;
+            let question = inputField.value;
             if (!question) return;
             
             let chat = document.getElementById("chat");
@@ -47,7 +108,7 @@
                     chat.innerHTML += `<div class='message bot error'>Fehler: ${error}</div>`;
                 });
             
-            document.getElementById("question").value = "";
+            inputField.value = "";
         }
     </script>
 </body>
