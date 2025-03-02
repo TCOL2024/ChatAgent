@@ -68,16 +68,20 @@
 <body>
     <div id="chat-container">
         <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich. Bist Du beispielsweise ein Wirtschaftsfachwirt, so schreibe: Ich bin ein Wirtschaftsfachwirt und bereite mich auf die Prüfung im Fach VWL vor, da möchte ich die Frage geklärt haben, wie sich das BIP vom BNE unterscheidet.</p>
+        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich. Bist Du beispielsweise ein Wirtschaftsfachwirt, so schreibe: Ich bin ein Wirtschaftsfachwirt und bereite mich auf die Prüfung im Fach VWL vor, da möchte ich die Frage geklärt haben, wie sich das BIP vom BNE unterscheidet. Die Upload-Funktion wird noch nicht unterstützt.</p>
         
         <div id="chat"></div>
         
         <input type="text" id="question" placeholder="Deine Frage hier...">
         <button onclick="sendQuestion()">Senden</button>
+        
+        <br><br>
+        <input type="file" id="fileUpload">
+        <button onclick="uploadFile()">Datei hochladen</button>
     </div>
     
     <script>
-        let lastResponse = "";  // Speichert die letzte Antwort
+        let lastResponse = "";  
         let inputField = document.getElementById("question");
         
         inputField.addEventListener("keypress", function(event) {
@@ -97,11 +101,8 @@
             fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(question)}&lastResponse=${encodeURIComponent(lastResponse)}`)
                 .then(response => response.text())
                 .then(data => {
-                    lastResponse = data; // Speichere die Antwort für die nächste Anfrage
-                    
-                    // Markdown-Formatierung in HTML umwandeln
+                    lastResponse = data;
                     let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
-                    
                     chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
                 })
                 .catch(error => {
@@ -109,6 +110,42 @@
                 });
             
             inputField.value = "";
+        }
+
+        function uploadFile() {
+            let fileInput = document.getElementById("fileUpload");
+            let file = fileInput.files[0];
+            
+            if (!file) {
+                alert("Bitte eine Datei auswählen.");
+                return;
+            }
+            
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let base64String = event.target.result.split(',')[1]; 
+
+                fetch("https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        filename: file.name,
+                        filedata: base64String
+                    })
+                })
+                .then(response => response.text())
+                .then(data => {
+                    let chat = document.getElementById("chat");
+                    chat.innerHTML += `<div class='message bot'>Datei hochgeladen: ${file.name}</div>`;
+                })
+                .catch(error => {
+                    let chat = document.getElementById("chat");
+                    chat.innerHTML += `<div class='message bot error'>Fehler beim Hochladen: ${error}</div>`;
+                });
+            };
+            reader.readAsDataURL(file);
         }
     </script>
 </body>
