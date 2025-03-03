@@ -67,24 +67,28 @@
             margin-top: 20px;
             text-align: left;
             display: none;
+            background-color: #0078D4;
+            padding: 10px;
+            border-radius: 8px;
         }
         .prompt-suggestions h3 {
-            color: #0057B8;
+            color: white;
         }
         .prompt-suggestions button {
             display: block;
             width: 100%;
             margin: 5px 0;
             text-align: left;
-            background-color: #0078D4;
+            background-color: white;
             border: none;
             padding: 10px;
             cursor: pointer;
             border-radius: 8px;
-            color: white;
+            color: #0078D4;
+            font-weight: bold;
         }
         .prompt-suggestions button:hover {
-            background-color: #005a9e;
+            background-color: #e1f0ff;
         }
     </style>
 </head>
@@ -142,13 +146,13 @@
             let prompts = generatePrompts(response);
             if (prompts.length > 0) {
                 promptContainer.innerHTML = "<h3>Weitere Fragen:</h3>";
+                promptContainer.style.display = "block";
                 prompts.forEach(prompt => {
                     let button = document.createElement("button");
                     button.innerText = prompt;
                     button.onclick = function() { sendQuestion(prompt); };
                     promptContainer.appendChild(button);
                 });
-                promptContainer.style.display = "block";
             }
         }
         
