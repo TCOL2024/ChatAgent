@@ -63,22 +63,45 @@
             background-color: #F8D7DA;
             color: red;
         }
+        .prompt-suggestions {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .prompt-suggestions button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            text-align: left;
+            background-color: #f1f1f1;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .prompt-suggestions button:hover {
+            background-color: #d0d0d0;
+        }
     </style>
 </head>
 <body>
     <div id="chat-container">
         <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können. Präzisiere Deine Anfrage so genau wie möglich. Bist Du beispielsweise ein Wirtschaftsfachwirt, so schreibe: Ich bin ein Wirtschaftsfachwirt und bereite mich auf die Prüfung im Fach VWL vor, da möchte ich die Frage geklärt haben, wie sich das BIP vom BNE unterscheidet.</p>
+        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können.</p>
         
         <div id="chat"></div>
         
         <input type="text" id="question" placeholder="Deine Frage hier...">
         <button onclick="sendQuestion()">Senden</button>
+        
+        <div class="prompt-suggestions" id="prompt-suggestions">
+            <h3>Vorschläge:</h3>
+        </div>
     </div>
     
     <script>
         let lastResponse = "";  
         let inputField = document.getElementById("question");
+        let promptContainer = document.getElementById("prompt-suggestions");
         
         inputField.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
@@ -87,25 +110,63 @@
             }
         });
 
-        function sendQuestion() {
-            let question = inputField.value;
-            if (!question) return;
+        function sendQuestion(question = null) {
+            let inputQuestion = question || inputField.value;
+            if (!inputQuestion) return;
             
             let chat = document.getElementById("chat");
-            chat.innerHTML += `<div class='message user'>${question}</div>`;
+            chat.innerHTML += `<div class='message user'>${inputQuestion}</div>`;
             
-            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(question)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(inputQuestion)}&lastResponse=${encodeURIComponent(lastResponse)}`)
                 .then(response => response.text())
                 .then(data => {
                     lastResponse = data;
                     let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
                     chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
+                    
+                    updatePromptSuggestions(inputQuestion);
                 })
                 .catch(error => {
                     chat.innerHTML += `<div class='message bot error'>Fehler: ${error}</div>`;
                 });
             
             inputField.value = "";
+        }
+        
+        function updatePromptSuggestions(question) {
+            let prompts = generatePrompts(question);
+            promptContainer.innerHTML = "<h3>Vorschläge:</h3>";
+            prompts.forEach(prompt => {
+                let button = document.createElement("button");
+                button.innerText = prompt;
+                button.onclick = function() { sendQuestion(prompt); };
+                promptContainer.appendChild(button);
+            });
+        }
+        
+        function generatePrompts(question) {
+            if (question.toLowerCase().includes("bip")) {
+                return [
+                    "Wie wird das BIP berechnet?",
+                    "Welche Faktoren beeinflussen das BIP?",
+                    "Unterschied zwischen nominalem und realem BIP?"
+                ];
+            }
+            if (question.toLowerCase().includes("steuer")) {
+                return [
+                    "Welche Steuerarten gibt es in Deutschland?",
+                    "Wie funktioniert die Einkommenssteuer?",
+                    "Welche Steuervergünstigungen gibt es für Selbstständige?"
+                ];
+            }
+            if (question.toLowerCase().includes("künstliche intelligenz")) {
+                return [
+                    "Was sind die Anwendungsbereiche von KI?",
+                    "Welche ethischen Herausforderungen gibt es bei KI?",
+                    "Wie wird KI im Gesundheitswesen eingesetzt?"
+                ];
+            }
+            return ["Kannst Du meine Frage präzisieren?", "Hast Du Beispiele für dieses Thema?", "Wie sieht die rechtliche Lage dazu aus?"];
         }
     </script>
 </body>
