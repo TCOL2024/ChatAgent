@@ -179,39 +179,95 @@
       addMessage("bot", data);
     }
 
+    /**
+     * Diese Funktion wandelt den Text in HTML um:
+     * - Teilt in Haupttext und Quellen (anhand "\n\nQuellen:\n")
+     * - Sucht Zeilen mit "* " für Aufzählungen
+     * - Wandelt *Text* in <em>Text</em>, **Text** in <strong>Text</strong>
+     * - Erzeugt Fußnoten für angegebene Quellen.
+     */
     function formatMessage(text) {
-      // Trennung in Haupttext und Fußnoten anhand des Separators "\n\nQuellen:\n"
-      let parts = text.split("\n\nQuellen:\n");
-      let mainText = parts[0];
+      // Haupttext und Fußnoten trennen
+      const parts = text.split("\n\nQuellen:\n");
+      const mainText = parts[0];
+      const footnoteText = parts[1] ? parts[1] : "";
+
+      // Haupttext in Zeilen aufsplitten
+      const lines = mainText.split("\n");
+
       let html = "";
-      // Haupttext in Absätze aufteilen
-      let paragraphs = mainText.split("\n\n");
-      paragraphs.forEach(p => {
-        html += "<p>" + p + "</p>";
-      });
-      // Fußnoten formatieren, falls vorhanden
-      if (parts.length > 1) {
-        let footnotes = parts[1].split("\n");
-        html += "<hr><div class='footnotes'>";
-        footnotes.forEach(fn => {
-          if (fn.trim() !== "") {
-            html += "<p>" + fn + "</p>";
+      let inList = false;
+
+      for (let line of lines) {
+        let trimmedLine = line.trim();
+
+        // Markdown für Fett und Kursiv ersetzen (sehr rudimentär)
+        // **fett** => <strong>fett</strong>
+        // *kursiv* => <em>kursiv</em>
+        trimmedLine = trimmedLine
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+        // Falls die Zeile mit "* " beginnt, ist es ein Aufzählungspunkt
+        if (trimmedLine.startsWith("* ")) {
+          if (!inList) {
+            inList = true;
+            html += "<ul>";
           }
-        });
-        html += "</div>";
+          // Den Stern und das Leerzeichen entfernen
+          let bulletPoint = trimmedLine.substring(2);
+          html += `<li>${bulletPoint}</li>`;
+        } else {
+          // Wenn wir in einer Liste waren und jetzt eine andere Zeile kommt, Liste schließen
+          if (inList) {
+            inList = false;
+            html += "</ul>";
+          }
+          // Normale Zeilen als Absatz
+          if (trimmedLine !== "") {
+            html += `<p>${trimmedLine}</p>`;
+          } else {
+            // Leere Zeile => Zeilenumbruch
+            html += "<br>";
+          }
+        }
       }
+      // Falls noch eine Liste offen ist, schließen
+      if (inList) {
+        html += "</ul>";
+      }
+
+      // Fußnoten ausgeben, wenn vorhanden
+      if (footnoteText.trim()) {
+        let footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
+        if (footnotes.length > 0) {
+          html += "<hr><div class='footnotes'>";
+          footnotes.forEach((fn, index) => {
+            // Ausgabe: Quelle 1 (Dateiname)
+            html += `<p>Quelle ${index + 1} (${fn.trim()})</p>`;
+          });
+          html += "</div>";
+        }
+      }
+
       return html;
     }
 
+    /**
+     * Fügt eine neue Nachricht in die Chat-Box ein.
+     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt.
+     */
     function addMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
       const message = document.createElement("div");
       message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+
       if (sender === "bot") {
         message.innerHTML = formatMessage(text);
       } else {
         message.textContent = text;
       }
+
       chatBox.appendChild(message);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
