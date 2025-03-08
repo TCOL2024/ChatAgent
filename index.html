@@ -149,68 +149,58 @@
     }
 
     /**
-     * Versucht, relevante Inhalte von der angegebenen URL zu holen.
-     * Hinweis: Aufgrund von CORS kann dies fehlschlagen – dann wird ein Fallback genutzt.
+     * Analysiert den Antworttext und ermittelt, welche Themen angesprochen wurden.
+     * Basierend darauf werden dynamische, intelligente Prompt-Vorschläge generiert.
      */
-    async function fetchContent(url) {
-      try {
-        const response = await fetch(url);
-        const htmlText = await response.text();
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlText, "text/html");
-        // Versuche den Text des ersten <p> zu extrahieren.
-        const firstP = doc.querySelector("p");
-        return firstP ? firstP.textContent.trim() : "";
-      } catch (error) {
-        console.error("Fehler beim Abrufen von", url, error);
-        return "";
-      }
-    }
-
-    /**
-     * Generiert intelligente Prompt-Vorschläge basierend auf der Bot-Antwort und
-     * unter Einbeziehung von Inhalten der Zielseiten (BBiG und JARBSCHG).
-     */
-    async function generateIntelligentPrompts(responseText) {
-      let prompts = [];
+    function generateDynamicPrompts(responseText) {
+      let topics = [];
       const lowerResponse = responseText.toLowerCase();
 
-      // Wenn die Antwort Hinweise zu Jugendlichen oder Urlaub enthält, verwende JARBSCHG.
-      if (lowerResponse.includes("jugend") || lowerResponse.includes("jarbschg") || lowerResponse.includes("urlaub")) {
-        const jarbschgSnippet = await fetchContent("https://www.gesetze-im-internet.de/jarbschg/__15.html");
-        if (jarbschgSnippet) {
-          prompts.push("Basierend auf den Regelungen des JARBSCHG: \"" + jarbschgSnippet.substring(0, 150) + "...\" – welche weiteren Aspekte zu Arbeitszeiten für Jugendliche interessieren Sie?");
-        }
-      }
+      if (lowerResponse.includes("urlaub")) { topics.push("urlaub"); }
+      if (lowerResponse.includes("jugend") || lowerResponse.includes("minderjährig") || lowerResponse.includes("jarbschg")) { topics.push("jugend"); }
+      if (lowerResponse.includes("ausbildung")) { topics.push("ausbildung"); }
+      if (lowerResponse.includes("arbeitszeit") || lowerResponse.includes("stunden")) { topics.push("arbeitszeit"); }
+      if (lowerResponse.includes("vertrag")) { topics.push("vertrag"); }
+      if (lowerResponse.includes("eignung") || lowerResponse.includes("fähigkeit") || lowerResponse.includes("interesse")) { topics.push("eignung"); }
 
-      // Wenn die Antwort Hinweise auf Ausbildung enthält, verwende BBiG.
-      if (lowerResponse.includes("ausbildung") || lowerResponse.includes("bbig")) {
-        const bbigSnippet = await fetchContent("https://www.gesetze-im-internet.de/bbig_2005/");
-        if (bbigSnippet) {
-          prompts.push("Aus dem Berufsbildungsgesetz (BBiG): \"" + bbigSnippet.substring(0, 150) + "...\" – haben Sie weitere Fragen zu Ausbildungsvoraussetzungen?");
-        }
-      }
+      topics = [...new Set(topics)]; // Duplikate entfernen
 
-      // Fallback – wenn weniger als drei Vorschläge generiert wurden.
+      let prompts = [];
+      topics.forEach(topic => {
+        if (topic === "urlaub") {
+          prompts.push("Ihre Antwort erwähnt Urlaub. Haben Sie noch Fragen zu den gesetzlichen Urlaubsansprüchen oder zur Berechnung der Urlaubstage?");
+        } else if (topic === "jugend") {
+          prompts.push("Sie haben Aspekte zur Situation von Jugendlichen angesprochen. Möchten Sie mehr über Arbeitszeiten und Pausenregelungen erfahren?");
+        } else if (topic === "ausbildung") {
+          prompts.push("Ihre Antwort bezieht sich auf die Ausbildung. Welche Details zu den Ausbildungsvoraussetzungen oder -inhalten interessieren Sie noch?");
+        } else if (topic === "arbeitszeit") {
+          prompts.push("Sie erwähnten Arbeitszeiten. Gibt es spezifische Fragen zu Überstunden oder zur Dokumentation der Arbeitszeiten?");
+        } else if (topic === "vertrag") {
+          prompts.push("Bezüglich Ihres Vertrags: Haben Sie weitere Fragen zu den Inhalten oder zu Kündigungsmodalitäten?");
+        } else if (topic === "eignung") {
+          prompts.push("Sie sprechen von Eignung. Möchten Sie mehr über notwendige Fähigkeiten oder Testverfahren erfahren?");
+        }
+      });
+
+      // Falls weniger als drei Themen erkannt wurden, ergänzen wir mit generischen Fragen
       while (prompts.length < 3) {
-        prompts.push("Ich habe weitere Fragen zu Jugendlichen in der Ausbildung – insbesondere interessiert mich die Arbeitszeit.");
-        break; // Hier nur einmal hinzufügen, da der Fallback schon konkret ist.
+        prompts.push("Könnten Sie bitte genauer erläutern, welche Aspekte Sie noch interessieren?");
       }
 
       return prompts.slice(0, 3);
     }
 
     /**
-     * Aktualisiert die dynamischen Prompt-Vorschläge nach der Bot-Antwort.
+     * Aktualisiert die Anzeige der dynamischen Prompt-Vorschläge basierend auf der Bot-Antwort.
      */
-    async function updateDynamicPrompts(responseText) {
+    function updateDynamicPrompts(responseText) {
       // Entferne existierenden Prompt-Container, falls vorhanden.
       let existingContainer = document.getElementById("dynamicPromptContainer");
       if (existingContainer) {
         existingContainer.remove();
       }
 
-      const suggestions = await generateIntelligentPrompts(responseText);
+      const suggestions = generateDynamicPrompts(responseText);
       const chatBox = document.getElementById("chatBox");
       const container = document.createElement("div");
       container.classList.add("prompt-container");
@@ -234,12 +224,13 @@
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
+      // Namenseingabe: Wird beim ersten Mal genutzt
       if (!userName) {
         userName = userInput;
         let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          // Nach der Namenseingabe keine Prompt-Vorschläge anzeigen.
+          // Keine Prompt-Vorschläge direkt nach der Namenseingabe
         }, 500);
         return;
       }
@@ -248,7 +239,7 @@
       const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
       const data = await response.text();
       addMessage("bot", data);
-      // Nach der Bot-Antwort werden die dynamischen Prompt-Vorschläge aktualisiert.
+      // Dynamisch generierte Prompts basierend auf der Antwort anzeigen.
       updateDynamicPrompts(data);
     }
 
