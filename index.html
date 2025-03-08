@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dein persönlicher Assistent</title>
   <style>
     body {
@@ -66,6 +66,8 @@
       padding: 8px 14px;
       cursor: pointer;
       transition: all 0.3s ease;
+      margin-right: 6px;
+      margin-bottom: 6px;
     }
     .prompt-button:hover {
       background: #003DA5;
@@ -106,6 +108,20 @@
     .footnotes p {
       margin: 4px 0;
     }
+    /* Container für Prompt-Buttons */
+    .prompt-container {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .prompt-category {
+      margin: 0;
+      font-weight: bold;
+      font-size: 15px;
+      width: 100%;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -113,7 +129,7 @@
     <div class="chat-header">Willkommen im Chat</div>
     <div class="chat-box" id="chatBox"></div>
     <div class="input-container">
-      <input type="text" id="userInput" placeholder="Ihre Nachricht" onkeypress="handleKeyPress(event)">
+      <input type="text" id="userInput" placeholder="Ihre Nachricht" onkeypress="handleKeyPress(event)" />
       <button onclick="sendMessage()">Absenden</button>
     </div>
   </div>
@@ -121,7 +137,48 @@
   <script>
     let userName = "";
 
-    document.addEventListener("DOMContentLoaded", function() {
+    // Globale Definition der Prompt-Gruppen
+    const promptGroups = {
+      "Ausbildungsfragen": [
+        "Welche Voraussetzungen muss ich für eine Ausbildung in [Beruf] erfüllen?",
+        "Wie bewerbe ich mich für eine Ausbildungsstelle bei [Unternehmen]?",
+        "Welche Ausbildungsinhalte erwarten mich in der Ausbildung zum/zur [Beruf]?",
+        "Wie lange dauert die Ausbildung zum/zur [Beruf]?",
+        "Welche Weiterbildungsmöglichkeiten habe ich nach der Ausbildung?"
+      ],
+      "Eignung": [
+        "Welche Fähigkeiten und Interessen sollte ich für den Beruf [Beruf] mitbringen?",
+        "Wie finde ich heraus, ob ich für eine Ausbildung in [Beruf] geeignet bin?",
+        "Welche Tests oder Prüfungen muss ich bestehen, um meine Eignung nachzuweisen?",
+        "Gibt es spezielle Programme oder Kurse zur Vorbereitung auf die Ausbildung in [Beruf]?"
+      ],
+      "Jugendarbeitsschutzgesetz": [
+        "Welche Arbeitszeiten gelten für minderjährige Auszubildende?",
+        "Welche Pausenregelungen gibt es für Jugendliche in der Ausbildung?",
+        "Welche Tätigkeiten sind für minderjährige Auszubildende verboten?",
+        "Wie viele Urlaubstage stehen mir als minderjähriger Auszubildender zu?"
+      ],
+      "Arbeitszeit": [
+        "Wie viele Stunden darf ich als Auszubildender pro Woche arbeiten?",
+        "Welche Regelungen gibt es für Überstunden in der Ausbildung?",
+        "Wie werden meine Arbeitszeiten dokumentiert?",
+        "Was passiert, wenn ich meine Arbeitszeit überschreite?"
+      ],
+      "Urlaub": [
+        "Wie viele Urlaubstage stehen mir während meiner Ausbildung zu?",
+        "Wie beantrage ich Urlaub in meiner Ausbildung?",
+        "Kann ich meinen Urlaub während der Berufsschulzeit nehmen?",
+        "Was passiert mit meinem Resturlaub, wenn ich die Ausbildung beende?"
+      ],
+      "Vertrag": [
+        "Welche Inhalte muss mein Ausbildungsvertrag enthalten?",
+        "Kann ich meinen Ausbildungsvertrag vorzeitig kündigen?",
+        "Was passiert, wenn mein Ausbildungsvertrag geändert werden muss?",
+        "Welche Rechte und Pflichten habe ich als Auszubildender laut Vertrag?"
+      ]
+    };
+
+    document.addEventListener("DOMContentLoaded", function () {
       setTimeout(() => {
         let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
         addMessage("bot", welcomeMessage);
@@ -139,21 +196,106 @@
       sendMessage();
     }
 
-    function showPrompts() {
-      const prompts = [
-        "Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.",
-        "Welche Bedeutung hat die Prüfungsordnung?",
-        "Welche Voraussetzungen gelten für die Zulassung zur Prüfung?"
-      ];
-      prompts.forEach(prompt => {
-        const button = document.createElement("button");
-        button.classList.add("prompt-button");
-        button.textContent = prompt;
-        button.onclick = () => usePrompt(prompt);
-        const chatBox = document.getElementById("chatBox");
-        chatBox.appendChild(button);
-        chatBox.scrollTop = chatBox.scrollHeight;
-      });
+    /**
+     * Zeigt statisch alle Prompt-Gruppen an.
+     * Wird initial nach Namenseingabe aufgerufen.
+     */
+    function showAllPrompts() {
+      // Entferne evtl. vorhandene dynamische Prompts
+      let existingContainer = document.getElementById("dynamicPromptContainer");
+      if (existingContainer) existingContainer.remove();
+
+      const chatBox = document.getElementById("chatBox");
+      const container = document.createElement("div");
+      container.classList.add("prompt-container");
+      container.id = "dynamicPromptContainer";
+
+      for (let category in promptGroups) {
+        const heading = document.createElement("p");
+        heading.classList.add("prompt-category");
+        heading.textContent = category;
+        container.appendChild(heading);
+
+        promptGroups[category].forEach(prompt => {
+          const button = document.createElement("button");
+          button.classList.add("prompt-button");
+          button.textContent = prompt;
+          button.onclick = () => usePrompt(prompt);
+          container.appendChild(button);
+        });
+      }
+
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    /**
+     * Analysiert den Bot-Antworttext und gibt die relevanten Prompt-Gruppen zurück.
+     */
+    function getRelevantPromptGroups(responseText) {
+      let relevant = {};
+      const textLower = responseText.toLowerCase();
+      
+      // Falls der Text keine spezifischen Keywords enthält, gebe ein leeres Objekt zurück.
+      // So kannst Du später entscheiden, ob alle Prompts angezeigt werden sollen.
+      if (textLower.includes("ausbildung")) {
+        relevant["Ausbildungsfragen"] = promptGroups["Ausbildungsfragen"];
+      }
+      if (textLower.includes("eignung") || textLower.includes("fähigkeit") || textLower.includes("interesse") || textLower.includes("test") || textLower.includes("prüfung")) {
+        relevant["Eignung"] = promptGroups["Eignung"];
+      }
+      if (textLower.includes("jugendarbeitsschutzgesetz") || textLower.includes("minderjährig") || textLower.includes("jugend")) {
+        relevant["Jugendarbeitsschutzgesetz"] = promptGroups["Jugendarbeitsschutzgesetz"];
+      }
+      if (textLower.includes("arbeitszeit") || textLower.includes("stunden") || textLower.includes("überstunden")) {
+        relevant["Arbeitszeit"] = promptGroups["Arbeitszeit"];
+      }
+      if (textLower.includes("urlaub")) {
+        relevant["Urlaub"] = promptGroups["Urlaub"];
+      }
+      if (textLower.includes("vertrag") || textLower.includes("kündigen") || textLower.includes("inhalt")) {
+        relevant["Vertrag"] = promptGroups["Vertrag"];
+      }
+      return relevant;
+    }
+
+    /**
+     * Aktualisiert die Anzeige der Prompt-Vorschläge dynamisch, basierend auf der Bot-Antwort.
+     */
+    function updateDynamicPrompts(responseText) {
+      // Entferne existierende Prompt-Container, falls vorhanden
+      let existingContainer = document.getElementById("dynamicPromptContainer");
+      if (existingContainer) {
+        existingContainer.remove();
+      }
+
+      let relevantPromptGroups = getRelevantPromptGroups(responseText);
+      // Falls keine relevante Gruppe gefunden wurde, zeige alle Prompts an
+      if (Object.keys(relevantPromptGroups).length === 0) {
+        relevantPromptGroups = promptGroups;
+      }
+
+      const chatBox = document.getElementById("chatBox");
+      const container = document.createElement("div");
+      container.classList.add("prompt-container");
+      container.id = "dynamicPromptContainer";
+
+      for (let category in relevantPromptGroups) {
+        const heading = document.createElement("p");
+        heading.classList.add("prompt-category");
+        heading.textContent = category;
+        container.appendChild(heading);
+
+        relevantPromptGroups[category].forEach(prompt => {
+          const button = document.createElement("button");
+          button.classList.add("prompt-button");
+          button.textContent = prompt;
+          button.onclick = () => usePrompt(prompt);
+          container.appendChild(button);
+        });
+      }
+      chatBox.appendChild(container);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     async function sendMessage() {
@@ -165,10 +307,11 @@
 
       if (!userName) {
         userName = userInput;
-        let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
+        let greeting = `Hallo ${userName}, nun stelle mir Deine Frage oder wähle einen Prompt.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          showPrompts();
+          // Zeige initial alle Prompts an
+          showAllPrompts();
         }, 500);
         return;
       }
@@ -177,22 +320,19 @@
       const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
       const data = await response.text();
       addMessage("bot", data);
+      // Dynamische Aktualisierung der Prompts basierend auf der Antwort
+      updateDynamicPrompts(data);
     }
 
     /**
-     * Diese Funktion wandelt den Text in HTML um:
-     * - Teilt in Haupttext und Quellen (anhand "\n\nQuellen:\n")
-     * - Sucht Zeilen mit "* " für Aufzählungen
-     * - Wandelt *Text* in <em>Text</em>, **Text** in <strong>Text</strong>
-     * - Erzeugt Fußnoten für angegebene Quellen.
+     * Wandelt den Text in formatiertes HTML um.
+     * Teilt dabei den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
+     * Ersetzt einfache Markdown-Syntax (* und **) und wandelt Zeilen, die mit "* " beginnen, in Listen um.
      */
     function formatMessage(text) {
-      // Haupttext und Fußnoten trennen
       const parts = text.split("\n\nQuellen:\n");
       const mainText = parts[0];
       const footnoteText = parts[1] ? parts[1] : "";
-
-      // Haupttext in Zeilen aufsplitten
       const lines = mainText.split("\n");
 
       let html = "";
@@ -200,50 +340,39 @@
 
       for (let line of lines) {
         let trimmedLine = line.trim();
-
-        // Markdown für Fett und Kursiv ersetzen (sehr rudimentär)
-        // **fett** => <strong>fett</strong>
-        // *kursiv* => <em>kursiv</em>
+        // Ersetze Markdown für Fett und Kursiv
         trimmedLine = trimmedLine
           .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
           .replace(/\*(.*?)\*/g, "<em>$1</em>");
 
-        // Falls die Zeile mit "* " beginnt, ist es ein Aufzählungspunkt
         if (trimmedLine.startsWith("* ")) {
           if (!inList) {
             inList = true;
             html += "<ul>";
           }
-          // Den Stern und das Leerzeichen entfernen
           let bulletPoint = trimmedLine.substring(2);
           html += `<li>${bulletPoint}</li>`;
         } else {
-          // Wenn wir in einer Liste waren und jetzt eine andere Zeile kommt, Liste schließen
           if (inList) {
             inList = false;
             html += "</ul>";
           }
-          // Normale Zeilen als Absatz
           if (trimmedLine !== "") {
             html += `<p>${trimmedLine}</p>`;
           } else {
-            // Leere Zeile => Zeilenumbruch
             html += "<br>";
           }
         }
       }
-      // Falls noch eine Liste offen ist, schließen
       if (inList) {
         html += "</ul>";
       }
 
-      // Fußnoten ausgeben, wenn vorhanden
       if (footnoteText.trim()) {
         let footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
         if (footnotes.length > 0) {
           html += "<hr><div class='footnotes'>";
           footnotes.forEach((fn, index) => {
-            // Ausgabe: Quelle 1 (Dateiname)
             html += `<p>Quelle ${index + 1} (${fn.trim()})</p>`;
           });
           html += "</div>";
@@ -253,10 +382,6 @@
       return html;
     }
 
-    /**
-     * Fügt eine neue Nachricht in die Chat-Box ein.
-     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt.
-     */
     function addMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
       const message = document.createElement("div");
