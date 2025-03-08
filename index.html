@@ -197,47 +197,12 @@
     }
 
     /**
-     * Zeigt statisch alle Prompt-Gruppen an.
-     * Wird initial nach Namenseingabe aufgerufen.
-     */
-    function showAllPrompts() {
-      // Entferne evtl. vorhandene dynamische Prompts
-      let existingContainer = document.getElementById("dynamicPromptContainer");
-      if (existingContainer) existingContainer.remove();
-
-      const chatBox = document.getElementById("chatBox");
-      const container = document.createElement("div");
-      container.classList.add("prompt-container");
-      container.id = "dynamicPromptContainer";
-
-      for (let category in promptGroups) {
-        const heading = document.createElement("p");
-        heading.classList.add("prompt-category");
-        heading.textContent = category;
-        container.appendChild(heading);
-
-        promptGroups[category].forEach(prompt => {
-          const button = document.createElement("button");
-          button.classList.add("prompt-button");
-          button.textContent = prompt;
-          button.onclick = () => usePrompt(prompt);
-          container.appendChild(button);
-        });
-      }
-
-      chatBox.appendChild(container);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    /**
-     * Analysiert den Bot-Antworttext und gibt die relevanten Prompt-Gruppen zurück.
+     * Ermittelt, welche Prompt-Gruppen basierend auf Schlüsselwörtern in der Bot-Antwort relevant sind.
      */
     function getRelevantPromptGroups(responseText) {
       let relevant = {};
       const textLower = responseText.toLowerCase();
       
-      // Falls der Text keine spezifischen Keywords enthält, gebe ein leeres Objekt zurück.
-      // So kannst Du später entscheiden, ob alle Prompts angezeigt werden sollen.
       if (textLower.includes("ausbildung")) {
         relevant["Ausbildungsfragen"] = promptGroups["Ausbildungsfragen"];
       }
@@ -261,6 +226,7 @@
 
     /**
      * Aktualisiert die Anzeige der Prompt-Vorschläge dynamisch, basierend auf der Bot-Antwort.
+     * Werden keine relevanten Kategorien gefunden, werden keine Prompts angezeigt.
      */
     function updateDynamicPrompts(responseText) {
       // Entferne existierende Prompt-Container, falls vorhanden
@@ -270,9 +236,9 @@
       }
 
       let relevantPromptGroups = getRelevantPromptGroups(responseText);
-      // Falls keine relevante Gruppe gefunden wurde, zeige alle Prompts an
+      // Nur anzeigen, wenn mindestens eine relevante Kategorie gefunden wurde
       if (Object.keys(relevantPromptGroups).length === 0) {
-        relevantPromptGroups = promptGroups;
+        return;
       }
 
       const chatBox = document.getElementById("chatBox");
@@ -305,13 +271,13 @@
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
+      // Namenseingabe
       if (!userName) {
         userName = userInput;
-        let greeting = `Hallo ${userName}, nun stelle mir Deine Frage oder wähle einen Prompt.`;
+        let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          // Zeige initial alle Prompts an
-          showAllPrompts();
+          // Keine Prompts direkt nach der Namenseingabe anzeigen.
         }, 500);
         return;
       }
@@ -320,7 +286,7 @@
       const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
       const data = await response.text();
       addMessage("bot", data);
-      // Dynamische Aktualisierung der Prompts basierend auf der Antwort
+      // Aktualisiere dynamisch die Prompts basierend auf der Antwort
       updateDynamicPrompts(data);
     }
 
@@ -340,7 +306,6 @@
 
       for (let line of lines) {
         let trimmedLine = line.trim();
-        // Ersetze Markdown für Fett und Kursiv
         trimmedLine = trimmedLine
           .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
           .replace(/\*(.*?)\*/g, "<em>$1</em>");
