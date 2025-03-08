@@ -1,48 +1,66 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dein persönlicher Assistent v01032025_22</title>
   <style>
+    /* Grundlayout */
     body {
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       margin: 0;
       padding: 0;
-      height: 100vh;
-      background: linear-gradient(135deg, #0078d7, #00bcf2);
-      display: flex;
-      justify-content: center;
-      align-items: center;
+      background-color: #f9f9f9;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       color: #333;
-    }
-    .chat-container {
-      width: 450px;
-      max-width: 100%;
-      background: rgba(255, 255, 255, 0.9);
-      border-radius: 12px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
       display: flex;
       flex-direction: column;
-      backdrop-filter: blur(10px);
+      height: 100vh;
     }
-    .chat-header {
-      background: linear-gradient(135deg, #00529b, #0078d7);
-      color: white;
+
+    /* Oberer Bereich (Überschrift) */
+    .main-header {
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
       padding: 20px;
       text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
-    .chat-box {
-      height: 400px;
-      overflow-y: auto;
+    .main-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    /* Einleitender Textbereich */
+    .intro-text {
+      background-color: #fff;
       padding: 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* Container für den gesamten Chatbereich */
+    .chat-wrapper {
+      flex: 1; /* damit dieser Bereich sich ausdehnt */
       display: flex;
       flex-direction: column;
-      background-color: rgba(255, 255, 255, 0.95);
+      max-width: 1000px;
+      margin: 0 auto; /* zentriert bei größeren Bildschirmen */
+      width: 100%;
+    }
+
+    /* Box für Nachrichtenverlauf */
+    .chat-box {
+      flex: 1;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
     }
     .message {
       padding: 12px 16px;
@@ -51,11 +69,12 @@
       max-width: 75%;
       font-size: 14px;
       line-height: 1.4;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      word-wrap: break-word;
     }
     .user-message {
       background-color: #0078d7;
-      color: white;
+      color: #fff;
       align-self: flex-end;
     }
     .bot-message {
@@ -63,41 +82,70 @@
       color: #333;
       align-self: flex-start;
     }
+
+    /* Eingabebereich unten */
     .input-container {
       display: flex;
+      padding: 20px;
+      background-color: #fff;
       border-top: 1px solid #ddd;
-      padding: 15px;
-      background: white;
     }
     .input-container input {
       flex: 1;
       padding: 12px;
       border: 1px solid #ddd;
-      border-radius: 25px;
-      background-color: #f9f9f9;
+      border-radius: 4px;
       font-size: 14px;
     }
     .input-container button {
-      padding: 12px;
-      background: #0078d7;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
       margin-left: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      padding: 0 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0078d7;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .input-container button:hover {
+      background-color: #005da4;
+    }
+
+    /* Responsives Verhalten (für kleinere Bildschirme) */
+    @media (max-width: 600px) {
+      .chat-box {
+        margin: 10px;
+        padding: 10px;
+      }
+      .input-container {
+        padding: 10px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="chat-container">
-    <div class="chat-header">💬 Dein persönlicher Assistent</div>
+  <!-- Oberer Titelbereich -->
+  <div class="main-header">
+    <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+  </div>
+
+  <!-- Einleitender Text -->
+  <div class="intro-text">
+    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
+    unterstütze ich Dich bei Fragen rund um das Personalamangement.<br>
+    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
+    Frage einfach unten ein oder nutzen Sie die Chat-Funktionen.
+  </div>
+
+  <!-- Haupt-Chatbereich -->
+  <div class="chat-wrapper">
     <div class="chat-box" id="chatBox"></div>
+
+    <!-- Eingabefeld + Button -->
     <div class="input-container">
-      <input type="text" id="userInput" placeholder="Schreibe eine Nachricht..." onkeypress="handleKeyPress(event)">
-      <button onclick="sendMessage()">Senden</button>
+      <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Absenden</button>
     </div>
   </div>
 
