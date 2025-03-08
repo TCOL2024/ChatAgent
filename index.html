@@ -108,19 +108,12 @@
     .footnotes p {
       margin: 4px 0;
     }
-    /* Container für Prompt-Buttons */
+    /* Container für dynamische Prompt-Vorschläge */
     .prompt-container {
       margin-top: 10px;
       display: flex;
       flex-wrap: wrap;
       gap: 6px;
-    }
-    .prompt-category {
-      margin: 0;
-      font-weight: bold;
-      font-size: 15px;
-      width: 100%;
-      margin-top: 10px;
     }
   </style>
 </head>
@@ -136,45 +129,38 @@
 
   <script>
     let userName = "";
-
-    // Globale Definition der Prompt-Gruppen
-    const promptGroups = {
-      "Ausbildungsfragen": [
-        "Welche Voraussetzungen muss ich für eine Ausbildung in [Beruf] erfüllen?",
-        "Wie bewerbe ich mich für eine Ausbildungsstelle bei [Unternehmen]?",
-        "Welche Ausbildungsinhalte erwarten mich in der Ausbildung zum/zur [Beruf]?",
-        "Wie lange dauert die Ausbildung zum/zur [Beruf]?",
-        "Welche Weiterbildungsmöglichkeiten habe ich nach der Ausbildung?"
+    
+    // Dynamische Prompt-Templates basierend auf Schlüsselwörtern (Themen)
+    const topicTemplates = {
+      "ausbildung": [
+        "Welche weiteren Details zur Ausbildung interessieren Sie?",
+        "Wie schätzen Sie die Bedeutung der Ausbildungsinhalte ein?",
+        "Haben Sie Fragen zu spezifischen Voraussetzungen der Ausbildung?"
       ],
-      "Eignung": [
-        "Welche Fähigkeiten und Interessen sollte ich für den Beruf [Beruf] mitbringen?",
-        "Wie finde ich heraus, ob ich für eine Ausbildung in [Beruf] geeignet bin?",
-        "Welche Tests oder Prüfungen muss ich bestehen, um meine Eignung nachzuweisen?",
-        "Gibt es spezielle Programme oder Kurse zur Vorbereitung auf die Ausbildung in [Beruf]?"
+      "eignung": [
+        "Welche Fähigkeiten halten Sie für besonders relevant?",
+        "Wie würden Sie Ihre Eignung im Kontext des Berufs bewerten?",
+        "Gibt es spezifische Tests, die Sie näher erläutert haben möchten?"
       ],
-      "Jugendarbeitsschutzgesetz": [
-        "Welche Arbeitszeiten gelten für minderjährige Auszubildende?",
-        "Welche Pausenregelungen gibt es für Jugendliche in der Ausbildung?",
-        "Welche Tätigkeiten sind für minderjährige Auszubildende verboten?",
-        "Wie viele Urlaubstage stehen mir als minderjähriger Auszubildender zu?"
+      "jugendarbeitsschutzgesetz": [
+        "Welche Aspekte des Jugendarbeitsschutzgesetzes bereiten Ihnen Sorgen?",
+        "Möchten Sie mehr über die gesetzlichen Regelungen für Auszubildende erfahren?",
+        "Wie wirken sich die Regelungen konkret in Ihrem Fall aus?"
       ],
-      "Arbeitszeit": [
-        "Wie viele Stunden darf ich als Auszubildender pro Woche arbeiten?",
-        "Welche Regelungen gibt es für Überstunden in der Ausbildung?",
-        "Wie werden meine Arbeitszeiten dokumentiert?",
-        "Was passiert, wenn ich meine Arbeitszeit überschreite?"
+      "arbeitszeit": [
+        "Wie wichtig sind für Sie spezifische Arbeitszeitregelungen?",
+        "Haben Sie Fragen zu Überstunden oder flexiblen Arbeitszeiten?",
+        "Welche Arbeitszeitmodelle interessieren Sie besonders?"
       ],
-      "Urlaub": [
-        "Wie viele Urlaubstage stehen mir während meiner Ausbildung zu?",
-        "Wie beantrage ich Urlaub in meiner Ausbildung?",
-        "Kann ich meinen Urlaub während der Berufsschulzeit nehmen?",
-        "Was passiert mit meinem Resturlaub, wenn ich die Ausbildung beende?"
+      "urlaub": [
+        "Möchten Sie erfahren, wie sich Ihre Urlaubstage konkret zusammensetzen?",
+        "Haben Sie Fragen zu gesetzlichen Urlaubsansprüchen?",
+        "Wie planen Sie Ihren Urlaub in der Ausbildung?"
       ],
-      "Vertrag": [
-        "Welche Inhalte muss mein Ausbildungsvertrag enthalten?",
-        "Kann ich meinen Ausbildungsvertrag vorzeitig kündigen?",
-        "Was passiert, wenn mein Ausbildungsvertrag geändert werden muss?",
-        "Welche Rechte und Pflichten habe ich als Auszubildender laut Vertrag?"
+      "vertrag": [
+        "Welche Vertragsinhalte sind für Sie noch unklar?",
+        "Möchten Sie mehr über Rechte und Pflichten im Ausbildungsvertrag wissen?",
+        "Wie bewerten Sie die Flexibilität Ihres Vertrags?"
       ]
     };
 
@@ -197,69 +183,54 @@
     }
 
     /**
-     * Ermittelt, welche Prompt-Gruppen basierend auf Schlüsselwörtern in der Bot-Antwort relevant sind.
+     * Generiert dynamische Prompt-Vorschläge basierend auf dem Antworttext.
+     * Prüft auf Schlüsselwörter und gibt drei passende Vorschläge zurück.
      */
-    function getRelevantPromptGroups(responseText) {
-      let relevant = {};
-      const textLower = responseText.toLowerCase();
-      
-      if (textLower.includes("ausbildung")) {
-        relevant["Ausbildungsfragen"] = promptGroups["Ausbildungsfragen"];
+    function generateDynamicPrompts(responseText) {
+      let matchedSuggestions = [];
+      const lowerResponse = responseText.toLowerCase();
+      for (let topic in topicTemplates) {
+        if (lowerResponse.includes(topic)) {
+          matchedSuggestions = matchedSuggestions.concat(topicTemplates[topic]);
+        }
       }
-      if (textLower.includes("eignung") || textLower.includes("fähigkeit") || textLower.includes("interesse") || textLower.includes("test") || textLower.includes("prüfung")) {
-        relevant["Eignung"] = promptGroups["Eignung"];
+      if (matchedSuggestions.length >= 3) {
+        return matchedSuggestions.slice(0, 3);
+      } else if (matchedSuggestions.length > 0) {
+        return matchedSuggestions;
+      } else {
+        // Fallback: Generische Vorschläge, wenn kein Thema erkannt wurde.
+        return [
+          "Bitte geben Sie weitere Details zu Ihrem Anliegen an.",
+          "Könnten Sie das Problem genauer beschreiben?",
+          "Welche Aspekte möchten Sie weiter vertiefen?"
+        ];
       }
-      if (textLower.includes("jugendarbeitsschutzgesetz") || textLower.includes("minderjährig") || textLower.includes("jugend")) {
-        relevant["Jugendarbeitsschutzgesetz"] = promptGroups["Jugendarbeitsschutzgesetz"];
-      }
-      if (textLower.includes("arbeitszeit") || textLower.includes("stunden") || textLower.includes("überstunden")) {
-        relevant["Arbeitszeit"] = promptGroups["Arbeitszeit"];
-      }
-      if (textLower.includes("urlaub")) {
-        relevant["Urlaub"] = promptGroups["Urlaub"];
-      }
-      if (textLower.includes("vertrag") || textLower.includes("kündigen") || textLower.includes("inhalt")) {
-        relevant["Vertrag"] = promptGroups["Vertrag"];
-      }
-      return relevant;
     }
 
     /**
-     * Aktualisiert die Anzeige der Prompt-Vorschläge dynamisch, basierend auf der Bot-Antwort.
-     * Werden keine relevanten Kategorien gefunden, werden keine Prompts angezeigt.
+     * Aktualisiert die dynamischen Prompt-Vorschläge nach der Bot-Antwort.
+     * Es werden drei Vorschläge als Buttons angezeigt, die sich an intelligenten Prompt-Formulierungen orientieren.
      */
     function updateDynamicPrompts(responseText) {
-      // Entferne existierende Prompt-Container, falls vorhanden
+      // Entferne existierenden Prompt-Container, falls vorhanden.
       let existingContainer = document.getElementById("dynamicPromptContainer");
       if (existingContainer) {
         existingContainer.remove();
       }
-
-      let relevantPromptGroups = getRelevantPromptGroups(responseText);
-      // Nur anzeigen, wenn mindestens eine relevante Kategorie gefunden wurde
-      if (Object.keys(relevantPromptGroups).length === 0) {
-        return;
-      }
-
+      const suggestions = generateDynamicPrompts(responseText);
       const chatBox = document.getElementById("chatBox");
       const container = document.createElement("div");
       container.classList.add("prompt-container");
       container.id = "dynamicPromptContainer";
 
-      for (let category in relevantPromptGroups) {
-        const heading = document.createElement("p");
-        heading.classList.add("prompt-category");
-        heading.textContent = category;
-        container.appendChild(heading);
-
-        relevantPromptGroups[category].forEach(prompt => {
-          const button = document.createElement("button");
-          button.classList.add("prompt-button");
-          button.textContent = prompt;
-          button.onclick = () => usePrompt(prompt);
-          container.appendChild(button);
-        });
-      }
+      suggestions.forEach(suggestion => {
+        const button = document.createElement("button");
+        button.classList.add("prompt-button");
+        button.textContent = suggestion;
+        button.onclick = () => usePrompt(suggestion);
+        container.appendChild(button);
+      });
       chatBox.appendChild(container);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -271,13 +242,13 @@
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
-      // Namenseingabe
+      // Falls noch kein Benutzername vorhanden ist, wird dieser gesetzt.
       if (!userName) {
         userName = userInput;
         let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          // Keine Prompts direkt nach der Namenseingabe anzeigen.
+          // Nach der Namenseingabe werden keine Prompt-Vorschläge angezeigt.
         }, 500);
         return;
       }
@@ -286,13 +257,13 @@
       const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
       const data = await response.text();
       addMessage("bot", data);
-      // Aktualisiere dynamisch die Prompts basierend auf der Antwort
+      // Nach der Antwort werden drei dynamische Prompt-Vorschläge generiert.
       updateDynamicPrompts(data);
     }
 
     /**
      * Wandelt den Text in formatiertes HTML um.
-     * Teilt dabei den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
+     * Teilt den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
      * Ersetzt einfache Markdown-Syntax (* und **) und wandelt Zeilen, die mit "* " beginnen, in Listen um.
      */
     function formatMessage(text) {
