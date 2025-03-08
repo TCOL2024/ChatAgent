@@ -58,21 +58,6 @@
       background-color: #f0f2f5;
       color: #333;
     }
-    .prompt-button {
-      background: none;
-      border: 1px solid #003DA5;
-      color: #003DA5;
-      border-radius: 20px;
-      padding: 8px 14px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      margin-right: 6px;
-      margin-bottom: 6px;
-    }
-    .prompt-button:hover {
-      background: #003DA5;
-      color: #fff;
-    }
     .input-container {
       display: flex;
       border-top: 1px solid #ddd;
@@ -108,13 +93,6 @@
     .footnotes p {
       margin: 4px 0;
     }
-    /* Container für dynamische Prompt-Vorschläge */
-    .prompt-container {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
   </style>
 </head>
 <body>
@@ -143,109 +121,35 @@
       }
     }
 
-    function usePrompt(promptText) {
-      document.getElementById("userInput").value = promptText;
-      sendMessage();
-    }
-
-    /**
-     * Analysiert den Antworttext und ermittelt, welche Themen angesprochen wurden.
-     * Basierend darauf werden dynamische, intelligente Prompt-Vorschläge generiert.
-     */
-    function generateDynamicPrompts(responseText) {
-      let topics = [];
-      const lowerResponse = responseText.toLowerCase();
-
-      if (lowerResponse.includes("urlaub")) { topics.push("urlaub"); }
-      if (lowerResponse.includes("jugend") || lowerResponse.includes("minderjährig") || lowerResponse.includes("jarbschg")) { topics.push("jugend"); }
-      if (lowerResponse.includes("ausbildung")) { topics.push("ausbildung"); }
-      if (lowerResponse.includes("arbeitszeit") || lowerResponse.includes("stunden")) { topics.push("arbeitszeit"); }
-      if (lowerResponse.includes("vertrag")) { topics.push("vertrag"); }
-      if (lowerResponse.includes("eignung") || lowerResponse.includes("fähigkeit") || lowerResponse.includes("interesse")) { topics.push("eignung"); }
-
-      topics = [...new Set(topics)]; // Duplikate entfernen
-
-      let prompts = [];
-      topics.forEach(topic => {
-        if (topic === "urlaub") {
-          prompts.push("Ihre Antwort erwähnt Urlaub. Haben Sie noch Fragen zu den gesetzlichen Urlaubsansprüchen oder zur Berechnung der Urlaubstage?");
-        } else if (topic === "jugend") {
-          prompts.push("Sie haben Aspekte zur Situation von Jugendlichen angesprochen. Möchten Sie mehr über Arbeitszeiten und Pausenregelungen erfahren?");
-        } else if (topic === "ausbildung") {
-          prompts.push("Ihre Antwort bezieht sich auf die Ausbildung. Welche Details zu den Ausbildungsvoraussetzungen oder -inhalten interessieren Sie noch?");
-        } else if (topic === "arbeitszeit") {
-          prompts.push("Sie erwähnten Arbeitszeiten. Gibt es spezifische Fragen zu Überstunden oder zur Dokumentation der Arbeitszeiten?");
-        } else if (topic === "vertrag") {
-          prompts.push("Bezüglich Ihres Vertrags: Haben Sie weitere Fragen zu den Inhalten oder zu Kündigungsmodalitäten?");
-        } else if (topic === "eignung") {
-          prompts.push("Sie sprechen von Eignung. Möchten Sie mehr über notwendige Fähigkeiten oder Testverfahren erfahren?");
-        }
-      });
-
-      // Falls weniger als drei Themen erkannt wurden, ergänzen wir mit generischen Fragen
-      while (prompts.length < 3) {
-        prompts.push("Könnten Sie bitte genauer erläutern, welche Aspekte Sie noch interessieren?");
-      }
-
-      return prompts.slice(0, 3);
-    }
-
-    /**
-     * Aktualisiert die Anzeige der dynamischen Prompt-Vorschläge basierend auf der Bot-Antwort.
-     */
-    function updateDynamicPrompts(responseText) {
-      // Entferne existierenden Prompt-Container, falls vorhanden.
-      let existingContainer = document.getElementById("dynamicPromptContainer");
-      if (existingContainer) {
-        existingContainer.remove();
-      }
-
-      const suggestions = generateDynamicPrompts(responseText);
-      const chatBox = document.getElementById("chatBox");
-      const container = document.createElement("div");
-      container.classList.add("prompt-container");
-      container.id = "dynamicPromptContainer";
-
-      suggestions.forEach(suggestion => {
-        const button = document.createElement("button");
-        button.classList.add("prompt-button");
-        button.textContent = suggestion;
-        button.onclick = () => usePrompt(suggestion);
-        container.appendChild(button);
-      });
-      chatBox.appendChild(container);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    async function sendMessage() {
+    function sendMessage() {
       const userInput = document.getElementById("userInput").value.trim();
       if (!userInput) return;
 
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
-      // Namenseingabe: Wird beim ersten Mal genutzt
+      // Bei der ersten Eingabe wird der Name gesetzt.
       if (!userName) {
         userName = userInput;
         let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          // Keine Prompt-Vorschläge direkt nach der Namenseingabe
         }, 500);
         return;
       }
 
+      // Beispielhafter Webhook-Aufruf; passe die URL bei Bedarf an.
       const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-      const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
-      const data = await response.text();
-      addMessage("bot", data);
-      // Dynamisch generierte Prompts basierend auf der Antwort anzeigen.
-      updateDynamicPrompts(data);
+      fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`)
+        .then(response => response.text())
+        .then(data => {
+          addMessage("bot", data);
+        });
     }
 
     /**
      * Wandelt den Text in formatiertes HTML um.
-     * Teilt dabei den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
+     * Teilt den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
      * Ersetzt einfache Markdown-Syntax (* und **) und wandelt Zeilen, die mit "* " beginnen, in Listen um.
      */
     function formatMessage(text) {
@@ -296,17 +200,22 @@
           html += "</div>";
         }
       }
-
       return html;
     }
 
+    /**
+     * Fügt eine neue Nachricht in die Chat-Box ein.
+     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt und mit einer Abschlussfrage versehen.
+     */
     function addMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
       const message = document.createElement("div");
       message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
 
       if (sender === "bot") {
-        message.innerHTML = formatMessage(text);
+        // Füge die Standardabschlussfrage an.
+        message.innerHTML = formatMessage(text) +
+          `<p><em>Möchtest Du noch weitere Informationen, dann formuliere die Frage präzise oder stelle eine neue Frage.</em></p>`;
       } else {
         message.textContent = text;
       }
