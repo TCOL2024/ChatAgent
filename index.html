@@ -1,185 +1,220 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
-    <style>
-        body {
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .chat-container {
-            width: 800px;
-            max-width: 90%;
-            background: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        .chat-header {
-            font-size: 24px;
-            font-weight: bold;
-            padding: 20px;
-            border-bottom: 1px solid #ddd;
-            text-align: center;
-            background: #fff;
-        }
-        .chat-box {
-            padding: 20px;
-            height: 400px;
-            overflow-y: auto;
-            background-color: #fff;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .message {
-            padding: 12px;
-            border-radius: 8px;
-            max-width: 70%;
-            font-size: 14px;
-            line-height: 1.5;
-        }
-        .user-message {
-            align-self: flex-end;
-            background-color: #003DA5;
-            color: #fff;
-        }
-        .bot-message {
-            align-self: flex-start;
-            background-color: #f0f2f5;
-            color: #333;
-        }
-        .prompt-button {
-            background: none;
-            border: 1px solid #003DA5;
-            color: #003DA5;
-            border-radius: 20px;
-            padding: 8px 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .prompt-button:hover {
-            background: #003DA5;
-            color: #fff;
-        }
-        .input-container {
-            display: flex;
-            border-top: 1px solid #ddd;
-            padding: 12px;
-            background: #fff;
-        }
-        .input-container input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            outline: none;
-            font-size: 14px;
-        }
-        .input-container button {
-            padding: 12px 20px;
-            margin-left: 10px;
-            background: #003DA5;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .input-container button:hover {
-            background: #002b7a;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dein persönlicher Assistent</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .chat-container {
+      width: 800px;
+      max-width: 90%;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+    .chat-header {
+      font-size: 24px;
+      font-weight: bold;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      background: #fff;
+    }
+    .chat-box {
+      padding: 20px;
+      height: 400px;
+      overflow-y: auto;
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .message {
+      padding: 12px;
+      border-radius: 8px;
+      max-width: 70%;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .user-message {
+      align-self: flex-end;
+      background-color: #003DA5;
+      color: #fff;
+    }
+    .bot-message {
+      align-self: flex-start;
+      background-color: #f0f2f5;
+      color: #333;
+    }
+    .prompt-button {
+      background: none;
+      border: 1px solid #003DA5;
+      color: #003DA5;
+      border-radius: 20px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .prompt-button:hover {
+      background: #003DA5;
+      color: #fff;
+    }
+    .input-container {
+      display: flex;
+      border-top: 1px solid #ddd;
+      padding: 12px;
+      background: #fff;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      outline: none;
+      font-size: 14px;
+    }
+    .input-container button {
+      padding: 12px 20px;
+      margin-left: 10px;
+      background: #003DA5;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .input-container button:hover {
+      background: #002b7a;
+    }
+    .footnotes {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+    .footnotes p {
+      margin: 4px 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">Willkommen im Chat</div>
-        <div class="chat-box" id="chatBox"></div>
-        <div class="input-container">
-            <input type="text" id="userInput" placeholder="Ihre Nachricht" onkeypress="handleKeyPress(event)">
-            <button onclick="sendMessage()">Absenden</button>
-        </div>
+  <div class="chat-container">
+    <div class="chat-header">Willkommen im Chat</div>
+    <div class="chat-box" id="chatBox"></div>
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Ihre Nachricht" onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Absenden</button>
     </div>
+  </div>
 
-    <script>
-        let userName = "";
+  <script>
+    let userName = "";
 
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
-                addMessage("bot", welcomeMessage);
-            }, 500);
+    document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(() => {
+        let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
+        addMessage("bot", welcomeMessage);
+      }, 500);
+    });
+
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+
+    function usePrompt(promptText) {
+      document.getElementById("userInput").value = promptText;
+      sendMessage();
+    }
+
+    function showPrompts() {
+      const prompts = [
+        "Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.",
+        "Welche Bedeutung hat die Prüfungsordnung?",
+        "Welche Voraussetzungen gelten für die Zulassung zur Prüfung?"
+      ];
+      prompts.forEach(prompt => {
+        const button = document.createElement("button");
+        button.classList.add("prompt-button");
+        button.textContent = prompt;
+        button.onclick = () => usePrompt(prompt);
+        const chatBox = document.getElementById("chatBox");
+        chatBox.appendChild(button);
+        chatBox.scrollTop = chatBox.scrollHeight;
+      });
+    }
+
+    async function sendMessage() {
+      const userInput = document.getElementById("userInput").value.trim();
+      if (!userInput) return;
+
+      addMessage("user", userInput);
+      document.getElementById("userInput").value = "";
+
+      if (!userName) {
+        userName = userInput;
+        let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
+        setTimeout(() => {
+          addMessage("bot", greeting);
+          showPrompts();
+        }, 500);
+        return;
+      }
+
+      const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
+      const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
+      const data = await response.text();
+      addMessage("bot", data);
+    }
+
+    function formatMessage(text) {
+      // Trennung in Haupttext und Fußnoten anhand des Separators "\n\nQuellen:\n"
+      let parts = text.split("\n\nQuellen:\n");
+      let mainText = parts[0];
+      let html = "";
+      // Haupttext in Absätze aufteilen
+      let paragraphs = mainText.split("\n\n");
+      paragraphs.forEach(p => {
+        html += "<p>" + p + "</p>";
+      });
+      // Fußnoten formatieren, falls vorhanden
+      if (parts.length > 1) {
+        let footnotes = parts[1].split("\n");
+        html += "<hr><div class='footnotes'>";
+        footnotes.forEach(fn => {
+          if (fn.trim() !== "") {
+            html += "<p>" + fn + "</p>";
+          }
         });
+        html += "</div>";
+      }
+      return html;
+    }
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        }
-
-        function usePrompt(promptText) {
-            document.getElementById("userInput").value = promptText;
-            sendMessage();
-        }
-
-        function showPrompts() {
-            const prompts = [
-                "Ich möchte Informationen zur persönlichen Eignung, wie sie im BBIG beschrieben ist.",
-                "Welche Bedeutung hat die Prüfungsordnung?",
-                "Welche Voraussetzungen gelten für die Zulassung zur Prüfung?"
-            ];
-
-            prompts.forEach(prompt => {
-                const button = document.createElement("button");
-                button.classList.add("prompt-button");
-                button.textContent = prompt;
-                button.onclick = () => usePrompt(prompt);
-                const chatBox = document.getElementById("chatBox");
-                chatBox.appendChild(button);
-                chatBox.scrollTop = chatBox.scrollHeight;
-            });
-        }
-
-        async function sendMessage() {
-            const userInput = document.getElementById("userInput").value.trim();
-            if (!userInput) return;
-
-            addMessage("user", userInput);
-            document.getElementById("userInput").value = "";
-
-            if (!userName) {
-                userName = userInput;
-                let greeting = `Hallo ${userName}, nun stelle mir Deine Frage.`;
-                setTimeout(() => {
-                    addMessage("bot", greeting);
-                    showPrompts();
-                }, 500);
-                return;
-            }
-
-            const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-            const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
-            const data = await response.text();
-            addMessage("bot", data);
-        }
-
-        function addMessage(sender, text) {
-            const chatBox = document.getElementById("chatBox");
-            const message = document.createElement("div");
-            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-            message.textContent = text;
-            chatBox.appendChild(message);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-    </script>
+    function addMessage(sender, text) {
+      const chatBox = document.getElementById("chatBox");
+      const message = document.createElement("div");
+      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      if (sender === "bot") {
+        message.innerHTML = formatMessage(text);
+      } else {
+        message.textContent = text;
+      }
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
 </body>
 </html>
