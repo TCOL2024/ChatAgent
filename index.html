@@ -129,40 +129,6 @@
 
   <script>
     let userName = "";
-    
-    // Dynamische Prompt-Templates basierend auf Schlüsselwörtern (Themen)
-    const topicTemplates = {
-      "ausbildung": [
-        "Welche weiteren Details zur Ausbildung interessieren Sie?",
-        "Wie schätzen Sie die Bedeutung der Ausbildungsinhalte ein?",
-        "Haben Sie Fragen zu spezifischen Voraussetzungen der Ausbildung?"
-      ],
-      "eignung": [
-        "Welche Fähigkeiten halten Sie für besonders relevant?",
-        "Wie würden Sie Ihre Eignung im Kontext des Berufs bewerten?",
-        "Gibt es spezifische Tests, die Sie näher erläutert haben möchten?"
-      ],
-      "jugendarbeitsschutzgesetz": [
-        "Welche Aspekte des Jugendarbeitsschutzgesetzes bereiten Ihnen Sorgen?",
-        "Möchten Sie mehr über die gesetzlichen Regelungen für Auszubildende erfahren?",
-        "Wie wirken sich die Regelungen konkret in Ihrem Fall aus?"
-      ],
-      "arbeitszeit": [
-        "Wie wichtig sind für Sie spezifische Arbeitszeitregelungen?",
-        "Haben Sie Fragen zu Überstunden oder flexiblen Arbeitszeiten?",
-        "Welche Arbeitszeitmodelle interessieren Sie besonders?"
-      ],
-      "urlaub": [
-        "Möchten Sie erfahren, wie sich Ihre Urlaubstage konkret zusammensetzen?",
-        "Haben Sie Fragen zu gesetzlichen Urlaubsansprüchen?",
-        "Wie planen Sie Ihren Urlaub in der Ausbildung?"
-      ],
-      "vertrag": [
-        "Welche Vertragsinhalte sind für Sie noch unklar?",
-        "Möchten Sie mehr über Rechte und Pflichten im Ausbildungsvertrag wissen?",
-        "Wie bewerten Sie die Flexibilität Ihres Vertrags?"
-      ]
-    };
 
     document.addEventListener("DOMContentLoaded", function () {
       setTimeout(() => {
@@ -183,42 +149,68 @@
     }
 
     /**
-     * Generiert dynamische Prompt-Vorschläge basierend auf dem Antworttext.
-     * Prüft auf Schlüsselwörter und gibt drei passende Vorschläge zurück.
+     * Versucht, relevante Inhalte von der angegebenen URL zu holen.
+     * Hinweis: Aufgrund von CORS kann dies fehlschlagen – dann wird ein Fallback genutzt.
      */
-    function generateDynamicPrompts(responseText) {
-      let matchedSuggestions = [];
-      const lowerResponse = responseText.toLowerCase();
-      for (let topic in topicTemplates) {
-        if (lowerResponse.includes(topic)) {
-          matchedSuggestions = matchedSuggestions.concat(topicTemplates[topic]);
-        }
-      }
-      if (matchedSuggestions.length >= 3) {
-        return matchedSuggestions.slice(0, 3);
-      } else if (matchedSuggestions.length > 0) {
-        return matchedSuggestions;
-      } else {
-        // Fallback: Generische Vorschläge, wenn kein Thema erkannt wurde.
-        return [
-          "Bitte geben Sie weitere Details zu Ihrem Anliegen an.",
-          "Könnten Sie das Problem genauer beschreiben?",
-          "Welche Aspekte möchten Sie weiter vertiefen?"
-        ];
+    async function fetchContent(url) {
+      try {
+        const response = await fetch(url);
+        const htmlText = await response.text();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlText, "text/html");
+        // Versuche den Text des ersten <p> zu extrahieren.
+        const firstP = doc.querySelector("p");
+        return firstP ? firstP.textContent.trim() : "";
+      } catch (error) {
+        console.error("Fehler beim Abrufen von", url, error);
+        return "";
       }
     }
 
     /**
-     * Aktualisiert die dynamischen Prompt-Vorschläge nach der Bot-Antwort.
-     * Es werden drei Vorschläge als Buttons angezeigt, die sich an intelligenten Prompt-Formulierungen orientieren.
+     * Generiert intelligente Prompt-Vorschläge basierend auf der Bot-Antwort und
+     * unter Einbeziehung von Inhalten der Zielseiten (BBiG und JARBSCHG).
      */
-    function updateDynamicPrompts(responseText) {
+    async function generateIntelligentPrompts(responseText) {
+      let prompts = [];
+      const lowerResponse = responseText.toLowerCase();
+
+      // Wenn die Antwort Hinweise zu Jugendlichen oder Urlaub enthält, verwende JARBSCHG.
+      if (lowerResponse.includes("jugend") || lowerResponse.includes("jarbschg") || lowerResponse.includes("urlaub")) {
+        const jarbschgSnippet = await fetchContent("https://www.gesetze-im-internet.de/jarbschg/__15.html");
+        if (jarbschgSnippet) {
+          prompts.push("Basierend auf den Regelungen des JARBSCHG: \"" + jarbschgSnippet.substring(0, 150) + "...\" – welche weiteren Aspekte zu Arbeitszeiten für Jugendliche interessieren Sie?");
+        }
+      }
+
+      // Wenn die Antwort Hinweise auf Ausbildung enthält, verwende BBiG.
+      if (lowerResponse.includes("ausbildung") || lowerResponse.includes("bbig")) {
+        const bbigSnippet = await fetchContent("https://www.gesetze-im-internet.de/bbig_2005/");
+        if (bbigSnippet) {
+          prompts.push("Aus dem Berufsbildungsgesetz (BBiG): \"" + bbigSnippet.substring(0, 150) + "...\" – haben Sie weitere Fragen zu Ausbildungsvoraussetzungen?");
+        }
+      }
+
+      // Fallback – wenn weniger als drei Vorschläge generiert wurden.
+      while (prompts.length < 3) {
+        prompts.push("Ich habe weitere Fragen zu Jugendlichen in der Ausbildung – insbesondere interessiert mich die Arbeitszeit.");
+        break; // Hier nur einmal hinzufügen, da der Fallback schon konkret ist.
+      }
+
+      return prompts.slice(0, 3);
+    }
+
+    /**
+     * Aktualisiert die dynamischen Prompt-Vorschläge nach der Bot-Antwort.
+     */
+    async function updateDynamicPrompts(responseText) {
       // Entferne existierenden Prompt-Container, falls vorhanden.
       let existingContainer = document.getElementById("dynamicPromptContainer");
       if (existingContainer) {
         existingContainer.remove();
       }
-      const suggestions = generateDynamicPrompts(responseText);
+
+      const suggestions = await generateIntelligentPrompts(responseText);
       const chatBox = document.getElementById("chatBox");
       const container = document.createElement("div");
       container.classList.add("prompt-container");
@@ -242,13 +234,12 @@
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
-      // Falls noch kein Benutzername vorhanden ist, wird dieser gesetzt.
       if (!userName) {
         userName = userInput;
         let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
         setTimeout(() => {
           addMessage("bot", greeting);
-          // Nach der Namenseingabe werden keine Prompt-Vorschläge angezeigt.
+          // Nach der Namenseingabe keine Prompt-Vorschläge anzeigen.
         }, 500);
         return;
       }
@@ -257,13 +248,13 @@
       const response = await fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`);
       const data = await response.text();
       addMessage("bot", data);
-      // Nach der Antwort werden drei dynamische Prompt-Vorschläge generiert.
+      // Nach der Bot-Antwort werden die dynamischen Prompt-Vorschläge aktualisiert.
       updateDynamicPrompts(data);
     }
 
     /**
      * Wandelt den Text in formatiertes HTML um.
-     * Teilt den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
+     * Teilt dabei den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
      * Ersetzt einfache Markdown-Syntax (* und **) und wandelt Zeilen, die mit "* " beginnen, in Listen um.
      */
     function formatMessage(text) {
