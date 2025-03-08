@@ -182,10 +182,6 @@
           addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
         }
 
-        if (jsonResponse.follow_up_question) {
-          addMessage("bot", jsonResponse.follow_up_question);
-        }
-
       } catch (error) {
         console.error("❌ Fehler:", error);
         addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
