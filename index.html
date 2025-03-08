@@ -205,7 +205,7 @@
 
     /**
      * Fügt eine neue Nachricht in die Chat-Box ein.
-     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt und mit einer Abschlussfrage versehen.
+     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt.
      */
     function addMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
@@ -213,9 +213,7 @@
       message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
 
       if (sender === "bot") {
-        // Füge die Standardabschlussfrage an.
-        message.innerHTML = formatMessage(text) +
-          `<p><em>Möchtest Du noch weitere Informationen, dann formuliere die Frage präzise oder stelle eine neue Frage.</em></p>`;
+        message.innerHTML = formatMessage(text);
       } else {
         message.textContent = text;
       }
