@@ -23,11 +23,28 @@
       border-bottom: 1px solid #ddd;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
     .main-header h1 {
       margin: 0;
       font-size: 24px;
       font-weight: bold;
+    }
+    .main-header button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #d9534f;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+    .main-header button:hover {
+      background-color: #c9302c;
     }
 
     /* Einleitender Textbereich */
@@ -42,11 +59,11 @@
 
     /* Container für den gesamten Chatbereich */
     .chat-wrapper {
-      flex: 1; /* damit dieser Bereich sich ausdehnt */
+      flex: 1;
       display: flex;
       flex-direction: column;
       max-width: 1000px;
-      margin: 0 auto; /* zentriert bei größeren Bildschirmen */
+      margin: 0 auto;
       width: 100%;
     }
 
@@ -135,9 +152,10 @@
   </style>
 </head>
 <body>
-  <!-- Oberer Titelbereich -->
+  <!-- Oberer Titelbereich mit Reset-Button -->
   <div class="main-header">
     <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+    <button onclick="resetChat()">Reset Chat</button>
   </div>
 
   <!-- Einleitender Text -->
@@ -363,6 +381,23 @@
         console.error("❌ Fehler:", error);
         addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
       }
+    }
+
+    // Reset-Funktion: Löscht Chatverlauf und gespeicherte Daten und startet den Chat neu
+    function resetChat() {
+      localStorage.removeItem("chatHistory");
+      localStorage.removeItem("userName");
+      // Optional: userId beibehalten oder entfernen
+      // localStorage.removeItem("userId");
+      chatHistory = [];
+      userName = "";
+      askedForName = true;
+      lastBotAnswer = "";
+      document.getElementById("chatBox").innerHTML = "";
+      setTimeout(() => {
+        const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
+        addMessage("bot", welcomeMessage);
+      }, 500);
     }
 
     console.log("🚀 JavaScript erfolgreich geladen!");
