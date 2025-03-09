@@ -122,6 +122,16 @@
         padding: 10px;
       }
     }
+
+    /* Stil für Quellenangaben */
+    .footnotes {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+    .footnotes p {
+      margin: 4px 0;
+    }
   </style>
 </head>
 <body>
@@ -200,12 +210,69 @@
       }
     }
 
-    // Rendert eine Nachricht in der Chat-Box, ohne sie dem Verlauf hinzuzufügen
+    // Formatiert den Text: Wandelt Markdown in HTML um, erstellt Absätze und zeigt Quellen an.
+    function formatMessage(text) {
+      const parts = text.split("\n\nQuellen:\n");
+      const mainText = parts[0];
+      const footnoteText = parts[1] ? parts[1] : "";
+      const lines = mainText.split("\n");
+      let html = "";
+      let inList = false;
+      
+      lines.forEach(line => {
+        let trimmedLine = line.trim();
+        // Markdown-Syntax in HTML umwandeln
+        trimmedLine = trimmedLine
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
+        if (trimmedLine.startsWith("* ")) {
+          if (!inList) {
+            inList = true;
+            html += "<ul>";
+          }
+          const bulletPoint = trimmedLine.substring(2);
+          html += `<li>${bulletPoint}</li>`;
+        } else {
+          if (inList) {
+            inList = false;
+            html += "</ul>";
+          }
+          if (trimmedLine !== "") {
+            html += `<p>${trimmedLine}</p>`;
+          } else {
+            html += "<br>";
+          }
+        }
+      });
+      
+      if (inList) {
+        html += "</ul>";
+      }
+      
+      // Falls Quellen angegeben wurden, diese am Ende anzeigen
+      if (footnoteText.trim()) {
+        const footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
+        if (footnotes.length > 0) {
+          html += "<hr><div class='footnotes'>";
+          footnotes.forEach((fn, index) => {
+            html += `<p>Quelle ${index + 1}: ${fn.trim()}</p>`;
+          });
+          html += "</div>";
+        }
+      }
+      return html;
+    }
+
+    // Rendert eine Nachricht in der Chat-Box
     function renderMessage(sender, text) {
       const chatBox = document.getElementById("chatBox");
       const message = document.createElement("div");
       message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-      message.textContent = text;
+      if (sender === "bot") {
+        message.innerHTML = formatMessage(text);
+      } else {
+        message.textContent = text;
+      }
       chatBox.appendChild(message);
       chatBox.scrollTop = chatBox.scrollHeight;
     }
@@ -223,7 +290,7 @@
       // Wenn kein Chatverlauf existiert, starte mit der Begrüßung
       if (chatHistory.length === 0) {
         setTimeout(() => {
-          let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
+          const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
           addMessage("bot", welcomeMessage);
           askedForName = true;
         }, 500);
@@ -241,7 +308,7 @@
       addMessage("user", userInput);
       document.getElementById("userInput").value = "";
 
-      // Falls der Name noch nicht erfasst wurde
+      // Falls Name noch nicht erfasst wurde
       if (askedForName && !userName) {
         if (userInput.toLowerCase() === "nein") {
           addMessage("bot", "Wie kann ich behilflich sein?");
@@ -292,7 +359,6 @@
         } else {
           addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
         }
-
       } catch (error) {
         console.error("❌ Fehler:", error);
         addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
