@@ -5,72 +5,74 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dein persönlicher Assistent v01032025_22</title>
   <style>
-    /* Grundlayout */
+    /* Global Styles */
     body {
       margin: 0;
       padding: 0;
-      background-color: #f9f9f9;
+      background-color: #f4f4f4;
       font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
       color: #333;
       display: flex;
       flex-direction: column;
       height: 100vh;
     }
-
-    /* Oberer Bereich (Überschrift) */
+    
+    /* Header */
     .main-header {
       background-color: #fff;
       border-bottom: 1px solid #ddd;
       padding: 20px;
       text-align: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .main-header h1 {
       margin: 0;
       font-size: 24px;
       font-weight: bold;
     }
-
-    /* Einleitender Textbereich */
+    
+    /* Intro Text */
     .intro-text {
       background-color: #fff;
       padding: 20px;
       border-bottom: 1px solid #ddd;
       text-align: center;
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.6;
     }
-
-    /* Container für den gesamten Chatbereich */
+    
+    /* Chat Wrapper */
     .chat-wrapper {
-      flex: 1; /* damit dieser Bereich sich ausdehnt */
+      flex: 1;
       display: flex;
       flex-direction: column;
       max-width: 1000px;
-      margin: 0 auto; /* zentriert bei größeren Bildschirmen */
+      margin: 20px auto;
       width: 100%;
     }
-
-    /* Box für Nachrichtenverlauf */
+    
+    /* Chat Box */
     .chat-box {
       flex: 1;
       background-color: #fff;
       border: 1px solid #ddd;
-      border-radius: 4px;
-      margin: 20px;
+      border-radius: 8px;
+      margin-bottom: 20px;
       padding: 20px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      gap: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     .message {
       padding: 12px 16px;
       border-radius: 18px;
-      margin-bottom: 12px;
       max-width: 75%;
       font-size: 14px;
-      line-height: 1.4;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      line-height: 1.5;
       word-wrap: break-word;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     .user-message {
       background-color: #0078d7;
@@ -82,8 +84,8 @@
       color: #333;
       align-self: flex-start;
     }
-
-    /* Eingabebereich unten */
+    
+    /* Input Container */
     .input-container {
       display: flex;
       padding: 20px;
@@ -99,7 +101,7 @@
     }
     .input-container button {
       margin-left: 10px;
-      padding: 0 20px;
+      padding: 12px 20px;
       border: none;
       border-radius: 4px;
       background-color: #0078d7;
@@ -111,9 +113,12 @@
     .input-container button:hover {
       background-color: #005da4;
     }
-
-    /* Responsives Verhalten (für kleinere Bildschirme) */
+    
+    /* Responsive */
     @media (max-width: 600px) {
+      .chat-wrapper {
+        margin: 10px;
+      }
       .chat-box {
         margin: 10px;
         padding: 10px;
@@ -125,24 +130,17 @@
   </style>
 </head>
 <body>
-  <!-- Oberer Titelbereich -->
   <div class="main-header">
     <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
   </div>
-
-  <!-- Einleitender Text -->
   <div class="intro-text">
     Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
     unterstütze ich Dich bei Fragen rund um das Personalamangement.<br>
     Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
     Frage einfach unten ein oder nutzen Sie die Chat-Funktionen.
   </div>
-
-  <!-- Haupt-Chatbereich -->
   <div class="chat-wrapper">
     <div class="chat-box" id="chatBox"></div>
-
-    <!-- Eingabefeld + Button -->
     <div class="input-container">
       <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
       <button onclick="sendMessage()">Absenden</button>
@@ -151,21 +149,86 @@
 
   <script>
     let userName = "";
-    let userId = generateUserId(); // Zufällige User-ID
+    let userId = "";
     let askedForName = false;
     let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
+    let chatHistory = [];
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
+
+    // Initialize userId and userName from localStorage if available
+    function initializeUser() {
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) {
+        userId = storedUserId;
+      } else {
+        userId = generateUserId();
+        localStorage.setItem("userId", userId);
+      }
+
+      const storedUserName = localStorage.getItem("userName");
+      if (storedUserName) {
+        userName = storedUserName;
+        askedForName = false;
+      }
+    }
 
     function generateUserId() {
       return "user-" + Math.random().toString(36).substr(2, 9);
     }
 
+    // Save chat history to localStorage
+    function saveChatHistory() {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    }
+
+    // Load chat history from localStorage and render it
+    function loadChatHistory() {
+      const storedHistory = localStorage.getItem("chatHistory");
+      if (storedHistory) {
+        try {
+          chatHistory = JSON.parse(storedHistory);
+          chatHistory.forEach(msg => {
+            renderMessage(msg.sender, msg.text);
+          });
+        } catch (e) {
+          console.error("Error parsing chatHistory from localStorage", e);
+          chatHistory = [];
+        }
+      }
+    }
+
+    // Render a message to the chatBox ohne in den History-Array zu pushen
+    function renderMessage(sender, text) {
+      const chatBox = document.getElementById("chatBox");
+      const message = document.createElement("div");
+      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      if (sender === "bot") {
+        message.innerHTML = formatMessage(text);
+      } else {
+        message.textContent = text;
+      }
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Fügt eine neue Nachricht hinzu und speichert sie in chatHistory
+    function addMessage(sender, text) {
+      renderMessage(sender, text);
+      chatHistory.push({ sender, text });
+      saveChatHistory();
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(() => {
-        let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
-        addMessage("bot", welcomeMessage);
-        askedForName = true;
-      }, 500);
+      initializeUser();
+      loadChatHistory();
+      // Falls kein Chatverlauf vorhanden ist, starte mit der Begrüßung
+      if (chatHistory.length === 0) {
+        setTimeout(() => {
+          let welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
+          addMessage("bot", welcomeMessage);
+          askedForName = true;
+        }, 500);
+      }
     });
 
     function handleKeyPress(event) {
@@ -185,6 +248,7 @@
           addMessage("bot", "Wie kann ich behilflich sein?");
         } else {
           userName = userInput;
+          localStorage.setItem("userName", userName);
           addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
         }
         askedForName = false;
@@ -236,16 +300,7 @@
       }
     }
 
-    function addMessage(sender, text) {
-      const chatBox = document.getElementById("chatBox");
-      const message = document.createElement("div");
-      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-      message.textContent = text;
-      chatBox.appendChild(message);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    console.log("🚀 JavaScript erfolgreich geladen!");
-  </script>
-</body>
-</html>
+    function formatMessage(text) {
+      const parts = text.split("\n\nQuellen:\n");
+      const mainText = parts[0];
+      const footnoteText = parts[1] ? p
