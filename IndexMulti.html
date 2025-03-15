@@ -12,7 +12,7 @@
       padding: 0;
     }
     body {
-      font-family: 'Allianz Neo', Arial, sans-serif;
+      font-family: 'Aptos', Arial, sans-serif;
       background-color: #f4f7f9;
       display: flex;
       justify-content: center;
@@ -34,7 +34,7 @@
     header {
       padding: 20px;
       text-align: center;
-      background: #003781;
+      background: #003781; /* Hauptfarbe */
       color: white;
     }
     header h1 {
@@ -69,11 +69,11 @@
       margin-right: 10px;
     }
     .user .avatar {
-      background-color: #003781;
+      background-color: #003781; /* Hauptfarbe */
     }
     .bot .avatar {
       background-color: #e8f0fe;
-      color: #003781;
+      color: #003781; /* Hauptfarbe */
     }
     .text {
       padding: 12px 16px;
@@ -103,14 +103,14 @@
       outline: none;
     }
     #send-button {
-      background-color: #003781;
+      background-color: #003781; /* Hauptfarbe */
       color: white;
       border: none;
       padding: 15px 20px;
       cursor: pointer;
     }
     #send-button:hover {
-      background-color: #002060;
+      background-color: #002060; /* Dunklere Variante der Hauptfarbe */
     }
     /* Responsive */
     @media (max-width: 600px) {
@@ -122,6 +122,8 @@
       }
     }
   </style>
+  <!-- Einbindung der Aptos-Schriftart -->
+  <link rel="stylesheet" href="path/to/aptos-font.css">
 </head>
 <body>
   <div id="chat-container">
@@ -135,27 +137,47 @@
       <button id="send-button" onclick="sendQuestion()">Senden</button>
     </div>
   </div>
-  <script>
-    let lastResponse = "";
-    const inputField = document.getElementById("question");
-    const chatContainer = document.getElementById("chat");
 
-    inputField.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        sendQuestion();
-      }
+<script>
+let lastResponse = "";
+const inputField = document.getElementById("question");
+const chatContainer = document.getElementById("chat");
+
+inputField.addEventListener("keypress", (e) => e.key === "Enter" && sendQuestion());
+
+function sendQuestion() {
+  const userText = inputField.value.trim();
+  if (!userText) return;
+  inputField.value = "";
+  addMessage("user", userText, "Du");
+
+  const loadingId = "loading-" + Date.now();
+  addMessage("bot", `<span id="${loadingId}" class="loading"><span>.</span><span>.</span><span>.</span></span>`, "KI");
+
+  fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(userText)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+    .then(res => res.text()).then(data => {
+      lastResponse = data;
+      removeLoading(loadingId);
+      addMessage("bot", data.replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>"), "KI");
+    })
+    .catch(err => {
+      removeLoading(loadingId);
+      addMessage("bot", `<span style="color:red;">Fehler: ${err}</span>`, "KI");
     });
+}
 
-    function sendQuestion() {
-      const userText = inputField.value.trim();
-      if (!userText) return;
-      inputField.value = "";
-      addMessage("user", userText, "DU");
+function addMessage(sender, msg, avatarText) {
+  const msgElem = document.createElement("div");
+  msgElem.className = `message ${sender}`;
+  msgElem.innerHTML = `<div class="avatar">${avatarText}</div><div class="text">${msg}</div>`;
+  chatContainer.appendChild(msgElem);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-      const loadingId = "loading-" + Date.now();
-      addMessage("bot", `<span id="${loadingId}" class="loading"><span>.</span><span>.</span><span>.</span></span>`, "KI");
-
-      fetch(`https://hook.us2.make
-::contentReference[oaicite:17]{index=17}
- 
+function removeLoading(id) {
+  const loadingElem = document.getElementById(id);
+  loadingElem && loadingElem.closest('.message').remove();
+}
+</script>
+</body>
+</html>
