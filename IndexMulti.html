@@ -7,103 +7,115 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
             background-color: #f4f7f9;
-        }
-        #chat-container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        /* -- TAB-MENÜ STYLING -- */
-        .model-select {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-        .model-select button {
-            background: #ddd;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            border-radius: 8px;
-            font-weight: bold;
-        }
-        .model-select button.active {
-            background: #0057B8;
-            color: #fff;
-        }
-        .model-select button:hover {
-            background: #ccc;
+            margin: 0;
+            padding: 0;
         }
         
-        /* Restliche Styles bleiben wie gehabt */
-        input, button {
-            margin-top: 10px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #0057B8;
-            outline: none;
-        }
-        input {
-            width: 70%;
-            padding-left: 10px;
-        }
-        button {
-            background-color: #0057B8;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #003E75;
-        }
-        #chat {
+        /* Container für den gesamten Chatbereich */
+        #chat-container {
             max-width: 800px;
-            margin: auto;
-            text-align: left;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            box-sizing: border-box;
         }
+
+        /* Überschrift / Begrüßung */
+        h1 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+        p {
+            text-align: center;
+            margin-top: 0;
+        }
+
+        /* Chat-Bereich */
+        #chat {
+            margin-top: 20px;
+        }
+
         .message {
-            padding: 12px;
+            max-width: 75%;
             margin: 10px 0;
-            border-radius: 8px;
+            padding: 15px;
+            border-radius: 12px;
             word-wrap: break-word;
             white-space: pre-wrap;
         }
+
+        /* Nachrichten vom Nutzer (rechts) */
         .user {
-            background-color: #D4E6F1;
+            background-color: #D4E6F1; /* Hellblau */
+            margin-left: auto;
             text-align: right;
+            border-top-right-radius: 0;
         }
+
+        /* Nachrichten von der KI (links) */
         .bot {
-            background-color: #E8F0FE;
+            background-color: #E8F0FE; /* Noch helleres Blau */
+            margin-right: auto;
             text-align: left;
+            border-top-left-radius: 0;
         }
+
+        /* Fehlermeldungen */
         .error {
             background-color: #F8D7DA;
             color: red;
         }
+
+        /* Eingabebereich */
+        #input-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        #question {
+            flex: 1;
+            max-width: 600px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px 0 0 8px;
+            border: 1px solid #0057B8;
+            outline: none;
+        }
+
+        button {
+            background-color: #0057B8;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+        }
+        button:hover {
+            background-color: #003E75;
+        }
+
+        /* Weitere Fragen (Prompt-Suggestions) */
         .prompt-suggestions {
             margin-top: 20px;
-            text-align: left;
-            display: none;
             background-color: #0078D4;
             padding: 10px;
             border-radius: 8px;
+            display: none;
         }
         .prompt-suggestions h3 {
-            color: white;
+            color: #fff;
+            margin-top: 0;
         }
         .prompt-suggestions button {
             display: block;
             width: 100%;
             margin: 5px 0;
             text-align: left;
-            background-color: white;
+            background-color: #fff;
             border: none;
             padding: 10px;
             cursor: pointer;
@@ -114,51 +126,45 @@
         .prompt-suggestions button:hover {
             background-color: #e1f0ff;
         }
+
+        /* Optional: Footer / Copyright etc. */
+        footer {
+            text-align: center;
+            margin: 20px 0;
+            color: #888;
+        }
     </style>
 </head>
 <body>
     <div id="chat-container">
-        <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können.</p>
-
-        <!-- TAB-MENÜ FÜR MODELLE -->
-        <div class="model-select">
-            <button class="active" data-model="GPT-4o">GPT-4o</button>
-            <button data-model="DALL-E">DALL·E</button>
-            <button data-model="Mistral Large">Mistral Large</button>
-            <button data-model="DeepSeek R1">DeepSeek R1</button>
-        </div>
-
+        <h1>Schön, dass Du da bist und diese KI nutzt.</h1>
+        <p>Stelle mir nun Deine Frage – ich freue mich, Dir helfen zu können.</p>
+        
+        <!-- Chat-Verlauf -->
         <div id="chat"></div>
+
+        <!-- Eingabefeld und Sende-Button -->
+        <div id="input-container">
+            <input type="text" id="question" placeholder="Deine Frage hier...">
+            <button onclick="sendQuestion()">Senden</button>
+        </div>
         
-        <input type="text" id="question" placeholder="Deine Frage hier...">
-        <button onclick="sendQuestion()">Senden</button>
-        
+        <!-- Weitere Fragen / Prompt-Suggestions -->
         <div class="prompt-suggestions" id="prompt-suggestions">
             <h3>Weitere Fragen:</h3>
         </div>
     </div>
     
+    <footer>
+        <p>© 2025 Dein Chatbot</p>
+    </footer>
+
     <script>
         let lastResponse = "";  
         let inputField = document.getElementById("question");
         let promptContainer = document.getElementById("prompt-suggestions");
-
-        // Aktuell ausgewähltes Modell
-        let currentModel = "GPT-4o";
         
-        // EventListener, um zwischen den Modellen zu wechseln
-        document.querySelectorAll('.model-select button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Alle Buttons zurücksetzen
-                document.querySelectorAll('.model-select button').forEach(b => b.classList.remove('active'));
-                // Aktiven Button markieren
-                btn.classList.add('active');
-                // Modell übernehmen
-                currentModel = btn.getAttribute('data-model');
-            });
-        });
-        
+        // Beim Drücken der Enter-Taste auch senden
         inputField.addEventListener("keypress", function(event) {
             if (event.key === "Enter") {
                 event.preventDefault();
@@ -170,26 +176,36 @@
             let inputQuestion = question || inputField.value;
             if (!inputQuestion) return;
             
+            // Frage des Nutzers anzeigen
             let chat = document.getElementById("chat");
             chat.innerHTML += `<div class='message user'>${inputQuestion}</div>`;
             
-            // fetch-URL um den Parameter "model" erweitern
-            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?model=${encodeURIComponent(currentModel)}&text=${encodeURIComponent(inputQuestion)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+            // Beispiel-Endpoint (hier musst du deinen eigenen Endpoint eintragen)
+            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(inputQuestion)}&lastResponse=${encodeURIComponent(lastResponse)}`)
                 .then(response => response.text())
                 .then(data => {
                     lastResponse = data;
-                    let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
+                    
+                    // Markdown-ähnliche Formatierung
+                    let formattedResponse = data
+                        .replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>")
+                        .replace(/\n/g, "<br>");
+                    
+                    // KI-Antwort anzeigen
                     chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
                     
+                    // Prompt-Vorschläge aktualisieren
                     updatePromptSuggestions(lastResponse);
                 })
                 .catch(error => {
                     chat.innerHTML += `<div class='message bot error'>Fehler: ${error}</div>`;
                 });
             
+            // Eingabefeld leeren
             inputField.value = "";
         }
         
+        // Vorschläge generieren
         function updatePromptSuggestions(response) {
             let prompts = generatePrompts(response);
             if (prompts.length > 0) {
@@ -204,29 +220,34 @@
             }
         }
         
+        // Beispielhafte Vorschläge
         function generatePrompts(response) {
-            if (response.toLowerCase().includes("bip")) {
-                return [
+            let suggestions = [];
+            let lowerResp = response.toLowerCase();
+            
+            if (lowerResp.includes("bip")) {
+                suggestions = [
                     "Wie wird das BIP berechnet?",
                     "Welche Faktoren beeinflussen das BIP?",
                     "Was sind die Unterschiede zwischen BIP und BNE?"
                 ];
             }
-            if (response.toLowerCase().includes("steuer")) {
-                return [
+            else if (lowerResp.includes("steuer")) {
+                suggestions = [
                     "Welche Steuerarten gibt es in Deutschland?",
                     "Wie funktioniert die Einkommenssteuer?",
                     "Gibt es steuerliche Vorteile für Selbstständige?"
                 ];
             }
-            if (response.toLowerCase().includes("künstliche intelligenz")) {
-                return [
+            else if (lowerResp.includes("künstliche intelligenz")) {
+                suggestions = [
                     "Welche Risiken birgt der Einsatz von KI?",
                     "Wie wird KI im Unternehmen genutzt?",
                     "Wie beeinflusst KI den Arbeitsmarkt?"
                 ];
             }
-            return [];
+            
+            return suggestions;
         }
     </script>
 </body>
