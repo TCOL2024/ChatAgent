@@ -5,194 +5,144 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KI Chat Interface</title>
   <style>
-    /* Grundlegendes Reset */
+    /* Global Styles */
     * {
       box-sizing: border-box;
-      margin: 0; 
+      margin: 0;
       padding: 0;
     }
-    html, body {
-      height: 100%;
-      font-family: Arial, sans-serif;
+    body {
+      font-family: 'Allianz Neo', Arial, sans-serif;
       background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
     }
-
-    /* Container für den gesamten Inhalt */
-    .container {
+    /* Container */
+    #chat-container {
+      width: 100%;
+      max-width: 800px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
       display: flex;
       flex-direction: column;
-      height: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      background-color: #fff;
-      position: relative;
+      overflow: hidden;
     }
-
-    /* Kopfbereich */
+    /* Header */
     header {
       padding: 20px;
       text-align: center;
-      border-bottom: 1px solid #ccc;
+      background: #003781;
+      color: white;
     }
     header h1 {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
     }
     header p {
       font-size: 1rem;
-      color: #666;
     }
-
-    /* Chatbereich, der scrollen kann */
-    .chat-area {
-      flex: 1; /* füllt den verfügbaren Platz */
-      overflow-y: auto; /* scrollbar wenn zu viele Nachrichten */
+    /* Chat Area */
+    #chat {
+      flex: 1;
       padding: 20px;
+      overflow-y: auto;
+      background: #f4f7f9;
+      display: flex;
+      flex-direction: column;
     }
-
-    /* Nachrichten-Wrapper */
     .message {
       display: flex;
-      align-items: flex-start;
-      margin-bottom: 15px;
-      max-width: 80%;
+      align-items: center;
+      margin: 10px 0;
     }
-    .message.user {
-      margin-left: auto; /* Nachricht nach rechts schieben */
-      flex-direction: row-reverse; /* Avatar rechts, Text links */
-    }
-
-    /* Avatar */
-    .avatar {
+    .message .avatar {
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      overflow: hidden;
-      margin-right: 10px;
       display: flex;
-      align-items: center;
       justify-content: center;
-      background-color: #ccc;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+      margin-right: 10px;
     }
-    .message.user .avatar {
-      margin-right: 0;
-      margin-left: 10px;
+    .user .avatar {
+      background-color: #003781;
     }
-    .avatar img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
+    .bot .avatar {
+      background-color: #e8f0fe;
+      color: #003781;
     }
-
-    /* Text-Bubble */
-    .bubble {
-      background-color: #E8F0FE; 
-      padding: 10px 15px;
-      border-radius: 12px;
+    .text {
+      padding: 12px 16px;
+      border-radius: 8px;
+      max-width: 75%;
       word-wrap: break-word;
-      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.4;
     }
-    /* Nutzer-Nachrichten-Bubble */
-    .user .bubble {
-      background-color: #D4E6F1;
+    .user .text {
+      background-color: #e1f5fe;
+      margin-left: auto;
     }
-
-    /* Eingabebereich am unteren Rand */
-    .input-container {
-      position: fixed;
-      bottom: 0;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 800px;
-      background-color: #fff;
-      border-top: 1px solid #ccc;
+    .bot .text {
+      background-color: #e8f0fe;
+    }
+    /* Input Area */
+    #input-area {
       display: flex;
-      padding: 10px;
+      border-top: 1px solid #ddd;
     }
-    .input-container input {
+    #question {
       flex: 1;
-      padding: 10px;
-      font-size: 16px;
-      border: 1px solid #0057B8;
-      border-radius: 8px 0 0 8px;
+      padding: 15px;
+      border: none;
+      font-size: 1rem;
       outline: none;
     }
-    .input-container button {
-      background-color: #0057B8;
-      color: #fff;
+    #send-button {
+      background-color: #003781;
+      color: white;
       border: none;
-      padding: 0 20px;
-      font-size: 16px;
+      padding: 15px 20px;
       cursor: pointer;
-      border-radius: 0 8px 8px 0;
     }
-    .input-container button:hover {
-      background-color: #003E75;
+    #send-button:hover {
+      background-color: #002060;
     }
-
-    /* Damit die letzten Nachrichten nicht unter der Input-Leiste verschwinden */
-    .chat-area {
-      padding-bottom: 100px; 
-    }
-
-    /* Responsive für mobile Geräte */
+    /* Responsive */
     @media (max-width: 600px) {
       header h1 {
-        font-size: 1.2rem;
+        font-size: 1.5rem;
       }
-      .avatar {
-        width: 32px;
-        height: 32px;
-      }
-      .input-container input {
-        font-size: 14px;
-      }
-      .input-container button {
-        font-size: 14px;
+      header p, .text, #question, #send-button {
+        font-size: 0.9rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Kopfbereich -->
+  <div id="chat-container">
     <header>
-      <h1>Willkommen beim KI-Chat!</h1>
-      <p>Hier steht die Frage, die der User tippen kann</p>
+      <h1>Schön, dass Du da bist!</h1>
+      <p>Stelle Deine Frage – ich helfe Dir gerne.</p>
     </header>
-    
-    <!-- Chatbereich -->
-    <div class="chat-area" id="chat">
-      <!-- Beispielhafte Startnachrichten (optional) -->
-      <!--
-      <div class="message bot">
-        <div class="avatar">
-          <img src="https://via.placeholder.com/40/888/fff?text=B" alt="Bot Avatar">
-        </div>
-        <div class="bubble">
-          Hallo! Wie kann ich dir helfen?
-        </div>
-      </div>
-      -->
-    </div>
-
-    <!-- Eingabebereich -->
-    <div class="input-container">
-      <input type="text" id="question" placeholder="Hier tippen ..." />
-      <button onclick="sendQuestion()">Senden</button>
+    <div id="chat"></div>
+    <div id="input-area">
+      <input type="text" id="question" placeholder="Deine Frage hier..." />
+      <button id="send-button" onclick="sendQuestion()">Senden</button>
     </div>
   </div>
-
   <script>
-    let lastResponse = ""; // Falls du einen "Kontext" mitschicken möchtest
-    const chatArea = document.getElementById('chat');
-    const inputField = document.getElementById('question');
+    let lastResponse = "";
+    const inputField = document.getElementById("question");
+    const chatContainer = document.getElementById("chat");
 
-    // ENTER zum Senden
-    inputField.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') {
-        e.preventDefault();
+    inputField.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
         sendQuestion();
       }
     });
@@ -200,51 +150,12 @@
     function sendQuestion() {
       const userText = inputField.value.trim();
       if (!userText) return;
-
-      // User-Nachricht im Chat anzeigen
-      addMessageToChat(userText, 'user');
       inputField.value = "";
+      addMessage("user", userText, "DU");
 
-      // Hier den echten Fetch-Aufruf zu deinem Make-Modul
-      fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(userText)}&lastResponse=${encodeURIComponent(lastResponse)}`)
-        .then(response => response.text())
-        .then(data => {
-          // Speichere den letzten Response, falls du ihn für Kontext brauchst
-          lastResponse = data;
+      const loadingId = "loading-" + Date.now();
+      addMessage("bot", `<span id="${loadingId}" class="loading"><span>.</span><span>.</span><span>.</span></span>`, "KI");
 
-          // Falls du Markdown-ähnliche Formatierungen hast, kannst du sie hier umwandeln
-          // z.B. **Text** => <b>Text</b> oder \n => <br>
-          let formatted = data
-            .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
-            .replace(/\n/g, "<br>");
-
-          addMessageToChat(formatted, 'bot');
-        })
-        .catch(error => {
-          addMessageToChat("Fehler: " + error, 'bot');
-        });
-    }
-
-    function addMessageToChat(message, sender) {
-      // Sender: 'user' oder 'bot'
-      const avatarUrl = (sender === 'user')
-        ? "https://via.placeholder.com/40/000/fff?text=U"
-        : "https://via.placeholder.com/40/888/fff?text=B";
-
-      // HTML zusammenbauen
-      const msgHtml = `
-        <div class="message ${sender}">
-          <div class="avatar">
-            <img src="${avatarUrl}" alt="${sender} Avatar">
-          </div>
-          <div class="bubble">${message}</div>
-        </div>
-      `;
-      chatArea.innerHTML += msgHtml;
-
-      // Automatisch nach unten scrollen
-      chatArea.scrollTop = chatArea.scrollHeight;
-    }
-  </script>
-</body>
-</html>
+      fetch(`https://hook.us2.make
+::contentReference[oaicite:17]{index=17}
+ 
