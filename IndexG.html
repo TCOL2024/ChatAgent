@@ -1,185 +1,275 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KI Chat Interface</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-            background-color: #f4f7f9;
-        }
-        #chat-container {
-            max-width: 800px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        }
-        input, button {
-            margin-top: 10px;
-            padding: 12px;
-            font-size: 16px;
-            border-radius: 8px;
-            border: 1px solid #0057B8;
-            outline: none;
-        }
-        input {
-            width: 70%;
-            padding-left: 10px;
-        }
-        button {
-            background-color: #0057B8;
-            color: white;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #003E75;
-        }
-        #chat {
-            max-width: 800px;
-            margin: auto;
-            text-align: left;
-        }
-        .message {
-            padding: 12px;
-            margin: 10px 0;
-            border-radius: 8px;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-        }
-        .user {
-            background-color: #D4E6F1;
-            text-align: right;
-        }
-        .bot {
-            background-color: #E8F0FE;
-            text-align: left;
-        }
-        .error {
-            background-color: #F8D7DA;
-            color: red;
-        }
-        .prompt-suggestions {
-            margin-top: 20px;
-            text-align: left;
-            display: none;
-            background-color: #0078D4;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .prompt-suggestions h3 {
-            color: white;
-        }
-        .prompt-suggestions button {
-            display: block;
-            width: 100%;
-            margin: 5px 0;
-            text-align: left;
-            background-color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            color: #0078D4;
-            font-weight: bold;
-        }
-        .prompt-suggestions button:hover {
-            background-color: #e1f0ff;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KI Chat Interface</title>
+  <style>
+    /* Global Styles */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      background-color: #f4f7f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    /* Container */
+    #chat-container {
+      width: 100%;
+      max-width: 800px;
+      background: #ffffff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    /* Header */
+    header {
+      padding: 20px;
+      text-align: center;
+      background: #0057B8;
+      color: white;
+    }
+    header h1 {
+      margin-bottom: 5px;
+      font-size: 1.8rem;
+    }
+    header p {
+      font-size: 1rem;
+    }
+    /* Chat Area */
+    #chat {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background: #f9f9f9;
+    }
+    .message {
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 8px;
+      max-width: 80%;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    .user {
+      background-color: #e1f5fe;
+      align-self: flex-end;
+      text-align: right;
+    }
+    .bot {
+      background-color: #e8f0fe;
+      align-self: flex-start;
+      text-align: left;
+    }
+    /* Loading Animation */
+    .loading {
+      color: #666;
+      display: inline-block;
+    }
+    .loading span {
+      display: inline-block;
+      animation: blink 1.5s infinite;
+    }
+    .loading span:nth-child(2) {
+      animation-delay: 0.3s;
+    }
+    .loading span:nth-child(3) {
+      animation-delay: 0.6s;
+    }
+    @keyframes blink {
+      0% { opacity: 0.2; }
+      20% { opacity: 1; }
+      100% { opacity: 0.2; }
+    }
+    /* Input Area */
+    #input-area {
+      display: flex;
+      border-top: 1px solid #ddd;
+    }
+    #question {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+    }
+    #send-button {
+      background-color: #0057B8;
+      color: white;
+      border: none;
+      padding: 15px 20px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    #send-button:hover {
+      background-color: #003E75;
+    }
+    /* Prompt Suggestions */
+    .prompt-suggestions {
+      padding: 10px;
+      background-color: #0078D4;
+      border-top: 1px solid #0057B8;
+      display: none;
+    }
+    .prompt-suggestions h3 {
+      margin-bottom: 10px;
+      color: white;
+      font-size: 1rem;
+    }
+    .prompt-suggestions button {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 5px;
+      background: white;
+      border: none;
+      border-radius: 6px;
+      text-align: left;
+      cursor: pointer;
+      font-size: 1rem;
+      color: #0078D4;
+      font-weight: bold;
+    }
+    .prompt-suggestions button:hover {
+      background: #e1f0ff;
+    }
+    /* Responsive */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.5rem;
+      }
+      header p {
+        font-size: 0.9rem;
+      }
+      .message {
+        font-size: 0.9rem;
+      }
+      #question, #send-button {
+        font-size: 0.9rem;
+        padding: 12px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div id="chat-container">
-        <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
-        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können.</p>
-        
-        <div id="chat"></div>
-        
-        <input type="text" id="question" placeholder="Deine Frage hier...">
-        <button onclick="sendQuestion()">Senden</button>
-        
-        <div class="prompt-suggestions" id="prompt-suggestions">
-            <h3>Weitere Fragen:</h3>
-        </div>
+  <div id="chat-container">
+    <header>
+      <h1>Schön, dass Du da bist!</h1>
+      <p>Stelle Deine Frage – ich helfe Dir gerne.</p>
+    </header>
+    <div id="chat"></div>
+    <div id="input-area">
+      <input type="text" id="question" placeholder="Deine Frage hier..." />
+      <button id="send-button" onclick="sendQuestion()">Senden</button>
     </div>
-    
-    <script>
-        let lastResponse = "";  
-        let inputField = document.getElementById("question");
-        let promptContainer = document.getElementById("prompt-suggestions");
-        
-        inputField.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                sendQuestion();
-            }
-        });
+    <div class="prompt-suggestions" id="prompt-suggestions">
+      <h3>Weitere Fragen:</h3>
+    </div>
+  </div>
+  <script>
+    let lastResponse = "";
+    const inputField = document.getElementById("question");
+    const chatContainer = document.getElementById("chat");
+    const promptContainer = document.getElementById("prompt-suggestions");
 
-        function sendQuestion(question = null) {
-            let inputQuestion = question || inputField.value;
-            if (!inputQuestion) return;
-            
-            let chat = document.getElementById("chat");
-            chat.innerHTML += `<div class='message user'>${inputQuestion}</div>`;
-            
-            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(inputQuestion)}&lastResponse=${encodeURIComponent(lastResponse)}`)
-                .then(response => response.text())
-                .then(data => {
-                    lastResponse = data;
-                    let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
-                    chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
-                    
-                    updatePromptSuggestions(lastResponse);
-                })
-                .catch(error => {
-                    chat.innerHTML += `<div class='message bot error'>Fehler: ${error}</div>`;
-                });
-            
-            inputField.value = "";
-        }
-        
-        function updatePromptSuggestions(response) {
-            let prompts = generatePrompts(response);
-            if (prompts.length > 0) {
-                promptContainer.innerHTML = "<h3>Weitere Fragen:</h3>";
-                promptContainer.style.display = "block";
-                prompts.forEach(prompt => {
-                    let button = document.createElement("button");
-                    button.innerText = prompt;
-                    button.onclick = function() { sendQuestion(prompt); };
-                    promptContainer.appendChild(button);
-                });
-            }
-        }
-        
-        function generatePrompts(response) {
-            if (response.toLowerCase().includes("bip")) {
-                return [
-                    "Wie wird das BIP berechnet?",
-                    "Welche Faktoren beeinflussen das BIP?",
-                    "Was sind die Unterschiede zwischen BIP und BNE?"
-                ];
-            }
-            if (response.toLowerCase().includes("steuer")) {
-                return [
-                    "Welche Steuerarten gibt es in Deutschland?",
-                    "Wie funktioniert die Einkommenssteuer?",
-                    "Gibt es steuerliche Vorteile für Selbstständige?"
-                ];
-            }
-            if (response.toLowerCase().includes("künstliche intelligenz")) {
-                return [
-                    "Welche Risiken birgt der Einsatz von KI?",
-                    "Wie wird KI im Unternehmen genutzt?",
-                    "Wie beeinflusst KI den Arbeitsmarkt?"
-                ];
-            }
-            return [];
-        }
-    </script>
+    inputField.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendQuestion();
+      }
+    });
+
+    function sendQuestion(question = null) {
+      const userText = question || inputField.value.trim();
+      if (!userText) return;
+      addMessage("user", userText);
+      inputField.value = "";
+
+      // Füge Ladeindikator hinzu
+      const loadingId = "loading-" + Date.now();
+      addMessage("bot", `<span id="${loadingId}" class="loading">
+                          <span>.</span><span>.</span><span>.</span>
+                        </span>`);
+
+      fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(userText)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+        .then(response => response.text())
+        .then(data => {
+          lastResponse = data;
+          const formattedResponse = data
+            .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+            .replace(/\n/g, "<br>");
+          removeLoading(loadingId);
+          addMessage("bot", formattedResponse);
+          updatePromptSuggestions(lastResponse);
+        })
+        .catch(error => {
+          removeLoading(loadingId);
+          addMessage("bot", `<span style="color:red;">Fehler: ${error}</span>`);
+        });
+    }
+
+    function addMessage(sender, message) {
+      const messageElem = document.createElement("div");
+      messageElem.classList.add("message", sender);
+      messageElem.innerHTML = message;
+      chatContainer.appendChild(messageElem);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function removeLoading(loadingId) {
+      const loadingElem = document.getElementById(loadingId);
+      if (loadingElem) {
+        loadingElem.parentElement.remove();
+      }
+    }
+
+    function updatePromptSuggestions(response) {
+      const prompts = generatePrompts(response);
+      if (prompts.length > 0) {
+        promptContainer.innerHTML = "<h3>Weitere Fragen:</h3>";
+        promptContainer.style.display = "block";
+        prompts.forEach(prompt => {
+          const button = document.createElement("button");
+          button.innerText = prompt;
+          button.onclick = () => sendQuestion(prompt);
+          promptContainer.appendChild(button);
+        });
+      }
+    }
+
+    function generatePrompts(response) {
+      if (response.toLowerCase().includes("bip")) {
+        return [
+          "Wie wird das BIP berechnet?",
+          "Welche Faktoren beeinflussen das BIP?",
+          "Was sind die Unterschiede zwischen BIP und BNE?"
+        ];
+      }
+      if (response.toLowerCase().includes("steuer")) {
+        return [
+          "Welche Steuerarten gibt es in Deutschland?",
+          "Wie funktioniert die Einkommenssteuer?",
+          "Gibt es steuerliche Vorteile für Selbstständige?"
+        ];
+      }
+      if (response.toLowerCase().includes("künstliche intelligenz")) {
+        return [
+          "Welche Risiken birgt der Einsatz von KI?",
+          "Wie wird KI im Unternehmen genutzt?",
+          "Wie beeinflusst KI den Arbeitsmarkt?"
+        ];
+      }
+      return [];
+    }
+  </script>
 </body>
 </html>
