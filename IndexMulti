@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KI Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+            background-color: #f4f7f9;
+        }
+        #chat-container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        /* -- TAB-MENÜ STYLING -- */
+        .model-select {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .model-select button {
+            background: #ddd;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+        }
+        .model-select button.active {
+            background: #0057B8;
+            color: #fff;
+        }
+        .model-select button:hover {
+            background: #ccc;
+        }
+        
+        /* Restliche Styles bleiben wie gehabt */
+        input, button {
+            margin-top: 10px;
+            padding: 12px;
+            font-size: 16px;
+            border-radius: 8px;
+            border: 1px solid #0057B8;
+            outline: none;
+        }
+        input {
+            width: 70%;
+            padding-left: 10px;
+        }
+        button {
+            background-color: #0057B8;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #003E75;
+        }
+        #chat {
+            max-width: 800px;
+            margin: auto;
+            text-align: left;
+        }
+        .message {
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 8px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        .user {
+            background-color: #D4E6F1;
+            text-align: right;
+        }
+        .bot {
+            background-color: #E8F0FE;
+            text-align: left;
+        }
+        .error {
+            background-color: #F8D7DA;
+            color: red;
+        }
+        .prompt-suggestions {
+            margin-top: 20px;
+            text-align: left;
+            display: none;
+            background-color: #0078D4;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .prompt-suggestions h3 {
+            color: white;
+        }
+        .prompt-suggestions button {
+            display: block;
+            width: 100%;
+            margin: 5px 0;
+            text-align: left;
+            background-color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            color: #0078D4;
+            font-weight: bold;
+        }
+        .prompt-suggestions button:hover {
+            background-color: #e1f0ff;
+        }
+    </style>
+</head>
+<body>
+    <div id="chat-container">
+        <h1>Schön, dass Du da bist und diese künstliche Intelligenz nutzt.</h1>
+        <p>Stelle mir nun Deine Frage - ich freue mich, Dir helfen zu können.</p>
+
+        <!-- TAB-MENÜ FÜR MODELLE -->
+        <div class="model-select">
+            <button class="active" data-model="GPT-4o">GPT-4o</button>
+            <button data-model="DALL-E">DALL·E</button>
+            <button data-model="Mistral Large">Mistral Large</button>
+            <button data-model="DeepSeek R1">DeepSeek R1</button>
+        </div>
+
+        <div id="chat"></div>
+        
+        <input type="text" id="question" placeholder="Deine Frage hier...">
+        <button onclick="sendQuestion()">Senden</button>
+        
+        <div class="prompt-suggestions" id="prompt-suggestions">
+            <h3>Weitere Fragen:</h3>
+        </div>
+    </div>
+    
+    <script>
+        let lastResponse = "";  
+        let inputField = document.getElementById("question");
+        let promptContainer = document.getElementById("prompt-suggestions");
+
+        // Aktuell ausgewähltes Modell
+        let currentModel = "GPT-4o";
+        
+        // EventListener, um zwischen den Modellen zu wechseln
+        document.querySelectorAll('.model-select button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Alle Buttons zurücksetzen
+                document.querySelectorAll('.model-select button').forEach(b => b.classList.remove('active'));
+                // Aktiven Button markieren
+                btn.classList.add('active');
+                // Modell übernehmen
+                currentModel = btn.getAttribute('data-model');
+            });
+        });
+        
+        inputField.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                sendQuestion();
+            }
+        });
+
+        function sendQuestion(question = null) {
+            let inputQuestion = question || inputField.value;
+            if (!inputQuestion) return;
+            
+            let chat = document.getElementById("chat");
+            chat.innerHTML += `<div class='message user'>${inputQuestion}</div>`;
+            
+            // fetch-URL um den Parameter "model" erweitern
+            fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?model=${encodeURIComponent(currentModel)}&text=${encodeURIComponent(inputQuestion)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+                .then(response => response.text())
+                .then(data => {
+                    lastResponse = data;
+                    let formattedResponse = data.replace(/\*{2}(.+?)\*{2}/g, "<b>$1</b>").replace(/\n/g, "<br>");
+                    chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
+                    
+                    updatePromptSuggestions(lastResponse);
+                })
+                .catch(error => {
+                    chat.innerHTML += `<div class='message bot error'>Fehler: ${error}</div>`;
+                });
+            
+            inputField.value = "";
+        }
+        
+        function updatePromptSuggestions(response) {
+            let prompts = generatePrompts(response);
+            if (prompts.length > 0) {
+                promptContainer.innerHTML = "<h3>Weitere Fragen:</h3>";
+                promptContainer.style.display = "block";
+                prompts.forEach(prompt => {
+                    let button = document.createElement("button");
+                    button.innerText = prompt;
+                    button.onclick = function() { sendQuestion(prompt); };
+                    promptContainer.appendChild(button);
+                });
+            }
+        }
+        
+        function generatePrompts(response) {
+            if (response.toLowerCase().includes("bip")) {
+                return [
+                    "Wie wird das BIP berechnet?",
+                    "Welche Faktoren beeinflussen das BIP?",
+                    "Was sind die Unterschiede zwischen BIP und BNE?"
+                ];
+            }
+            if (response.toLowerCase().includes("steuer")) {
+                return [
+                    "Welche Steuerarten gibt es in Deutschland?",
+                    "Wie funktioniert die Einkommenssteuer?",
+                    "Gibt es steuerliche Vorteile für Selbstständige?"
+                ];
+            }
+            if (response.toLowerCase().includes("künstliche intelligenz")) {
+                return [
+                    "Welche Risiken birgt der Einsatz von KI?",
+                    "Wie wird KI im Unternehmen genutzt?",
+                    "Wie beeinflusst KI den Arbeitsmarkt?"
+                ];
+            }
+            return [];
+        }
+    </script>
+</body>
+</html>
