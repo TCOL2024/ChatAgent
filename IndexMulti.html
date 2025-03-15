@@ -1,250 +1,241 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KI Chat Interface</title>
   <style>
-      body {
-          font-family: Arial, sans-serif;
-          background-color: #f4f7f9;
-          margin: 0;
-          padding: 0;
-      }
-      
-      /* Container für den gesamten Chatbereich */
-      #chat-container {
-          max-width: 800px;
-          margin: 0 auto;
-          padding: 20px;
-          background-color: #ffffff;
-          min-height: 100vh;
-          box-sizing: border-box;
-      }
+    /* Grundlegendes Reset */
+    * {
+      box-sizing: border-box;
+      margin: 0; 
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      font-family: Arial, sans-serif;
+      background-color: #f4f7f9;
+    }
 
-      /* Überschrift / Begrüßung */
-      h1 {
-          text-align: center;
-          margin-bottom: 0.5rem;
-      }
-      p {
-          text-align: center;
-          margin-top: 0;
-      }
+    /* Container für den gesamten Inhalt */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: #fff;
+      position: relative;
+    }
 
-      /* Chat-Bereich */
-      #chat {
-          margin-top: 20px;
-      }
+    /* Kopfbereich */
+    header {
+      padding: 20px;
+      text-align: center;
+      border-bottom: 1px solid #ccc;
+    }
+    header h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    header p {
+      font-size: 1rem;
+      color: #666;
+    }
 
-      .message {
-          max-width: 75%;
-          margin: 10px 0;
-          padding: 15px;
-          border-radius: 12px;
-          word-wrap: break-word;
-          white-space: pre-wrap;
-      }
+    /* Chatbereich, der scrollen kann */
+    .chat-area {
+      flex: 1; /* füllt den verfügbaren Platz */
+      overflow-y: auto; /* scrollbar wenn zu viele Nachrichten */
+      padding: 20px;
+    }
 
-      /* Nachrichten vom Nutzer (rechts) */
-      .user {
-          background-color: #D4E6F1; /* Hellblau */
-          margin-left: auto;
-          text-align: right;
-          border-top-right-radius: 0;
-      }
+    /* Nachrichten-Wrapper */
+    .message {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 15px;
+      max-width: 80%;
+    }
+    .message.user {
+      margin-left: auto; /* Nachricht nach rechts schieben */
+      flex-direction: row-reverse; /* Avatar rechts, Text links */
+    }
 
-      /* Nachrichten von der KI (links) */
-      .bot {
-          background-color: #E8F0FE; /* Noch helleres Blau */
-          margin-right: auto;
-          text-align: left;
-          border-top-left-radius: 0;
-      }
+    /* Avatar */
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ccc;
+    }
+    .message.user .avatar {
+      margin-right: 0;
+      margin-left: 10px;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
 
-      /* Fehlermeldungen */
-      .error {
-          background-color: #F8D7DA;
-          color: red;
-      }
+    /* Text-Bubble */
+    .bubble {
+      background-color: #E8F0FE; 
+      padding: 10px 15px;
+      border-radius: 12px;
+      word-wrap: break-word;
+      white-space: pre-wrap;
+    }
+    /* Nutzer-Nachrichten-Bubble */
+    .user .bubble {
+      background-color: #D4E6F1;
+    }
 
-      /* Eingabebereich */
-      #input-container {
-          display: flex;
-          justify-content: center;
-          margin-top: 20px;
-      }
+    /* Eingabebereich am unteren Rand */
+    .input-container {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 800px;
+      background-color: #fff;
+      border-top: 1px solid #ccc;
+      display: flex;
+      padding: 10px;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #0057B8;
+      border-radius: 8px 0 0 8px;
+      outline: none;
+    }
+    .input-container button {
+      background-color: #0057B8;
+      color: #fff;
+      border: none;
+      padding: 0 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 0 8px 8px 0;
+    }
+    .input-container button:hover {
+      background-color: #003E75;
+    }
 
-      #question {
-          flex: 1;
-          max-width: 600px;
-          padding: 12px;
-          font-size: 16px;
-          border-radius: 8px 0 0 8px;
-          border: 1px solid #0057B8;
-          outline: none;
-      }
+    /* Damit die letzten Nachrichten nicht unter der Input-Leiste verschwinden */
+    .chat-area {
+      padding-bottom: 100px; 
+    }
 
-      button {
-          background-color: #0057B8;
-          color: white;
-          border: none;
-          padding: 0 20px;
-          font-size: 16px;
-          cursor: pointer;
-          border-radius: 0 8px 8px 0;
+    /* Responsive für mobile Geräte */
+    @media (max-width: 600px) {
+      header h1 {
+        font-size: 1.2rem;
       }
-      button:hover {
-          background-color: #003E75;
+      .avatar {
+        width: 32px;
+        height: 32px;
       }
-
-      /* Weitere Fragen (Prompt-Suggestions) */
-      .prompt-suggestions {
-          margin-top: 20px;
-          background-color: #0078D4;
-          padding: 10px;
-          border-radius: 8px;
-          display: none;
+      .input-container input {
+        font-size: 14px;
       }
-      .prompt-suggestions h3 {
-          color: #fff;
-          margin-top: 0;
+      .input-container button {
+        font-size: 14px;
       }
-      .prompt-suggestions button {
-          display: block;
-          width: 100%;
-          margin: 5px 0;
-          text-align: left;
-          background-color: #fff;
-          border: none;
-          padding: 10px;
-          cursor: pointer;
-          border-radius: 8px;
-          color: #0078D4;
-          font-weight: bold;
-      }
-      .prompt-suggestions button:hover {
-          background-color: #e1f0ff;
-      }
-
-      /* Optional: Footer / Copyright etc. */
-      footer {
-          text-align: center;
-          margin: 20px 0;
-          color: #888;
-      }
+    }
   </style>
 </head>
 <body>
-  <div id="chat-container">
-    <h1>Willkommen bei Deinem KI-Chat!</h1>
-    <p>Stelle mir nun Deine Frage – ich freue mich, Dir helfen zu können.</p>
+  <div class="container">
+    <!-- Kopfbereich -->
+    <header>
+      <h1>Willkommen beim KI-Chat!</h1>
+      <p>Hier steht die Frage, die der User tippen kann</p>
+    </header>
     
-    <!-- Chat-Verlauf -->
-    <div id="chat"></div>
+    <!-- Chatbereich -->
+    <div class="chat-area" id="chat">
+      <!-- Beispielhafte Nachrichten -->
+      <div class="message user">
+        <div class="avatar">
+          <!-- User-Avatar -->
+          <img src="https://via.placeholder.com/40/000/fff?text=U" alt="User Avatar">
+        </div>
+        <div class="bubble">
+          Kannst Du mir bei einer Vollmacht helfen?
+        </div>
+      </div>
+      <div class="message bot">
+        <div class="avatar">
+          <!-- Bot-Avatar -->
+          <img src="https://via.placeholder.com/40/888/fff?text=B" alt="Bot Avatar">
+        </div>
+        <div class="bubble">
+          Natürlich kann ich Ihnen dabei helfen, eine Vollmacht zu erstellen oder zu verstehen...
+        </div>
+      </div>
+    </div>
 
-    <!-- Eingabefeld und Sende-Button -->
-    <div id="input-container">
-      <input type="text" id="question" placeholder="Deine Frage hier...">
+    <!-- Eingabebereich -->
+    <div class="input-container">
+      <input type="text" id="question" placeholder="Hier tippen ..." />
       <button onclick="sendQuestion()">Senden</button>
     </div>
-    
-    <!-- Weitere Fragen / Prompt-Suggestions -->
-    <div class="prompt-suggestions" id="prompt-suggestions">
-      <h3>Weitere Fragen:</h3>
-    </div>
   </div>
-  
-  <footer>
-    <p>© 2025 Dein Chatbot</p>
-  </footer>
 
   <script>
-    let lastResponse = "";  
-    let inputField = document.getElementById("question");
-    let promptContainer = document.getElementById("prompt-suggestions");
-    
-    // ENTER-Taste zum Senden
-    inputField.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
+    function sendQuestion() {
+      const input = document.getElementById('question');
+      const userText = input.value.trim();
+      if (!userText) return;
+
+      // User-Nachricht einfügen
+      const chatArea = document.getElementById('chat');
+      chatArea.innerHTML += `
+        <div class="message user">
+          <div class="avatar">
+            <img src="https://via.placeholder.com/40/000/fff?text=U" alt="User Avatar">
+          </div>
+          <div class="bubble">${userText}</div>
+        </div>
+      `;
+      input.value = "";
+
+      // Scroll nach unten
+      chatArea.scrollTop = chatArea.scrollHeight;
+
+      // Simulierte Bot-Antwort (hier später fetch einbauen)
+      setTimeout(() => {
+        const botResponse = "Danke für Deine Frage: " + userText + "<br>Hier wäre eine Beispiel-Antwort...";
+        chatArea.innerHTML += `
+          <div class="message bot">
+            <div class="avatar">
+              <img src="https://via.placeholder.com/40/888/fff?text=B" alt="Bot Avatar">
+            </div>
+            <div class="bubble">${botResponse}</div>
+          </div>
+        `;
+        // Nach unten scrollen
+        chatArea.scrollTop = chatArea.scrollHeight;
+      }, 800);
+    }
+
+    // ENTER zum Senden
+    document.getElementById('question').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
         sendQuestion();
       }
     });
-
-    function sendQuestion(question = null) {
-      let inputQuestion = question || inputField.value;
-      if (!inputQuestion) return;
-      
-      // User-Frage anzeigen
-      let chat = document.getElementById("chat");
-      chat.innerHTML += `<div class='message user'>${inputQuestion}</div>`;
-      
-      // FAKE-RESPONSE simulieren (statt echtem fetch)
-      // Hier kannst du später deinen fetch(...) einbauen.
-      setTimeout(() => {
-        // Beispielantwort
-        let data = "Dies ist eine simulierte KI-Antwort auf deine Frage: <b>" + inputQuestion + "</b>";
-        lastResponse = data;
-
-        // Formatierung (Markdown-Simulation)
-        let formattedResponse = data.replace(/\n/g, "<br>");
-        
-        // KI-Antwort anzeigen
-        chat.innerHTML += `<div class='message bot'>${formattedResponse}</div>`;
-
-        // Prompt-Vorschläge aktualisieren
-        updatePromptSuggestions(lastResponse);
-      }, 500);
-      
-      // Eingabefeld leeren
-      inputField.value = "";
-    }
-    
-    // Prompt-Vorschläge generieren
-    function updatePromptSuggestions(response) {
-      let prompts = generatePrompts(response);
-      if (prompts.length > 0) {
-        promptContainer.innerHTML = "<h3>Weitere Fragen:</h3>";
-        promptContainer.style.display = "block";
-        prompts.forEach(prompt => {
-          let button = document.createElement("button");
-          button.innerText = prompt;
-          button.onclick = function() { sendQuestion(prompt); };
-          promptContainer.appendChild(button);
-        });
-      }
-    }
-
-    // Beispielhafte Vorschläge
-    function generatePrompts(response) {
-      let suggestions = [];
-      let lowerResp = response.toLowerCase();
-      
-      if (lowerResp.includes("bip")) {
-        suggestions = [
-          "Wie wird das BIP berechnet?",
-          "Welche Faktoren beeinflussen das BIP?",
-          "Was sind die Unterschiede zwischen BIP und BNE?"
-        ];
-      }
-      else if (lowerResp.includes("steuer")) {
-        suggestions = [
-          "Welche Steuerarten gibt es in Deutschland?",
-          "Wie funktioniert die Einkommenssteuer?",
-          "Gibt es steuerliche Vorteile für Selbstständige?"
-        ];
-      }
-      else if (lowerResp.includes("künstliche intelligenz")) {
-        suggestions = [
-          "Welche Risiken birgt der Einsatz von KI?",
-          "Wie wird KI im Unternehmen genutzt?",
-          "Wie beeinflusst KI den Arbeitsmarkt?"
-        ];
-      }
-      
-      return suggestions;
-    }
   </script>
 </body>
 </html>
