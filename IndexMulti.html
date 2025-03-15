@@ -164,25 +164,17 @@
     
     <!-- Chatbereich -->
     <div class="chat-area" id="chat">
-      <!-- Beispielhafte Nachrichten -->
-      <div class="message user">
-        <div class="avatar">
-          <!-- User-Avatar -->
-          <img src="https://via.placeholder.com/40/000/fff?text=U" alt="User Avatar">
-        </div>
-        <div class="bubble">
-          Kannst Du mir bei einer Vollmacht helfen?
-        </div>
-      </div>
+      <!-- Beispielhafte Startnachrichten (optional) -->
+      <!--
       <div class="message bot">
         <div class="avatar">
-          <!-- Bot-Avatar -->
           <img src="https://via.placeholder.com/40/888/fff?text=B" alt="Bot Avatar">
         </div>
         <div class="bubble">
-          Natürlich kann ich Ihnen dabei helfen, eine Vollmacht zu erstellen oder zu verstehen...
+          Hallo! Wie kann ich dir helfen?
         </div>
       </div>
+      -->
     </div>
 
     <!-- Eingabebereich -->
@@ -193,49 +185,66 @@
   </div>
 
   <script>
-    function sendQuestion() {
-      const input = document.getElementById('question');
-      const userText = input.value.trim();
-      if (!userText) return;
-
-      // User-Nachricht einfügen
-      const chatArea = document.getElementById('chat');
-      chatArea.innerHTML += `
-        <div class="message user">
-          <div class="avatar">
-            <img src="https://via.placeholder.com/40/000/fff?text=U" alt="User Avatar">
-          </div>
-          <div class="bubble">${userText}</div>
-        </div>
-      `;
-      input.value = "";
-
-      // Scroll nach unten
-      chatArea.scrollTop = chatArea.scrollHeight;
-
-      // Simulierte Bot-Antwort (hier später fetch einbauen)
-      setTimeout(() => {
-        const botResponse = "Danke für Deine Frage: " + userText + "<br>Hier wäre eine Beispiel-Antwort...";
-        chatArea.innerHTML += `
-          <div class="message bot">
-            <div class="avatar">
-              <img src="https://via.placeholder.com/40/888/fff?text=B" alt="Bot Avatar">
-            </div>
-            <div class="bubble">${botResponse}</div>
-          </div>
-        `;
-        // Nach unten scrollen
-        chatArea.scrollTop = chatArea.scrollHeight;
-      }, 800);
-    }
+    let lastResponse = ""; // Falls du einen "Kontext" mitschicken möchtest
+    const chatArea = document.getElementById('chat');
+    const inputField = document.getElementById('question');
 
     // ENTER zum Senden
-    document.getElementById('question').addEventListener('keypress', (e) => {
+    inputField.addEventListener('keypress', (e) => {
       if (e.key === 'Enter') {
         e.preventDefault();
         sendQuestion();
       }
     });
+
+    function sendQuestion() {
+      const userText = inputField.value.trim();
+      if (!userText) return;
+
+      // User-Nachricht im Chat anzeigen
+      addMessageToChat(userText, 'user');
+      inputField.value = "";
+
+      // Hier den echten Fetch-Aufruf zu deinem Make-Modul
+      fetch(`https://hook.us2.make.com/hq1w4uay9lnxtbdpuw2luier6211ca77?text=${encodeURIComponent(userText)}&lastResponse=${encodeURIComponent(lastResponse)}`)
+        .then(response => response.text())
+        .then(data => {
+          // Speichere den letzten Response, falls du ihn für Kontext brauchst
+          lastResponse = data;
+
+          // Falls du Markdown-ähnliche Formatierungen hast, kannst du sie hier umwandeln
+          // z.B. **Text** => <b>Text</b> oder \n => <br>
+          let formatted = data
+            .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+            .replace(/\n/g, "<br>");
+
+          addMessageToChat(formatted, 'bot');
+        })
+        .catch(error => {
+          addMessageToChat("Fehler: " + error, 'bot');
+        });
+    }
+
+    function addMessageToChat(message, sender) {
+      // Sender: 'user' oder 'bot'
+      const avatarUrl = (sender === 'user')
+        ? "https://via.placeholder.com/40/000/fff?text=U"
+        : "https://via.placeholder.com/40/888/fff?text=B";
+
+      // HTML zusammenbauen
+      const msgHtml = `
+        <div class="message ${sender}">
+          <div class="avatar">
+            <img src="${avatarUrl}" alt="${sender} Avatar">
+          </div>
+          <div class="bubble">${message}</div>
+        </div>
+      `;
+      chatArea.innerHTML += msgHtml;
+
+      // Automatisch nach unten scrollen
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
   </script>
 </body>
 </html>
