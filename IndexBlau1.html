@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dein persönlicher Assistent</title>
-  <!-- Inter Font from Google Fonts -->
+  <!-- Inter Font von Google Fonts -->
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
   <style>
     /* Global Styles */
@@ -115,11 +115,11 @@
     }
     .input-area button {
       padding: 0 20px;
+      font-size: 16px;
       border: none;
       border-radius: 8px;
       background-color: #007aff;
       color: #fff;
-      font-size: 16px;
       cursor: pointer;
       transition: background 0.2s;
     }
@@ -143,7 +143,7 @@
   
   <!-- Chat Container -->
   <div class="chat-container" id="chatContainer">
-    <!-- Chat messages werden hier eingefügt -->
+    <!-- Chat-Nachrichten werden hier eingefügt -->
   </div>
   
   <!-- Input Area -->
@@ -191,11 +191,52 @@
       }
     }
     
+    // Neue Formatierungsfunktion: erkennt Headings, Absätze und einen Quellen-Block
+    function formatMessage(text) {
+      // Splitte den Text in Hauptinhalt und Quellen (falls vorhanden)
+      const parts = text.split("\n\nQuellen:\n");
+      const mainText = parts[0];
+      const footnoteText = parts[1] || "";
+      let html = "";
+      
+      // Zeilen einzeln verarbeiten
+      const lines = mainText.split("\n");
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith("# ")) {
+          html += `<h1>${trimmed.substring(2)}</h1>`;
+        } else if (trimmed.startsWith("## ")) {
+          html += `<h2>${trimmed.substring(3)}</h2>`;
+        } else if (trimmed.startsWith("### ")) {
+          html += `<h3>${trimmed.substring(4)}</h3>`;
+        } else if (trimmed !== "") {
+          html += `<p>${trimmed}</p>`;
+        } else {
+          html += `<br>`;
+        }
+      });
+      
+      // Falls Quellen vorhanden sind, als eigenen Abschnitt anzeigen
+      if (footnoteText.trim()) {
+        html += `<h3>Quellen</h3>`;
+        const sources = footnoteText.split("\n");
+        sources.forEach(source => {
+          const s = source.trim();
+          if (s !== "") {
+            html += `<p>${s}</p>`;
+          }
+        });
+      }
+      
+      return html;
+    }
+    
     function renderMessage(sender, text) {
       const container = document.getElementById("chatContainer");
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", sender);
-      msgDiv.innerHTML = text;
+      // Für Bot-Nachrichten wird die Formatierung angewendet
+      msgDiv.innerHTML = sender === "bot" ? formatMessage(text) : text;
       container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
     }
