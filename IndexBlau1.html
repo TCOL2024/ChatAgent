@@ -38,20 +38,29 @@
       font-size: 14px;
       cursor: pointer;
     }
-    /* Chat Container */
-    .chat-container {
+    /* Main Container: Zwei Spalten */
+    .main-container {
       flex: 1;
       display: flex;
+      overflow: hidden;
+    }
+    /* Chat Section (Links, 75%) */
+    .chat-section {
+      flex: 3;
+      display: flex;
       flex-direction: column;
-      max-width: 800px;
-      width: 100%;
-      margin: 0 auto;
       padding: 16px;
       overflow-y: auto;
     }
+    /* Chat Container */
+    .chat-container {
+      flex: 1;
+      overflow-y: auto;
+      margin-bottom: 16px;
+    }
     /* Message Bubbles */
     .message {
-      max-width: 70%;
+      max-width: 80%;
       margin-bottom: 12px;
       padding: 12px 16px;
       border-radius: 12px;
@@ -67,8 +76,8 @@
     }
     .message.bot {
       background-color: #fff;
-      align-self: flex-start;
       border: 1px solid #e0e0e0;
+      align-self: flex-start;
     }
     .message.user {
       background-color: #007aff;
@@ -126,37 +135,55 @@
     .input-area button:hover {
       background-color: #005ecb;
     }
+    /* Info Section (Rechts, 25%) */
+    .info-section {
+      flex: 1;
+      border-left: 1px solid #e0e0e0;
+      padding: 16px;
+      overflow-y: auto;
+      background-color: #fff;
+    }
     /* Responsive */
-    @media (max-width: 600px) {
-      .chat-container, .input-area {
-        padding: 8px;
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      .info-section {
+        border-left: none;
+        border-top: 1px solid #e0e0e0;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Header -->
   <div class="header">
     Dein persönlicher Assistent
     <button onclick="resetChat()">Reset</button>
   </div>
-  
-  <!-- Chat Container -->
-  <div class="chat-container" id="chatContainer">
-    <!-- Chat-Nachrichten werden hier eingefügt -->
-  </div>
-  
-  <!-- Input Area -->
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Deine Nachricht..." onkeypress="handleKeyPress(event)">
-    <button onclick="sendMessage()">Absenden</button>
+  <div class="main-container">
+    <!-- Linke Spalte: Chat -->
+    <div class="chat-section">
+      <div class="chat-container" id="chatContainer">
+        <!-- Chat-Nachrichten erscheinen hier -->
+      </div>
+      <div class="input-area" id="inputArea">
+        <input type="text" id="userInput" placeholder="Deine Nachricht..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">Absenden</button>
+      </div>
+    </div>
+    <!-- Rechte Spalte: Info -->
+    <div class="info-section">
+      <h3>Infos</h3>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae justo euismod, pharetra eros ac, efficitur nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis in volutpat lectus. Vivamus ac ante sit amet ligula sodales suscipit. Cras nec felis vel arcu fermentum dictum.</p>
+    </div>
   </div>
   
   <script>
     let userName = "";
     let userId = "";
-    let askedForName = false;
+    let askedForName = true;
     let lastBotAnswer = "";
+    // Der Webhook wird hier simuliert – der echte Aufruf kann integriert werden.
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
     let chatHistory = [];
     
@@ -171,6 +198,7 @@
       const storedUserName = localStorage.getItem("userName");
       if (storedUserName) {
         userName = storedUserName;
+        askedForName = false;
       }
     }
     
@@ -191,15 +219,12 @@
       }
     }
     
-    // Neue Formatierungsfunktion: erkennt Headings, Absätze und einen Quellen-Block
+    // Formatiert Bot-Nachrichten: erkennt Headings, Absätze und einen Quellen-Block
     function formatMessage(text) {
-      // Splitte den Text in Hauptinhalt und Quellen (falls vorhanden)
       const parts = text.split("\n\nQuellen:\n");
       const mainText = parts[0];
       const footnoteText = parts[1] || "";
       let html = "";
-      
-      // Zeilen einzeln verarbeiten
       const lines = mainText.split("\n");
       lines.forEach(line => {
         const trimmed = line.trim();
@@ -215,8 +240,6 @@
           html += `<br>`;
         }
       });
-      
-      // Falls Quellen vorhanden sind, als eigenen Abschnitt anzeigen
       if (footnoteText.trim()) {
         html += `<h3>Quellen</h3>`;
         const sources = footnoteText.split("\n");
@@ -227,7 +250,6 @@
           }
         });
       }
-      
       return html;
     }
     
@@ -235,7 +257,6 @@
       const container = document.getElementById("chatContainer");
       const msgDiv = document.createElement("div");
       msgDiv.classList.add("message", sender);
-      // Für Bot-Nachrichten wird die Formatierung angewendet
       msgDiv.innerHTML = sender === "bot" ? formatMessage(text) : text;
       container.appendChild(msgDiv);
       container.scrollTop = container.scrollHeight;
@@ -257,82 +278,53 @@
       const inputEl = document.getElementById("userInput");
       const userInput = inputEl.value.trim();
       if (!userInput) return;
-      addMessage("user", userInput);
-      inputEl.value = "";
       
-      // Falls Name noch nicht erfasst wurde
+      // Wenn der Name noch abgefragt wird, wird dieser Wert als Name übernommen.
       if (askedForName && !userName) {
-        if (userInput.toLowerCase() === "nein") {
-          addMessage("bot", "Wie kann ich dir behilflich sein?");
-        } else {
-          userName = userInput;
-          localStorage.setItem("userName", userName);
-          addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich dir weiterhelfen?`);
-        }
+        userName = userInput;
+        localStorage.setItem("userName", userName);
+        addMessage("bot", `Hallo ${userName}, schön, dass Du hier bist und diese neue und noch im Training befindliche KI testen möchtest.`);
+        showInitialOptions();
         askedForName = false;
+        inputEl.value = "";
         return;
       }
       
-      // Zeige "Bot denkt" Indikator
-      showTypingIndicator();
+      // Normale Chat-Nachricht (z. B. bei "Ausbildung")
+      addMessage("user", userInput);
+      inputEl.value = "";
       
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: userId,
-            name: userName || "Unbekannt",
-            question: userInput,
-            last_answer: lastBotAnswer
-          })
-        });
-        const textResponse = await response.text();
-        console.log("Serverantwort:", textResponse);
-        if (!response.ok) {
-          throw new Error(`HTTP-Fehler! Status: ${response.status}`);
-        }
-        let jsonResponse;
-        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
-          try {
-            jsonResponse = JSON.parse(textResponse);
-          } catch (error) {
-            jsonResponse = { answer: textResponse };
-          }
-        } else {
-          jsonResponse = { answer: textResponse };
-        }
-        
-        removeTypingIndicator();
-        
-        if (jsonResponse.answer) {
-          lastBotAnswer = jsonResponse.answer;
-          addMessage("bot", jsonResponse.answer);
-        } else {
-          addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
-        }
-      } catch (error) {
-        console.error("Fehler:", error);
-        removeTypingIndicator();
-        addMessage("bot", "Es gab ein Problem mit der Server-Antwort.");
+      // Hier kann ein Webhook-Aufruf integriert werden – aktuell simulieren wir eine Antwort.
+      addMessage("bot", "Danke für deine Frage. Bitte warte einen Moment...");
+    }
+    
+    // Zeigt initial die beiden Auswahlmöglichkeiten an.
+    function showInitialOptions() {
+      const optionsHTML = `
+        <p>Bitte wähle:</p>
+        <button onclick="handleOption('prueferseminar')">Hast Du Fragen zum Prüferseminar?</button>
+        <button onclick="handleOption('ausbildung')">Hast Du Fragen zu Ausbildung?</button>
+      `;
+      addMessage("bot", optionsHTML);
+    }
+    
+    // Behandelt die Auswahl.
+    function handleOption(option) {
+      if (option === 'prueferseminar') {
+        showPrueferseminarOptions();
+      } else if (option === 'ausbildung') {
+        addMessage("bot", "Bitte stelle jetzt deine Fragen zur Ausbildung.");
       }
     }
     
-    function showTypingIndicator() {
-      const container = document.getElementById("chatContainer");
-      const indicator = document.createElement("div");
-      indicator.classList.add("typing-indicator");
-      indicator.id = "typingIndicator";
-      indicator.innerHTML = "Bot denkt<span>.</span>";
-      container.appendChild(indicator);
-      container.scrollTop = container.scrollHeight;
-    }
-    
-    function removeTypingIndicator() {
-      const indicator = document.getElementById("typingIndicator");
-      if (indicator) {
-        indicator.remove();
-      }
+    // Zeigt für das Prüferseminar zwei klickbare Optionen an.
+    function showPrueferseminarOptions() {
+      const html = `
+        <p>Wähle eine Option:</p>
+        <button onclick="window.open('https://www.ihk-oldenburg.de/sps', '_blank')">Termine der Prüferseminare</button>
+        <button onclick="window.open('https://www.ihk-oldenburg.de/prueferunterlagen', '_blank')">Prüferunterlagen</button>
+      `;
+      addMessage("bot", html);
     }
     
     function resetChat() {
@@ -343,9 +335,9 @@
       askedForName = true;
       lastBotAnswer = "";
       document.getElementById("chatContainer").innerHTML = "";
+      document.getElementById("userInput").value = "";
       setTimeout(() => {
-        addMessage("bot", "Schön, dass du hier bist. Darf ich dich mit Vornamen ansprechen?");
-        askedForName = true;
+        addMessage("bot", "Hallo, darf ich dich mit deinem Vornamen ansprechen?");
       }, 500);
     }
     
@@ -354,7 +346,7 @@
       loadChatHistory();
       if (chatHistory.length === 0) {
         setTimeout(() => {
-          addMessage("bot", "Schön, dass du hier bist. Darf ich dich mit Vornamen ansprechen?");
+          addMessage("bot", "Hallo, darf ich dich mit deinem Vornamen ansprechen?");
           askedForName = true;
         }, 500);
       }
