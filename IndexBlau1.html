@@ -143,6 +143,23 @@
       overflow-y: auto;
       background-color: #fff;
     }
+    /* Option Button Style */
+    .button-option {
+      display: inline-block;
+      padding: 10px 20px;
+      margin: 8px 4px;
+      font-size: 16px;
+      color: #fff;
+      background-color: #007aff;
+      border: none;
+      border-radius: 24px;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .button-option:hover {
+      background-color: #005ecb;
+    }
     /* Responsive */
     @media (max-width: 768px) {
       .main-container {
@@ -172,9 +189,9 @@
       </div>
     </div>
     <!-- Rechte Spalte: Info -->
-    <div class="info-section">
+    <div class="info-section" id="infoSection">
       <h3>Infos</h3>
-      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae justo euismod, pharetra eros ac, efficitur nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Duis in volutpat lectus. Vivamus ac ante sit amet ligula sodales suscipit. Cras nec felis vel arcu fermentum dictum.</p>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae justo euismod, pharetra eros ac, efficitur nibh. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas.</p>
     </div>
   </div>
   
@@ -183,7 +200,6 @@
     let userId = "";
     let askedForName = true;
     let lastBotAnswer = "";
-    // Der Webhook wird hier simuliert – der echte Aufruf kann integriert werden.
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
     let chatHistory = [];
     
@@ -219,7 +235,6 @@
       }
     }
     
-    // Formatiert Bot-Nachrichten: erkennt Headings, Absätze und einen Quellen-Block
     function formatMessage(text) {
       const parts = text.split("\n\nQuellen:\n");
       const mainText = parts[0];
@@ -279,7 +294,6 @@
       const userInput = inputEl.value.trim();
       if (!userInput) return;
       
-      // Wenn der Name noch abgefragt wird, wird dieser Wert als Name übernommen.
       if (askedForName && !userName) {
         userName = userInput;
         localStorage.setItem("userName", userName);
@@ -290,25 +304,22 @@
         return;
       }
       
-      // Normale Chat-Nachricht (z. B. bei "Ausbildung")
       addMessage("user", userInput);
       inputEl.value = "";
       
-      // Hier kann ein Webhook-Aufruf integriert werden – aktuell simulieren wir eine Antwort.
+      // Hier könnte ein Webhook-Aufruf integriert werden. Aktuell simulieren wir eine Antwort:
       addMessage("bot", "Danke für deine Frage. Bitte warte einen Moment...");
     }
     
-    // Zeigt initial die beiden Auswahlmöglichkeiten an.
     function showInitialOptions() {
       const optionsHTML = `
         <p>Bitte wähle:</p>
-        <button onclick="handleOption('prueferseminar')">Hast Du Fragen zum Prüferseminar?</button>
-        <button onclick="handleOption('ausbildung')">Hast Du Fragen zu Ausbildung?</button>
+        <button class="button-option" onclick="handleOption('prueferseminar')">Fragen zum Prüferseminar</button>
+        <button class="button-option" onclick="handleOption('ausbildung')">Fragen zur Ausbildung</button>
       `;
       addMessage("bot", optionsHTML);
     }
     
-    // Behandelt die Auswahl.
     function handleOption(option) {
       if (option === 'prueferseminar') {
         showPrueferseminarOptions();
@@ -317,14 +328,15 @@
       }
     }
     
-    // Zeigt für das Prüferseminar zwei klickbare Optionen an.
+    // Schiebt die Prüferseminar-Optionen in die rechte Spalte (Info-Bereich)
     function showPrueferseminarOptions() {
-      const html = `
-        <p>Wähle eine Option:</p>
-        <button onclick="window.open('https://www.ihk-oldenburg.de/sps', '_blank')">Termine der Prüferseminare</button>
-        <button onclick="window.open('https://www.ihk-oldenburg.de/prueferunterlagen', '_blank')">Prüferunterlagen</button>
+      const infoSection = document.getElementById("infoSection");
+      const optionsHTML = `
+        <h3>Prüferseminar Optionen</h3>
+        <button class="button-option" onclick="window.open('https://www.ihk-oldenburg.de/sps', '_blank')">Termine Prüferseminare</button>
+        <button class="button-option" onclick="window.open('https://www.ihk-oldenburg.de/prueferunterlagen', '_blank')">Prüferunterlagen</button>
       `;
-      addMessage("bot", html);
+      infoSection.innerHTML = optionsHTML;
     }
     
     function resetChat() {
@@ -336,6 +348,9 @@
       lastBotAnswer = "";
       document.getElementById("chatContainer").innerHTML = "";
       document.getElementById("userInput").value = "";
+      // Setze den Info-Bereich auf Standard-Inhalt zurück
+      document.getElementById("infoSection").innerHTML = `<h3>Infos</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae justo euismod, pharetra eros ac, efficitur nibh.</p>`;
       setTimeout(() => {
         addMessage("bot", "Hallo, darf ich dich mit deinem Vornamen ansprechen?");
       }, 500);
