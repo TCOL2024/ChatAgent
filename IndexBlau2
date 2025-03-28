@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ihr Personalmanagement-Assistent</title>
+  <style>
+    :root {
+      --primary-blue: #0038A8; /* Allianz Blau */
+      --secondary-blue: #0054F0;
+      --light-gray: #F5F7FA;
+      --medium-gray: #E1E5EB;
+      --dark-gray: #6C757D;
+      --accent-gray: #F8F9FA;
+      --white: #FFFFFF;
+      --black: #212529;
+      --success-green: #28A745;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'AllianzSans', 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--light-gray);
+      color: var(--black);
+      line-height: 1.6;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header im Allianz-Stil */
+    .main-header {
+      background-color: var(--white);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .main-header h1 {
+      color: var(--primary-blue);
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .reset-btn {
+      background-color: transparent;
+      color: var(--primary-blue);
+      border: 1px solid var(--primary-blue);
+      border-radius: 4px;
+      padding: 0.5rem 1rem;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .reset-btn:hover {
+      background-color: var(--primary-blue);
+      color: var(--white);
+    }
+
+    /* Intro-Bereich */
+    .intro-text {
+      background-color: var(--white);
+      padding: 1.5rem 2rem;
+      text-align: center;
+      border-bottom: 1px solid var(--medium-gray);
+      font-size: 0.9375rem;
+      color: var(--dark-gray);
+    }
+
+    /* Haupt-Chat-Container */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 1.5rem;
+    }
+
+    /* Chat-Box mit Scrollbereich */
+    .chat-box {
+      flex: 1;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Nachrichten-Stile */
+    .message {
+      padding: 0.75rem 1.25rem;
+      border-radius: 1rem;
+      margin-bottom: 0.75rem;
+      max-width: 80%;
+      font-size: 0.9375rem;
+      line-height: 1.5;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user-message {
+      background-color: var(--primary-blue);
+      color: var(--white);
+      align-self: flex-end;
+      border-bottom-right-radius: 0.25rem;
+    }
+
+    .bot-message {
+      background-color: var(--accent-gray);
+      color: var(--black);
+      align-self: flex-start;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    .question-highlight {
+      background-color: rgba(0, 56, 168, 0.05);
+      border-left: 3px solid var(--primary-blue);
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+
+    /* Ladeanimation */
+    .typing-indicator {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      background-color: var(--accent-gray);
+      border-radius: 1rem;
+      margin-bottom: 0.75rem;
+      align-self: flex-start;
+      border-bottom-left-radius: 0.25rem;
+    }
+
+    .typing-dot {
+      width: 8px;
+      height: 8px;
+      margin: 0 2px;
+      background-color: var(--dark-gray);
+      border-radius: 50%;
+      opacity: 0.4;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+      30% { transform: translateY(-5px); opacity: 1; }
+    }
+
+    /* Eingabebereich */
+    .input-area {
+      display: flex;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+      padding: 1rem;
+    }
+
+    .input-field {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--medium-gray);
+      border-radius: 4px;
+      font-size: 0.9375rem;
+      transition: border 0.3s ease;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 2px rgba(0, 56, 168, 0.2);
+    }
+
+    .send-btn {
+      margin-left: 0.75rem;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary-blue);
+      color: var(--white);
+      border: none;
+      border-radius: 4px;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .send-btn:hover {
+      background-color: var(--secondary-blue);
+    }
+
+    .send-btn:disabled {
+      background-color: var(--medium-gray);
+      cursor: not-allowed;
+    }
+
+    /* Fußnoten */
+    .footnotes {
+      font-size: 0.75rem;
+      color: var(--dark-gray);
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid var(--medium-gray);
+    }
+
+    .footnotes p {
+      margin: 0.25rem 0;
+    }
+
+    /* Responsive Anpassungen */
+    @media (max-width: 768px) {
+      .main-header {
+        padding: 1rem;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .main-header h1 {
+        font-size: 1.25rem;
+        margin-bottom: 0.5rem;
+      }
+
+      .chat-container {
+        padding: 1rem;
+      }
+
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header-Bereich -->
+  <header class="main-header">
+    <h1>Ihr persönlicher Personalmanagement-Assistent</h1>
+    <button class="reset-btn" onclick="resetChat()">Neuen Chat starten</button>
+  </header>
+
+  <!-- Einleitungstext -->
+  <section class="intro-text">
+    Willkommen bei Ihrem digitalen Assistenten für Personalmanagement-Fragen. 
+    Stellen Sie Ihre Frage und erhalten Sie professionelle Unterstützung.
+  </section>
+
+  <!-- Haupt-Chat-Bereich -->
+  <main class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+
+    <!-- Eingabebereich -->
+    <div class="input-area">
+      <input 
+        type="text" 
+        id="userInput" 
+        class="input-field" 
+        placeholder="Ihre Nachricht hier eingeben..." 
+        onkeypress="handleKeyPress(event)"
+        aria-label="Nachricht eingeben"
+      >
+      <button id="sendButton" class="send-btn" onclick="sendMessage()">Senden</button>
+    </div>
+  </main>
+
+  <script>
+    let userName = "";
+    let userId = "";
+    let askedForName = false;
+    let lastBotAnswer = "";
+    let isTyping = false;
+    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+
+    // Chatverlauf
+    let chatHistory = [];
+
+    // Initialisiert den Nutzer
+    function initializeUser() {
+      userId = localStorage.getItem("userId") || generateUserId();
+      localStorage.setItem("userId", userId);
+      
+      userName = localStorage.getItem("userName") || "";
+    }
+
+    function generateUserId() {
+      return "user-" + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    }
+
+    // Speichert den Chatverlauf
+    function saveChatHistory() {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    }
+
+    // Lädt den Chatverlauf
+    function loadChatHistory() {
+      const storedHistory = localStorage.getItem("chatHistory");
+      if (storedHistory) {
+        try {
+          chatHistory = JSON.parse(storedHistory);
+          chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
+        } catch (error) {
+          console.error("Fehler beim Laden:", error);
+          chatHistory = [];
+        }
+      }
+    }
+
+    // Zeigt Typing-Indicator an
+    function showTypingIndicator() {
+      if (isTyping) return;
+      
+      isTyping = true;
+      const chatBox = document.getElementById("chatBox");
+      const typingDiv = document.createElement("div");
+      typingDiv.className = "typing-indicator";
+      typingDiv.id = "typingIndicator";
+      typingDiv.innerHTML = `
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      `;
+      chatBox.appendChild(typingDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Entfernt Typing-Indicator
+    function hideTypingIndicator() {
+      isTyping = false;
+      const typingElement = document.getElementById("typingIndicator");
+      if (typingElement) {
+        typingElement.remove();
+      }
+    }
+
+    // Formatiert Nachrichten mit persönlicher Ansprache
+    function formatMessage(text) {
+      let formattedText = text;
+      
+      // Persönliche Ansprache einfügen
+      if (userName) {
+        const namePattern = new RegExp(`\\b${userName}\\b`, 'gi');
+        formattedText = formattedText.replace(namePattern, match => 
+          `<strong style="color: var(--primary-blue)">${match}</strong>`
+        );
+      }
+      
+      // Fragen hervorheben
+      formattedText = formattedText.replace(/(Frage:|Frage|F:)\s*(.*?)(?=\n|$)/gi, 
+        '<div class="question-highlight">$&</div>'
+      );
+      
+      // Markdown zu HTML
+      formattedText = formattedText
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '<br><br>');
+      
+      // Quellen formatieren
+      const sourcesMatch = formattedText.match(/\nQuellen:\n(.*)/s);
+      if (sourcesMatch) {
+        const mainText = formattedText.replace(sourcesMatch[0], '');
+        const sources = sourcesMatch[1].split('\n').filter(s => s.trim());
+        let sourcesHtml = '<div class="footnotes"><p><strong>Quellen:</strong></p>';
+        sources.forEach((source, i) => {
+          sourcesHtml += `<p>${i + 1}. ${source.trim()}</p>`;
+        });
+        sourcesHtml += '</div>';
+        formattedText = mainText + sourcesHtml;
+      }
+      
+      return formattedText;
+    }
+
+    // Zeigt eine Nachricht an
+    function renderMessage(sender, text) {
+      const chatBox = document.getElementById("chatBox");
+      const messageDiv = document.createElement("div");
+      messageDiv.className = `message ${sender}-message`;
+      
+      if (sender === "bot") {
+        messageDiv.innerHTML = formatMessage(text);
+      } else {
+        messageDiv.textContent = text;
+      }
+      
+      chatBox.appendChild(messageDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    // Fügt Nachricht hinzu
+    function addMessage(sender, text) {
+      renderMessage(sender, text);
+      chatHistory.push({ sender, text });
+      saveChatHistory();
+    }
+
+    // DOM ready
+    document.addEventListener("DOMContentLoaded", function() {
+      initializeUser();
+      loadChatHistory();
+      
+      if (chatHistory.length === 0) {
+        setTimeout(() => {
+          const greeting = userName 
+            ? `Willkommen zurück, ${userName}! Wie kann ich Ihnen helfen?`
+            : "Herzlich willkommen! Darf ich Sie mit Ihrem Vornamen ansprechen?";
+          addMessage("bot", greeting);
+          askedForName = !userName;
+        }, 800);
+      }
+      
+      // Fokus auf Eingabefeld
+      document.getElementById("userInput").focus();
+    });
+
+    // Enter-Taste abfangen
+    function handleKeyPress(event) {
+      if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        sendMessage();
+      }
+    }
+
+    // Nachricht senden
+    async function sendMessage() {
+      const inputField = document.getElementById("userInput");
+      const userInput = inputField.value.trim();
+      if (!userInput || isTyping) return;
+
+      // UI sperren während der Verarbeitung
+      inputField.disabled = true;
+      document.getElementById("sendButton").disabled = true;
+      
+      addMessage("user", userInput);
+      inputField.value = "";
+      
+      // Name erfassen falls benötigt
+      if (askedForName && !userName) {
+        if (userInput.toLowerCase() === "nein") {
+          addMessage("bot", "Kein Problem. Wie kann ich Ihnen helfen?");
+        } else {
+          userName = userInput;
+          localStorage.setItem("userName", userName);
+          addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Ihnen weiterhelfen?`);
+        }
+        askedForName = false;
+        inputField.disabled = false;
+        document.getElementById("sendButton").disabled = false;
+        inputField.focus();
+        return;
+      }
+      
+      // Typing-Indicator anzeigen
+      showTypingIndicator();
+      
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            name: userName || "",
+            question: userInput,
+            last_answer: lastBotAnswer
+          })
+        });
+
+        hideTypingIndicator();
+        
+        const textResponse = await response.text();
+        let jsonResponse;
+        
+        try {
+          jsonResponse = JSON.parse(textResponse);
+        } catch {
+          jsonResponse = { answer: textResponse };
+        }
+        
+        if (jsonResponse.answer) {
+          lastBotAnswer = jsonResponse.answer;
+          // Persönliche Ansprache einfügen
+          let answerText = jsonResponse.answer;
+          if (userName && !answerText.includes(userName)) {
+            const personalTouches = [
+              ` ${userName}, `,
+              ` ${userName}, `,
+              `, ${userName}`,
+              `. ${userName}, `
+            ];
+            const randomTouch = personalTouches[Math.floor(Math.random() * personalTouches.length)];
+            answerText = answerText.replace(/(\.|,|!|\?|$)/, randomTouch + '$1');
+          }
+          addMessage("bot", answerText);
+        } else {
+          addMessage("bot", "Es tut mir leid, ich konnte keine Antwort generieren. Bitte versuchen Sie es erneut.");
+        }
+      } catch (error) {
+        hideTypingIndicator();
+        console.error("Fehler:", error);
+        addMessage("bot", "Es gab ein technisches Problem. Bitte versuchen Sie es später erneut.");
+      } finally {
+        inputField.disabled = false;
+        document.getElementById("sendButton").disabled = false;
+        inputField.focus();
+      }
+    }
+
+    // Chat zurücksetzen
+    function resetChat() {
+      if (confirm("Möchten Sie wirklich einen neuen Chat starten? Der aktuelle Verlauf wird gelöscht.")) {
+        localStorage.removeItem("chatHistory");
+        localStorage.removeItem("userName");
+        chatHistory = [];
+        askedForName = true;
+        lastBotAnswer = "";
+        document.getElementById("chatBox").innerHTML = "";
+        
+        setTimeout(() => {
+          const greeting = "Vielen Dank. Darf ich Sie mit Ihrem Vornamen ansprechen?";
+          addMessage("bot", greeting);
+        }, 500);
+      }
+    }
+  </script>
+</body>
+</html>
