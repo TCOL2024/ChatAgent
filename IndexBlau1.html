@@ -235,6 +235,7 @@
       }
     }
     
+    // Formatiert Bot-Nachrichten: erkennt Headings, Absätze und einen Quellen-Block
     function formatMessage(text) {
       const parts = text.split("\n\nQuellen:\n");
       const mainText = parts[0];
@@ -294,6 +295,7 @@
       const userInput = inputEl.value.trim();
       if (!userInput) return;
       
+      // Falls noch Name abgefragt wird:
       if (askedForName && !userName) {
         userName = userInput;
         localStorage.setItem("userName", userName);
@@ -304,11 +306,70 @@
         return;
       }
       
+      // Sende die User-Nachricht:
       addMessage("user", userInput);
       inputEl.value = "";
       
-      // Hier könnte ein Webhook-Aufruf integriert werden. Aktuell simulieren wir eine Antwort:
-      addMessage("bot", "Danke für deine Frage. Bitte warte einen Moment...");
+      // Zeige "Bot denkt" Indikator
+      showTypingIndicator();
+      
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            name: userName || "Unbekannt",
+            question: userInput,
+            last_answer: lastBotAnswer
+          })
+        });
+        const textResponse = await response.text();
+        console.log("Serverantwort:", textResponse);
+        if (!response.ok) {
+          throw new Error(`HTTP-Fehler! Status: ${response.status}`);
+        }
+        let jsonResponse;
+        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
+          try {
+            jsonResponse = JSON.parse(textResponse);
+          } catch (error) {
+            jsonResponse = { answer: textResponse };
+          }
+        } else {
+          jsonResponse = { answer: textResponse };
+        }
+        
+        removeTypingIndicator();
+        
+        if (jsonResponse.answer) {
+          lastBotAnswer = jsonResponse.answer;
+          addMessage("bot", jsonResponse.answer);
+        } else {
+          addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
+        }
+      } catch (error) {
+        console.error("Fehler:", error);
+        removeTypingIndicator();
+        addMessage("bot", "Es gab ein Problem mit der Server-Antwort.");
+      }
+    }
+    
+    function showTypingIndicator() {
+      const container = document.getElementById("chatContainer");
+      const indicator = document.createElement("div");
+      indicator.classList.add("typing-indicator");
+      indicator.id = "typingIndicator";
+      indicator.innerHTML = "Bot denkt<span>.</span>";
+      container.appendChild(indicator);
+      container.scrollTop = container.scrollHeight;
+    }
+    
+    function removeTypingIndicator() {
+      const indicator = document.getElementById("typingIndicator");
+      if (indicator) {
+        indicator.remove();
+      }
     }
     
     function showInitialOptions() {
@@ -348,7 +409,6 @@
       lastBotAnswer = "";
       document.getElementById("chatContainer").innerHTML = "";
       document.getElementById("userInput").value = "";
-      // Setze den Info-Bereich auf Standard-Inhalt zurück
       document.getElementById("infoSection").innerHTML = `<h3>Infos</h3>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin vitae justo euismod, pharetra eros ac, efficitur nibh.</p>`;
       setTimeout(() => {
