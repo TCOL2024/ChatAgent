@@ -2,14 +2,14 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Dein persönlicher Assistent</title>
   <style>
-    /* Global Styles */
+    /* Base Styles */
     body {
       margin: 0;
       padding: 0;
-      background-color: #f5f5f5;
+      background: #f0f2f5;
       font-family: 'Roboto', sans-serif;
       color: #333;
       display: flex;
@@ -17,45 +17,46 @@
       height: 100vh;
     }
     
-    /* Header (Anlehnung an Allianz.de) */
+    /* Header */
     .main-header {
-      background-color: #fff;
-      border-bottom: 2px solid #e0e0e0;
+      background: linear-gradient(90deg, #004e92, #000428);
+      color: #fff;
       padding: 20px;
       text-align: center;
       position: relative;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .main-header h1 {
       margin: 0;
-      font-size: 26px;
+      font-size: 28px;
       font-weight: 500;
-      color: #003a70;
     }
     .main-header button {
       position: absolute;
       right: 20px;
       top: 20px;
-      padding: 8px 16px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
+      background: transparent;
+      border: 1px solid #fff;
       border-radius: 4px;
-      background-color: #d9534f;
+      padding: 6px 12px;
       color: #fff;
-      transition: background 0.3s ease;
+      cursor: pointer;
+      transition: background 0.3s;
     }
     .main-header button:hover {
-      background-color: #c9302c;
+      background: rgba(255,255,255,0.2);
     }
     
-    /* Introductory Text */
+    /* Intro Text */
     .intro-text {
-      background-color: #fff;
+      background: #fff;
       padding: 20px;
-      border-bottom: 1px solid #e0e0e0;
+      margin: 10px;
       text-align: center;
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.6;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     
     /* Chat Container */
@@ -63,53 +64,59 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      max-width: 900px;
+      max-width: 800px;
       margin: 20px auto;
       width: 100%;
-      background-color: #fff;
-      border: 1px solid #e0e0e0;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     
     /* Chat Box */
     .chat-box {
       flex: 1;
+      background: #fff;
+      border-radius: 12px;
       padding: 20px;
+      margin-bottom: 10px;
       overflow-y: auto;
-      background-color: #fafafa;
-    }
-    .message {
-      padding: 12px 16px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-      max-width: 75%;
-      font-size: 15px;
-      line-height: 1.5;
-      word-wrap: break-word;
-    }
-    .user-message {
-      background-color: #0078d7;
-      color: #fff;
-      align-self: flex-end;
-      border-bottom-right-radius: 0;
-    }
-    .bot-message {
-      background-color: #f0f0f0;
-      color: #333;
-      align-self: flex-start;
-      border-bottom-left-radius: 0;
-      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
     
-    /* "Bot denkt" Indikator */
+    /* Message Bubbles */
+    .message {
+      margin-bottom: 16px;
+      max-width: 70%;
+      line-height: 1.5;
+      font-size: 16px;
+      padding: 12px 16px;
+      border-radius: 20px;
+      position: relative;
+      opacity: 0;
+      animation: fadeIn 0.3s forwards;
+    }
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+    .user-message {
+      background: #0078d7;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .bot-message {
+      background: #f1f1f1;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    
+    /* Hervorhebung der Frage */
+    .question-highlight {
+      background: #ececec;
+    }
+    
+    /* Bot "denkt" Indikator */
     .bot-thinking::after {
-      content: '...';
+      content: ' ...';
       animation: dots 1s steps(5, end) infinite;
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
       font-weight: bold;
       color: #999;
     }
@@ -122,41 +129,43 @@
       100% { content: '.....'; }
     }
     
-    /* Leicht graue Hinterlegung für Fragen */
-    .question-highlight {
-      background-color: #f7f7f7;
-    }
-    
-    /* Eingabebereich */
+    /* Input-Bereich */
     .input-container {
       display: flex;
       padding: 20px;
-      border-top: 1px solid #e0e0e0;
-      background-color: #fff;
+      background: #fff;
+      border-top: 1px solid #ddd;
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 -2px 4px rgba(0,0,0,0.05);
     }
     .input-container input {
       flex: 1;
-      padding: 12px;
-      font-size: 15px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
+      padding: 12px 16px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 24px;
       outline: none;
+      transition: border-color 0.3s;
+    }
+    .input-container input:focus {
+      border-color: #0078d7;
     }
     .input-container button {
       margin-left: 10px;
       padding: 0 20px;
+      font-size: 16px;
       border: none;
-      border-radius: 4px;
-      background-color: #0078d7;
+      border-radius: 24px;
+      background: #0078d7;
       color: #fff;
-      font-size: 15px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s;
     }
     .input-container button:hover {
-      background-color: #005da4;
+      background: #005da4;
     }
     
+    /* Responsive */
     @media (max-width: 600px) {
       .chat-wrapper {
         margin: 10px;
@@ -170,22 +179,21 @@
 <body>
   <!-- Header -->
   <div class="main-header">
-    <h1>Dein persönlicher Assistent</h1>
-    <button onclick="resetChat()">Reset Chat</button>
+    <h1>Dein Assistent</h1>
+    <button onclick="resetChat()">Reset</button>
   </div>
   
   <!-- Intro Text -->
   <div class="intro-text">
-    Herzlich willkommen bei Deinem Chatbot. Ich unterstütze Dich bei Fragen rund um Personalmanagement.
-    Stelle Deine Frage so präzise wie möglich. Gib Deinen Vornamen an, damit ich Dich persönlich ansprechen kann.
+    Willkommen bei Deinem Chatbot. Stelle Deine Frage präzise – und wenn Du Deinen Vornamen angibst, spreche ich Dich persönlich an.
   </div>
   
   <!-- Chat Container -->
   <div class="chat-wrapper">
     <div class="chat-box" id="chatBox"></div>
-    <!-- Input Bereich -->
+    <!-- Input Area -->
     <div class="input-container">
-      <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
+      <input type="text" id="userInput" placeholder="Deine Nachricht..." onkeypress="handleKeyPress(event)">
       <button onclick="sendMessage()">Absenden</button>
     </div>
   </div>
@@ -196,11 +204,8 @@
     let askedForName = false;
     let lastBotAnswer = "";
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
-    
-    // Chatverlauf im LocalStorage
     let chatHistory = [];
     
-    // User initialisieren
     function initializeUser() {
       const storedUserId = localStorage.getItem("userId");
       if (storedUserId) {
@@ -215,12 +220,10 @@
       }
     }
     
-    // Chatverlauf speichern
     function saveChatHistory() {
       localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
     }
     
-    // Chatverlauf laden und rendern
     function loadChatHistory() {
       const storedHistory = localStorage.getItem("chatHistory");
       if (storedHistory) {
@@ -234,7 +237,6 @@
       }
     }
     
-    // Formatierung der Bot-Nachrichten (Markdown, Absätze, etc.)
     function formatMessage(text) {
       const parts = text.split("\n\nQuellen:\n");
       const mainText = parts[0];
@@ -242,7 +244,6 @@
       const lines = mainText.split("\n");
       let html = "";
       let inList = false;
-      
       lines.forEach(line => {
         let trimmed = line.trim()
           .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
@@ -269,13 +270,11 @@
       return html;
     }
     
-    // Nachricht rendern
     function renderMessage(sender, text, additionalClass = "") {
       const chatBox = document.getElementById("chatBox");
       const messageEl = document.createElement("div");
       messageEl.classList.add("message", sender === "user" ? "user-message" : "bot-message");
       if (additionalClass) messageEl.classList.add(additionalClass);
-      
       if (sender === "bot") {
         messageEl.innerHTML = formatMessage(text);
       } else {
@@ -285,7 +284,6 @@
       chatBox.scrollTop = chatBox.scrollHeight;
     }
     
-    // Neue Nachricht hinzufügen
     function addMessage(sender, text, additionalClass = "") {
       renderMessage(sender, text, additionalClass);
       chatHistory.push({ sender, text });
@@ -303,7 +301,6 @@
       }
     });
     
-    // Enter-Taste auslösen
     function handleKeyPress(event) {
       if (event.key === "Enter") sendMessage();
     }
@@ -312,11 +309,9 @@
       const inputEl = document.getElementById("userInput");
       const userInput = inputEl.value.trim();
       if (!userInput) return;
-      
       addMessage("user", userInput);
       inputEl.value = "";
       
-      // Falls Name noch nicht erfasst wurde
       if (askedForName && !userName) {
         if (userInput.toLowerCase() === "nein") {
           addMessage("bot", "Wie kann ich Dir behilflich sein?");
@@ -329,7 +324,6 @@
         return;
       }
       
-      // Bot "denkt" anzeigen
       addMessage("bot", "Ich überlege", "bot-thinking");
       
       try {
@@ -343,34 +337,29 @@
             last_answer: lastBotAnswer
           })
         });
-        
         const textResponse = await response.text();
-        console.log("Serverantwort (raw):", textResponse);
-        
+        console.log("Serverantwort:", textResponse);
         if (!response.ok) {
-          throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
+          throw new Error(`HTTP-Fehler! Status: ${response.status}`);
         }
-        
         let jsonResponse;
         if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
           try {
             jsonResponse = JSON.parse(textResponse);
           } catch (error) {
-            console.warn("Fehler beim Parsen der JSON-Antwort, Fallback auf Text.");
+            console.warn("JSON Parse Fehler, Fallback auf Text.");
             jsonResponse = { answer: textResponse };
           }
         } else {
           jsonResponse = { answer: textResponse };
         }
-        
-        // Entferne die "Bot denkt"-Nachricht
+        // Entferne "Bot denkt"-Nachricht
         const chatBox = document.getElementById("chatBox");
         const lastMessage = chatBox.lastElementChild;
         if (lastMessage && lastMessage.classList.contains("bot-thinking")) {
           chatBox.removeChild(lastMessage);
           chatHistory.pop();
         }
-        
         if (jsonResponse.answer) {
           lastBotAnswer = jsonResponse.answer;
           addMessage("bot", jsonResponse.answer);
@@ -379,11 +368,10 @@
         }
       } catch (error) {
         console.error("Fehler:", error);
-        addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details siehe Konsole.");
+        addMessage("bot", "Es gab ein Problem mit der Server-Antwort.");
       }
     }
     
-    // Reset-Funktion
     function resetChat() {
       localStorage.removeItem("chatHistory");
       localStorage.removeItem("userName");
