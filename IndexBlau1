@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dein persönlicher Assistent</title>
+  <style>
+    /* Global Styles */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f5;
+      font-family: 'Roboto', sans-serif;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    /* Header (Anlehnung an Allianz.de) */
+    .main-header {
+      background-color: #fff;
+      border-bottom: 2px solid #e0e0e0;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .main-header h1 {
+      margin: 0;
+      font-size: 26px;
+      font-weight: 500;
+      color: #003a70;
+    }
+    .main-header button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #d9534f;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+    .main-header button:hover {
+      background-color: #c9302c;
+    }
+    
+    /* Introductory Text */
+    .intro-text {
+      background-color: #fff;
+      padding: 20px;
+      border-bottom: 1px solid #e0e0e0;
+      text-align: center;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+    
+    /* Chat Container */
+    .chat-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 900px;
+      margin: 20px auto;
+      width: 100%;
+      background-color: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    /* Chat Box */
+    .chat-box {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+      background-color: #fafafa;
+    }
+    .message {
+      padding: 12px 16px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      max-width: 75%;
+      font-size: 15px;
+      line-height: 1.5;
+      word-wrap: break-word;
+    }
+    .user-message {
+      background-color: #0078d7;
+      color: #fff;
+      align-self: flex-end;
+      border-bottom-right-radius: 0;
+    }
+    .bot-message {
+      background-color: #f0f0f0;
+      color: #333;
+      align-self: flex-start;
+      border-bottom-left-radius: 0;
+      position: relative;
+    }
+    
+    /* "Bot denkt" Indikator */
+    .bot-thinking::after {
+      content: '...';
+      animation: dots 1s steps(5, end) infinite;
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      font-weight: bold;
+      color: #999;
+    }
+    @keyframes dots {
+      0% { content: ''; }
+      20% { content: '.'; }
+      40% { content: '..'; }
+      60% { content: '...'; }
+      80% { content: '....'; }
+      100% { content: '.....'; }
+    }
+    
+    /* Leicht graue Hinterlegung für Fragen */
+    .question-highlight {
+      background-color: #f7f7f7;
+    }
+    
+    /* Eingabebereich */
+    .input-container {
+      display: flex;
+      padding: 20px;
+      border-top: 1px solid #e0e0e0;
+      background-color: #fff;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      outline: none;
+    }
+    .input-container button {
+      margin-left: 10px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0078d7;
+      color: #fff;
+      font-size: 15px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .input-container button:hover {
+      background-color: #005da4;
+    }
+    
+    @media (max-width: 600px) {
+      .chat-wrapper {
+        margin: 10px;
+      }
+      .input-container {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="main-header">
+    <h1>Dein persönlicher Assistent</h1>
+    <button onclick="resetChat()">Reset Chat</button>
+  </div>
+  
+  <!-- Intro Text -->
+  <div class="intro-text">
+    Herzlich willkommen bei Deinem Chatbot. Ich unterstütze Dich bei Fragen rund um Personalmanagement.
+    Stelle Deine Frage so präzise wie möglich. Gib Deinen Vornamen an, damit ich Dich persönlich ansprechen kann.
+  </div>
+  
+  <!-- Chat Container -->
+  <div class="chat-wrapper">
+    <div class="chat-box" id="chatBox"></div>
+    <!-- Input Bereich -->
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Absenden</button>
+    </div>
+  </div>
+  
+  <script>
+    let userName = "";
+    let userId = "";
+    let askedForName = false;
+    let lastBotAnswer = "";
+    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+    
+    // Chatverlauf im LocalStorage
+    let chatHistory = [];
+    
+    // User initialisieren
+    function initializeUser() {
+      const storedUserId = localStorage.getItem("userId");
+      if (storedUserId) {
+        userId = storedUserId;
+      } else {
+        userId = "user-" + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem("userId", userId);
+      }
+      const storedUserName = localStorage.getItem("userName");
+      if (storedUserName) {
+        userName = storedUserName;
+      }
+    }
+    
+    // Chatverlauf speichern
+    function saveChatHistory() {
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    }
+    
+    // Chatverlauf laden und rendern
+    function loadChatHistory() {
+      const storedHistory = localStorage.getItem("chatHistory");
+      if (storedHistory) {
+        try {
+          chatHistory = JSON.parse(storedHistory);
+          chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
+        } catch (error) {
+          console.error("Fehler beim Laden des Chatverlaufs:", error);
+          chatHistory = [];
+        }
+      }
+    }
+    
+    // Formatierung der Bot-Nachrichten (Markdown, Absätze, etc.)
+    function formatMessage(text) {
+      const parts = text.split("\n\nQuellen:\n");
+      const mainText = parts[0];
+      const footnoteText = parts[1] || "";
+      const lines = mainText.split("\n");
+      let html = "";
+      let inList = false;
+      
+      lines.forEach(line => {
+        let trimmed = line.trim()
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
+        if (trimmed.startsWith("* ")) {
+          if (!inList) { html += "<ul>"; inList = true; }
+          html += `<li>${trimmed.substring(2)}</li>`;
+        } else {
+          if (inList) { html += "</ul>"; inList = false; }
+          if (trimmed !== "") { html += `<p>${trimmed}</p>`; }
+        }
+      });
+      if (inList) { html += "</ul>"; }
+      if (footnoteText.trim()) {
+        const footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
+        if (footnotes.length) {
+          html += "<hr><div class='footnotes'>";
+          footnotes.forEach((fn, index) => {
+            html += `<p>Quelle ${index+1}: ${fn.trim()}</p>`;
+          });
+          html += "</div>";
+        }
+      }
+      return html;
+    }
+    
+    // Nachricht rendern
+    function renderMessage(sender, text, additionalClass = "") {
+      const chatBox = document.getElementById("chatBox");
+      const messageEl = document.createElement("div");
+      messageEl.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      if (additionalClass) messageEl.classList.add(additionalClass);
+      
+      if (sender === "bot") {
+        messageEl.innerHTML = formatMessage(text);
+      } else {
+        messageEl.textContent = text;
+      }
+      chatBox.appendChild(messageEl);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+    
+    // Neue Nachricht hinzufügen
+    function addMessage(sender, text, additionalClass = "") {
+      renderMessage(sender, text, additionalClass);
+      chatHistory.push({ sender, text });
+      saveChatHistory();
+    }
+    
+    document.addEventListener("DOMContentLoaded", function() {
+      initializeUser();
+      loadChatHistory();
+      if (chatHistory.length === 0) {
+        setTimeout(() => {
+          addMessage("bot", "Schön, dass Du hier bist. Darf ich Dich mit Vornamen ansprechen?", "question-highlight");
+          askedForName = true;
+        }, 500);
+      }
+    });
+    
+    // Enter-Taste auslösen
+    function handleKeyPress(event) {
+      if (event.key === "Enter") sendMessage();
+    }
+    
+    async function sendMessage() {
+      const inputEl = document.getElementById("userInput");
+      const userInput = inputEl.value.trim();
+      if (!userInput) return;
+      
+      addMessage("user", userInput);
+      inputEl.value = "";
+      
+      // Falls Name noch nicht erfasst wurde
+      if (askedForName && !userName) {
+        if (userInput.toLowerCase() === "nein") {
+          addMessage("bot", "Wie kann ich Dir behilflich sein?");
+        } else {
+          userName = userInput;
+          localStorage.setItem("userName", userName);
+          addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
+        }
+        askedForName = false;
+        return;
+      }
+      
+      // Bot "denkt" anzeigen
+      addMessage("bot", "Ich überlege", "bot-thinking");
+      
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            name: userName || "Unbekannt",
+            question: userInput,
+            last_answer: lastBotAnswer
+          })
+        });
+        
+        const textResponse = await response.text();
+        console.log("Serverantwort (raw):", textResponse);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
+        }
+        
+        let jsonResponse;
+        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
+          try {
+            jsonResponse = JSON.parse(textResponse);
+          } catch (error) {
+            console.warn("Fehler beim Parsen der JSON-Antwort, Fallback auf Text.");
+            jsonResponse = { answer: textResponse };
+          }
+        } else {
+          jsonResponse = { answer: textResponse };
+        }
+        
+        // Entferne die "Bot denkt"-Nachricht
+        const chatBox = document.getElementById("chatBox");
+        const lastMessage = chatBox.lastElementChild;
+        if (lastMessage && lastMessage.classList.contains("bot-thinking")) {
+          chatBox.removeChild(lastMessage);
+          chatHistory.pop();
+        }
+        
+        if (jsonResponse.answer) {
+          lastBotAnswer = jsonResponse.answer;
+          addMessage("bot", jsonResponse.answer);
+        } else {
+          addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
+        }
+      } catch (error) {
+        console.error("Fehler:", error);
+        addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details siehe Konsole.");
+      }
+    }
+    
+    // Reset-Funktion
+    function resetChat() {
+      localStorage.removeItem("chatHistory");
+      localStorage.removeItem("userName");
+      chatHistory = [];
+      userName = "";
+      askedForName = true;
+      lastBotAnswer = "";
+      document.getElementById("chatBox").innerHTML = "";
+      setTimeout(() => {
+        addMessage("bot", "Schön, dass Du hier bist. Darf ich Dich mit Vornamen ansprechen?", "question-highlight");
+      }, 500);
+    }
+    
+    console.log("JavaScript geladen!");
+  </script>
+</body>
+</html>
