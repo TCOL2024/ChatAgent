@@ -3,17 +3,159 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dein persönlicher Assistent Version 26.03.2025 1.0</title>
+  <title>Dein persönlicher Assistent v01032025_22</title>
   <style>
-    /* [Dein bestehendes CSS bleibt unverändert] */
+    /* Grundlayout */
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f9f9f9;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
 
-    /* NEU: Zusätzliche Styles für Quellen */
+    /* Oberer Bereich */
+    .main-header {
+      background-color: #fff;
+      border-bottom: 1px solid #ddd;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    .main-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .main-header button {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      padding: 8px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      border: none;
+      border-radius: 4px;
+      background-color: #d9534f;
+      color: #fff;
+      transition: background 0.3s ease;
+    }
+    .main-header button:hover {
+      background-color: #c9302c;
+    }
+
+    /* Einleitender Text */
+    .intro-text {
+      background-color: #fff;
+      padding: 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    /* Chatbereich */
+    .chat-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      max-width: 1000px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    .chat-box {
+      flex: 1;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .message {
+      padding: 12px 16px;
+      border-radius: 18px;
+      margin-bottom: 12px;
+      max-width: 75%;
+      font-size: 14px;
+      line-height: 1.4;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      word-wrap: break-word;
+    }
+    .user-message {
+      background-color: #0078d7;
+      color: #fff;
+      align-self: flex-end;
+    }
+    .bot-message {
+      background-color: #f1f1f1;
+      color: #333;
+      align-self: flex-start;
+    }
+
+    /* Eingabebereich */
+    .input-container {
+      display: flex;
+      padding: 20px;
+      background-color: #fff;
+      border-top: 1px solid #ddd;
+    }
+    .input-container input {
+      flex: 1;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    .input-container button {
+      margin-left: 10px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 4px;
+      background-color: #0078d7;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .input-container button:hover {
+      background-color: #005da4;
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .chat-box {
+        margin: 10px;
+        padding: 10px;
+      }
+      .input-container {
+        padding: 10px;
+      }
+    }
+
+    /* Quellenangaben */
+    .footnotes {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+    .footnotes p {
+      margin: 4px 0;
+    }
+
+    /* NEU: Erweiterte Quellenangaben */
     .source-ref {
       color: #1a73e8;
       text-decoration: none;
       font-weight: bold;
       cursor: pointer;
       position: relative;
+      padding: 0 2px;
     }
     .source-ref:hover::before {
       content: attr(data-source);
@@ -59,9 +201,26 @@
   </style>
 </head>
 <body>
-  <!-- [Dein bestehender HTML-Code bleibt unverändert] -->
+  <div class="main-header">
+    <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+    <button onclick="resetChat()">Reset Chat</button>
+  </div>
 
-  <!-- NEU: Modal für Quellen am Ende des Body -->
+  <div class="intro-text">
+    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
+    unterstütze ich Dich bei Fragen rund um das Personalamangement.
+  </div>
+
+  <div class="chat-wrapper">
+    <div class="chat-box" id="chatBox"></div>
+
+    <div class="input-container">
+      <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
+      <button onclick="sendMessage()">Absenden</button>
+    </div>
+  </div>
+
+  <!-- NEU: Quellen-Modal -->
   <div id="source-modal" class="source-modal" onclick="closeSourceModal()">
     <div class="source-modal-content" onclick="event.stopPropagation()">
       <span class="close-source-modal" onclick="closeSourceModal()">&times;</span>
@@ -70,14 +229,19 @@
   </div>
 
   <script>
-    // [Dein bestehender JavaScript-Code bleibt unverändert]
+    let userName = "";
+    let userId = "";
+    let askedForName = false;
+    let lastBotAnswer = "";
+    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+    let chatHistory = [];
 
-    /* NEU: Funktionen für Quellen-Modal */
+    // NEU: Verbesserte Quellenfunktionen
     function showSourceModal(sourceText) {
       document.getElementById('source-modal-content').innerHTML = `
         <h4>Rechtsquelle</h4>
         <p>${sourceText}</p>
-        <small>Quelle: <a href="https://www.gesetze-im-internet.de/bvadig/" target="_blank">https://www.gesetze-im-internet.de/bvadig/</a></small>
+        <small>Quelle: <a href="https://www.gesetze-im-internet.de/bvadig/" target="_blank">BVaDiG</a></small>
       `;
       document.getElementById('source-modal').style.display = "block";
     }
@@ -86,16 +250,140 @@
       document.getElementById('source-modal').style.display = "none";
     }
 
-    /* NEU: Anpassung der formatMessage-Funktion */
+    // NEU: Flexiblere Formatierung für alle Quellenformate
     function formatMessage(text) {
-      // Ersetze 【4:1†source】 durch interaktives Element
-      text = text.replace(/【(\d+):(\d+)†source】/g, 
-        '<span class="source-ref" data-source="Berufsbildungsvalidierungs- und -digitalisierungsgesetz (BVaDiG), §$2 Abs.$1" onclick="showSourceModal(\'Berufsbildungsvalidierungs- und -digitalisierungsgesetz (BVaDiG), §$2 Abs.$1\')">[$1]</span>'
+      // Erkenne alle Quellenformate (【X:Y†source】, [X:Y†source], etc.)
+      text = text.replace(
+        /(【(\d+):(\d+)†source】|\[(\d+):(\d+)†source\])/g, 
+        '<span class="source-ref" data-source="BVaDiG §$3$5 Abs.$2$4" onclick="showSourceModal(\'BVaDiG §$3$5 Abs.$2$4\')">[$2$4]</span>'
       );
-      
-      // Rest der bestehenden formatMessage-Logik...
+
+      // Fallback für andere Formate (z.B. nur [1])
+      text = text.replace(
+        /\[(\d+)\]/g,
+        '<span class="source-ref" data-source="Quelle $1" onclick="showSourceModal(\'Quellennachweis $1\')">[$1]</span>'
+      );
+
       const parts = text.split("\n\nQuellen:\n");
-      /* [Der restliche Code der Funktion bleibt unverändert] */
+      const mainText = parts[0];
+      const footnoteText = parts[1] ? parts[1] : "";
+      const lines = mainText.split("\n");
+      let html = "";
+      let inList = false;
+      
+      lines.forEach(line => {
+        let trimmedLine = line.trim();
+        trimmedLine = trimmedLine
+          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+          .replace(/\*(.*?)\*/g, "<em>$1</em>");
+        
+        if (trimmedLine.startsWith("* ")) {
+          if (!inList) html += "<ul>";
+          inList = true;
+          html += `<li>${trimmedLine.substring(2)}</li>`;
+        } else {
+          if (inList) html += "</ul>";
+          inList = false;
+          html += trimmedLine ? `<p>${trimmedLine}</p>` : "<br>";
+        }
+      });
+      
+      if (footnoteText) {
+        html += "<div class='footnotes'><hr>";
+        footnoteText.split("\n").filter(fn => fn.trim()).forEach((fn, i) => {
+          html += `<p>${fn}</p>`;
+        });
+        html += "</div>";
+      }
+      
+      return html;
+    }
+
+    // Bestehende Funktionen (angepasst)
+    function initializeUser() {
+      userId = localStorage.getItem("userId") || "user-" + Math.random().toString(36).substr(2, 9);
+      userName = localStorage.getItem("userName") || "";
+      localStorage.setItem("userId", userId);
+    }
+
+    function renderMessage(sender, text) {
+      const chatBox = document.getElementById("chatBox");
+      const message = document.createElement("div");
+      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      message.innerHTML = sender === "bot" ? formatMessage(text) : text;
+      chatBox.appendChild(message);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function addMessage(sender, text) {
+      renderMessage(sender, text);
+      chatHistory.push({ sender, text });
+      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+    }
+
+    // Initialisierung
+    document.addEventListener("DOMContentLoaded", () => {
+      initializeUser();
+      const history = localStorage.getItem("chatHistory");
+      if (history) chatHistory = JSON.parse(history);
+      chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
+      
+      if (chatHistory.length === 0) {
+        setTimeout(() => {
+          addMessage("bot", "Schön, dass Du hier bist. Darf ich Dich mit Vornamen ansprechen?");
+          askedForName = true;
+        }, 500);
+      }
+    });
+
+    async function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage("user", text);
+      input.value = "";
+
+      if (askedForName) {
+        userName = text === "nein" ? "" : text;
+        if (userName) localStorage.setItem("userName", userName);
+        addMessage("bot", userName ? `Hallo ${userName}! Wie kann ich helfen?` : "Wie kann ich helfen?");
+        askedForName = false;
+        return;
+      }
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            user_id: userId,
+            name: userName || "Unbekannt",
+            question: text,
+            last_answer: lastBotAnswer
+          })
+        });
+
+        const data = await response.text();
+        lastBotAnswer = data.startsWith("{") ? JSON.parse(data).answer : data;
+        addMessage("bot", lastBotAnswer);
+      } catch (error) {
+        console.error("Fehler:", error);
+        addMessage("bot", "Entschuldigung, ein Fehler ist aufgetreten.");
+      }
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === "Enter") sendMessage();
+    }
+
+    function resetChat() {
+      localStorage.removeItem("chatHistory");
+      localStorage.removeItem("userName");
+      document.getElementById("chatBox").innerHTML = "";
+      chatHistory = [];
+      askedForName = true;
+      setTimeout(() => addMessage("bot", "Neu starten! Wie darf ich Dich nennen?"), 300);
     }
   </script>
 </body>
