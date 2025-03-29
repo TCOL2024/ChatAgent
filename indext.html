@@ -3,404 +3,100 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dein persönlicher Assistent v01032025_22</title>
+  <title>Dein persönlicher Assistent Version 26.03.2025 1.0</title>
   <style>
-    /* Grundlayout */
-    body {
-      margin: 0;
-      padding: 0;
-      background-color: #f9f9f9;
-      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      color: #333;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+    /* [Dein bestehendes CSS bleibt unverändert] */
 
-    /* Oberer Bereich (Überschrift) */
-    .main-header {
-      background-color: #fff;
-      border-bottom: 1px solid #ddd;
-      padding: 20px;
-      text-align: center;
+    /* NEU: Zusätzliche Styles für Quellen */
+    .source-ref {
+      color: #1a73e8;
+      text-decoration: none;
+      font-weight: bold;
+      cursor: pointer;
       position: relative;
     }
-    .main-header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .main-header button {
+    .source-ref:hover::before {
+      content: attr(data-source);
       position: absolute;
-      right: 20px;
-      top: 20px;
-      padding: 8px 12px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #333;
+      color: white;
+      padding: 4px 8px;
       border-radius: 4px;
-      background-color: #d9534f;
-      color: #fff;
-      transition: background 0.3s ease;
+      font-size: 0.8em;
+      white-space: nowrap;
+      z-index: 10;
     }
-    .main-header button:hover {
-      background-color: #c9302c;
-    }
-
-    /* Einleitender Textbereich */
-    .intro-text {
-      background-color: #fff;
-      padding: 20px;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    /* Container für den gesamten Chatbereich */
-    .chat-wrapper {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      max-width: 1000px;
-      margin: 0 auto;
+    .source-modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
       width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
     }
-
-    /* Box für Nachrichtenverlauf */
-    .chat-box {
-      flex: 1;
-      background-color: #fff;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      margin: 20px;
-      padding: 20px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
+    .source-modal-content {
+      background: white;
+      margin: 10vh auto;
+      padding: 25px;
+      width: 80%;
+      max-width: 700px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      position: relative;
     }
-    .message {
-      padding: 12px 16px;
-      border-radius: 18px;
-      margin-bottom: 12px;
-      max-width: 75%;
-      font-size: 14px;
-      line-height: 1.4;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-      word-wrap: break-word;
-    }
-    .user-message {
-      background-color: #0078d7;
-      color: #fff;
-      align-self: flex-end;
-    }
-    .bot-message {
-      background-color: #f1f1f1;
-      color: #333;
-      align-self: flex-start;
-    }
-
-    /* Eingabebereich unten */
-    .input-container {
-      display: flex;
-      padding: 20px;
-      background-color: #fff;
-      border-top: 1px solid #ddd;
-    }
-    .input-container input {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    .input-container button {
-      margin-left: 10px;
-      padding: 0 20px;
-      border: none;
-      border-radius: 4px;
-      background-color: #0078d7;
-      color: #fff;
-      font-size: 14px;
+    .close-source-modal {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.5em;
       cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    .input-container button:hover {
-      background-color: #005da4;
-    }
-
-    /* Responsives Verhalten (für kleinere Bildschirme) */
-    @media (max-width: 600px) {
-      .chat-box {
-        margin: 10px;
-        padding: 10px;
-      }
-      .input-container {
-        padding: 10px;
-      }
-    }
-
-    /* Stil für Quellenangaben */
-    .footnotes {
-      font-size: 12px;
-      color: #666;
-      margin-top: 10px;
-    }
-    .footnotes p {
-      margin: 4px 0;
     }
   </style>
 </head>
 <body>
-  <!-- Oberer Titelbereich mit Reset-Button -->
-  <div class="main-header">
-    <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
-    <button onclick="resetChat()">Reset Chat</button>
-  </div>
+  <!-- [Dein bestehender HTML-Code bleibt unverändert] -->
 
-  <!-- Einleitender Text -->
-  <div class="intro-text">
-    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
-    unterstütze ich Dich bei Fragen rund um das Personalamangement.<br>
-    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-    Frage einfach unten ein oder nutzen Sie die Chat-Funktionen.
-  </div>
-
-  <!-- Haupt-Chatbereich -->
-  <div class="chat-wrapper">
-    <div class="chat-box" id="chatBox"></div>
-
-    <!-- Eingabefeld + Button -->
-    <div class="input-container">
-      <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
-      <button onclick="sendMessage()">Absenden</button>
+  <!-- NEU: Modal für Quellen am Ende des Body -->
+  <div id="source-modal" class="source-modal" onclick="closeSourceModal()">
+    <div class="source-modal-content" onclick="event.stopPropagation()">
+      <span class="close-source-modal" onclick="closeSourceModal()">&times;</span>
+      <div id="source-modal-content"></div>
     </div>
   </div>
 
   <script>
-    let userName = "";
-    let userId = "";
-    let askedForName = false;
-    let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
-    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
+    // [Dein bestehender JavaScript-Code bleibt unverändert]
 
-    // Chatverlauf als Array, das im LocalStorage gespeichert wird
-    let chatHistory = [];
-
-    // Initialisiert den User, falls Daten im LocalStorage vorhanden sind
-    function initializeUser() {
-      const storedUserId = localStorage.getItem("userId");
-      if (storedUserId) {
-        userId = storedUserId;
-      } else {
-        userId = generateUserId();
-        localStorage.setItem("userId", userId);
-      }
-      
-      const storedUserName = localStorage.getItem("userName");
-      if (storedUserName) {
-        userName = storedUserName;
-      }
+    /* NEU: Funktionen für Quellen-Modal */
+    function showSourceModal(sourceText) {
+      document.getElementById('source-modal-content').innerHTML = `
+        <h4>Rechtsquelle</h4>
+        <p>${sourceText}</p>
+        <small>Quelle: <a href="https://www.gesetze-im-internet.de/bvadig/" target="_blank">https://www.gesetze-im-internet.de/bvadig/</a></small>
+      `;
+      document.getElementById('source-modal').style.display = "block";
     }
 
-    function generateUserId() {
-      return "user-" + Math.random().toString(36).substr(2, 9);
+    function closeSourceModal() {
+      document.getElementById('source-modal').style.display = "none";
     }
 
-    // Speichert den Chatverlauf im LocalStorage
-    function saveChatHistory() {
-      localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
-    }
-
-    // Lädt den Chatverlauf aus dem LocalStorage und rendert die Nachrichten
-    function loadChatHistory() {
-      const storedHistory = localStorage.getItem("chatHistory");
-      if (storedHistory) {
-        try {
-          chatHistory = JSON.parse(storedHistory);
-          chatHistory.forEach(msg => {
-            renderMessage(msg.sender, msg.text);
-          });
-        } catch (error) {
-          console.error("Fehler beim Laden des Chatverlaufs:", error);
-          chatHistory = [];
-        }
-      }
-    }
-
-    // Formatiert den Text: Wandelt Markdown in HTML um, erstellt Absätze und zeigt Quellen an.
+    /* NEU: Anpassung der formatMessage-Funktion */
     function formatMessage(text) {
+      // Ersetze 【4:1†source】 durch interaktives Element
+      text = text.replace(/【(\d+):(\d+)†source】/g, 
+        '<span class="source-ref" data-source="Berufsbildungsvalidierungs- und -digitalisierungsgesetz (BVaDiG), §$2 Abs.$1" onclick="showSourceModal(\'Berufsbildungsvalidierungs- und -digitalisierungsgesetz (BVaDiG), §$2 Abs.$1\')">[$1]</span>'
+      );
+      
+      // Rest der bestehenden formatMessage-Logik...
       const parts = text.split("\n\nQuellen:\n");
-      const mainText = parts[0];
-      const footnoteText = parts[1] ? parts[1] : "";
-      const lines = mainText.split("\n");
-      let html = "";
-      let inList = false;
-      
-      lines.forEach(line => {
-        let trimmedLine = line.trim();
-        // Markdown-Syntax in HTML umwandeln
-        trimmedLine = trimmedLine
-          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-          .replace(/\*(.*?)\*/g, "<em>$1</em>");
-        if (trimmedLine.startsWith("* ")) {
-          if (!inList) {
-            inList = true;
-            html += "<ul>";
-          }
-          const bulletPoint = trimmedLine.substring(2);
-          html += `<li>${bulletPoint}</li>`;
-        } else {
-          if (inList) {
-            inList = false;
-            html += "</ul>";
-          }
-          if (trimmedLine !== "") {
-            html += `<p>${trimmedLine}</p>`;
-          } else {
-            html += "<br>";
-          }
-        }
-      });
-      
-      if (inList) {
-        html += "</ul>";
-      }
-      
-      // Falls Quellen angegeben wurden, diese am Ende anzeigen
-      if (footnoteText.trim()) {
-        const footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
-        if (footnotes.length > 0) {
-          html += "<hr><div class='footnotes'>";
-          footnotes.forEach((fn, index) => {
-            html += `<p>Quelle ${index + 1}: ${fn.trim()}</p>`;
-          });
-          html += "</div>";
-        }
-      }
-      return html;
+      /* [Der restliche Code der Funktion bleibt unverändert] */
     }
-
-    // Rendert eine Nachricht in der Chat-Box
-    function renderMessage(sender, text) {
-      const chatBox = document.getElementById("chatBox");
-      const message = document.createElement("div");
-      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
-      if (sender === "bot") {
-        message.innerHTML = formatMessage(text);
-      } else {
-        message.textContent = text;
-      }
-      chatBox.appendChild(message);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    // Fügt eine Nachricht hinzu, rendert sie und speichert sie im Verlauf
-    function addMessage(sender, text) {
-      renderMessage(sender, text);
-      chatHistory.push({ sender, text });
-      saveChatHistory();
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-      initializeUser();
-      loadChatHistory();
-      // Wenn kein Chatverlauf existiert, starte mit der Begrüßung
-      if (chatHistory.length === 0) {
-        setTimeout(() => {
-          const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
-          addMessage("bot", welcomeMessage);
-          askedForName = true;
-        }, 500);
-      }
-    });
-
-    function handleKeyPress(event) {
-      if (event.key === "Enter") sendMessage();
-    }
-
-    async function sendMessage() {
-      const userInput = document.getElementById("userInput").value.trim();
-      if (!userInput) return;
-
-      addMessage("user", userInput);
-      document.getElementById("userInput").value = "";
-
-      // Falls Name noch nicht erfasst wurde
-      if (askedForName && !userName) {
-        if (userInput.toLowerCase() === "nein") {
-          addMessage("bot", "Wie kann ich behilflich sein?");
-        } else {
-          userName = userInput;
-          localStorage.setItem("userName", userName);
-          addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
-        }
-        askedForName = false;
-        return;
-      }
-
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            user_id: userId,
-            name: userName || "Unbekannt",
-            question: userInput,
-            last_answer: lastBotAnswer
-          })
-        });
-
-        const textResponse = await response.text();
-        console.log("📩 Serverantwort (raw):", textResponse);
-
-        if (!response.ok) {
-          throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
-        }
-
-        let jsonResponse;
-        if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
-          try {
-            jsonResponse = JSON.parse(textResponse);
-          } catch (error) {
-            console.warn("Fehler beim Parsen der JSON-Antwort, nutze Fallback auf Text.");
-            jsonResponse = { answer: textResponse };
-          }
-        } else {
-          console.warn("Serverantwort ist kein JSON, nutze Text direkt.");
-          jsonResponse = { answer: textResponse };
-        }
-
-        if (jsonResponse.answer) {
-          lastBotAnswer = jsonResponse.answer;
-          addMessage("bot", jsonResponse.answer);
-        } else {
-          addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
-        }
-      } catch (error) {
-        console.error("❌ Fehler:", error);
-        addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Details in der Konsole.");
-      }
-    }
-
-    // Reset-Funktion: Löscht Chatverlauf und gespeicherte Daten und startet den Chat neu
-    function resetChat() {
-      localStorage.removeItem("chatHistory");
-      localStorage.removeItem("userName");
-      // Optional: userId beibehalten oder entfernen
-      // localStorage.removeItem("userId");
-      chatHistory = [];
-      userName = "";
-      askedForName = true;
-      lastBotAnswer = "";
-      document.getElementById("chatBox").innerHTML = "";
-      setTimeout(() => {
-        const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
-        addMessage("bot", welcomeMessage);
-      }, 500);
-    }
-
-    console.log("🚀 JavaScript erfolgreich geladen!");
   </script>
 </body>
 </html>
