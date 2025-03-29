@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dein persönlicher Assistent</title>
+  <title>Dein persönlicher Assistent Version 29.03.2025 V1.1</title>
   <style>
     body {
       margin: 0;
@@ -132,41 +132,13 @@
       }
     }
 
-    /* Optimierte Quellenanzeige */
+    /* Quellenangaben */
     .source-ref {
-      background-color: #f0f7ff;
       color: #0066cc;
-      padding: 2px 6px;
-      border-radius: 4px;
-      cursor: pointer;
       font-weight: bold;
-      font-size: 0.9em;
-      position: relative;
-      display: inline-block;
+      cursor: pointer;
+      text-decoration: underline;
     }
-    .source-ref::after {
-      content: "?";
-      font-size: 0.8em;
-      vertical-align: super;
-    }
-    .source-tooltip {
-      position: absolute;
-      bottom: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #333;
-      color: white;
-      padding: 6px 10px;
-      border-radius: 4px;
-      font-size: 0.8em;
-      white-space: nowrap;
-      z-index: 100;
-      display: none;
-    }
-    .source-ref:hover .source-tooltip {
-      display: block;
-    }
-
     .source-modal {
       display: none;
       position: fixed;
@@ -231,32 +203,25 @@
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
     let chatHistory = [];
 
-    // Verbesserte Quellenverarbeitung
+    // Verbesserte Namensabfrage
+    function askForName() {
+      addMessage("bot", "Wie darf ich Dich mit Vornamen ansprechen?");
+      askedForName = true;
+    }
+
+    // Quellenverarbeitung
     function formatMessage(text) {
-      // Verarbeitet Quellen im Format: 【BVaDiG §4 Abs.1】 oder [BGB §123]
+      // Verarbeitet Quellen im Format [[QUELLENTEXT]]
       return text.replace(
-        /([【\[])([^】\]]+)([】\]])/g, 
-        function(match, p1, p2, p3) {
-          const cleanSource = p2
-            .replace(/§/g, ' ')
-            .replace(/Abs\./g, '')
-            .replace(/Art\./g, '')
-            .trim();
-          
-          return `<span class="source-ref" onclick="showSourceModal(this)">
-                    <span class="source-text">${cleanSource}</span>
-                    <span class="source-tooltip">${p2}</span>
-                  </span>`;
-        }
+        /\[\[(.*?)\]\]/g,
+        '<span class="source-ref" onclick="showSourceModal(\'$1\')">[Quelle]</span>'
       );
     }
 
-    function showSourceModal(element) {
-      const sourceText = element.querySelector('.source-tooltip').textContent;
+    function showSourceModal(sourceText) {
       document.getElementById('source-modal-content').innerHTML = `
-        <h4>Rechtsquelle</h4>
+        <h4>Quellennachweis</h4>
         <p>${sourceText}</p>
-        <small>Klicken Sie außerhalb des Fensters um zu schließen</small>
       `;
       document.getElementById('source-modal').style.display = "block";
     }
@@ -265,11 +230,21 @@
       document.getElementById('source-modal').style.display = "none";
     }
 
-    // Bestehende Funktionen
+    // Initialisierung
     function initializeUser() {
       userId = localStorage.getItem("userId") || "user-" + Math.random().toString(36).substr(2, 9);
       userName = localStorage.getItem("userName") || "";
       localStorage.setItem("userId", userId);
+      
+      const storedHistory = localStorage.getItem("chatHistory");
+      if (storedHistory) {
+        chatHistory = JSON.parse(storedHistory);
+        chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
+      }
+      
+      if (chatHistory.length === 0) {
+        setTimeout(askForName, 500);
+      }
     }
 
     function renderMessage(sender, text) {
@@ -287,19 +262,7 @@
       localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-      initializeUser();
-      const history = localStorage.getItem("chatHistory");
-      if (history) chatHistory = JSON.parse(history);
-      chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
-      
-      if (chatHistory.length === 0) {
-        setTimeout(() => {
-          addMessage("bot", "Schön, dass Du hier bist. Darf ich Dich mit Vornamen ansprechen?");
-          askedForName = true;
-        }, 500);
-      }
-    });
+    document.addEventListener("DOMContentLoaded", initializeUser);
 
     async function sendMessage() {
       const input = document.getElementById("userInput");
@@ -309,14 +272,21 @@
       addMessage("user", text);
       input.value = "";
 
+      // Namensabfrage verarbeiten
       if (askedForName) {
-        userName = text === "nein" ? "" : text;
-        if (userName) localStorage.setItem("userName", userName);
-        addMessage("bot", userName ? `Hallo ${userName}! Wie kann ich helfen?` : "Wie kann ich helfen?");
+        if (text.toLowerCase() === "nein" || text.trim() === "") {
+          userName = "";
+          addMessage("bot", "Wie kann ich Dir helfen?");
+        } else {
+          userName = text;
+          localStorage.setItem("userName", userName);
+          addMessage("bot", `Hallo ${userName}, schön dass Du da bist und mit mir arbeiten möchtest!`);
+        }
         askedForName = false;
         return;
       }
 
+      // Normale Nachricht verarbeiten
       try {
         const response = await fetch(webhookUrl, {
           method: "POST",
@@ -348,7 +318,7 @@
       document.getElementById("chatBox").innerHTML = "";
       chatHistory = [];
       askedForName = true;
-      setTimeout(() => addMessage("bot", "Neuer Chat gestartet! Wie darf ich Dich nennen?"), 300);
+      setTimeout(askForName, 300);
     }
   </script>
 </body>
