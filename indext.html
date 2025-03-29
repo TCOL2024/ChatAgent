@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dein persönlicher Assistent Version 1.0 vom 27. März 2025</title>
+  <title>Dein persönlicher Assistent Version 1.1 vom 27.03.2025</title>
   <style>
     /* Grundlayout */
     body {
@@ -34,17 +34,17 @@
       position: absolute;
       right: 20px;
       top: 20px;
-      padding: 8px 12px;
+      padding: 8px 16px;
       font-size: 14px;
       cursor: pointer;
       border: none;
       border-radius: 4px;
-      background-color: #d9534f;
+      background-color: #0056b3; /* Dunkelblau */
       color: #fff;
       transition: background 0.3s ease;
     }
     .main-header button:hover {
-      background-color: #c9302c;
+      background-color: #003d7a; /* Dunkleres Blau bei Hover */
     }
 
     /* Einleitender Text */
@@ -148,29 +148,41 @@
       margin: 4px 0;
     }
 
-    /* NEU: Erweiterte Quellenangaben */
+    /* Dynamische Quellen */
     .source-ref {
-      color: #1a73e8;
+      background-color: #f0f7ff;
+      color: #0066cc;
+      padding: 2px 6px;
+      border-radius: 4px;
+      cursor: pointer;
       text-decoration: none;
       font-weight: bold;
-      cursor: pointer;
+      font-size: 0.9em;
       position: relative;
-      padding: 0 2px;
+      display: inline-block;
     }
-    .source-ref:hover::before {
-      content: attr(data-source);
+    .source-ref:hover {
+      text-decoration: underline;
+    }
+    .source-tooltip {
       position: absolute;
       bottom: 100%;
       left: 50%;
       transform: translateX(-50%);
       background: #333;
       color: white;
-      padding: 4px 8px;
+      padding: 6px 10px;
       border-radius: 4px;
       font-size: 0.8em;
       white-space: nowrap;
-      z-index: 10;
+      z-index: 100;
+      display: none;
     }
+    .source-ref:hover .source-tooltip {
+      display: block;
+    }
+
+    /* Modal für Quellen */
     .source-modal {
       display: none;
       position: fixed;
@@ -201,26 +213,30 @@
   </style>
 </head>
 <body>
+  <!-- Oberer Titelbereich -->
   <div class="main-header">
     <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
-    <button onclick="resetChat()">Reset Chat</button>
+    <button onclick="resetChat()">Neuen Chat starten</button>
   </div>
 
+  <!-- Einleitender Text -->
   <div class="intro-text">
     Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
-    unterstütze ich Dich bei Fragen rund um das Personalamangement. Trainiert bin ich für Fragen rund um das Berufsbildungsgesetz. Stelle daher Deine Fragen sehr gerne gezielt aus diesem Bereich. Gebe mir die Informationen so konkret wie möglich.
+    unterstütze ich Dich bei Fragen rund um das Personalamangement. Trainiert bin ich speziell für Fragen rund um das Berufsbildungsgesetz. Stelle daher Deine Fragen sehr gerne gezielt aus diesem Bereich. Gebe mir die Informationen so konkret wie möglich.
   </div>
 
+  <!-- Haupt-Chatbereich -->
   <div class="chat-wrapper">
     <div class="chat-box" id="chatBox"></div>
 
+    <!-- Eingabefeld + Button -->
     <div class="input-container">
       <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
       <button onclick="sendMessage()">Absenden</button>
     </div>
   </div>
 
-  <!-- NEU: Quellen-Modal -->
+  <!-- Modal für Quellen -->
   <div id="source-modal" class="source-modal" onclick="closeSourceModal()">
     <div class="source-modal-content" onclick="event.stopPropagation()">
       <span class="close-source-modal" onclick="closeSourceModal()">&times;</span>
@@ -236,12 +252,24 @@
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
     let chatHistory = [];
 
-    // NEU: Verbesserte Quellenfunktionen
-    function showSourceModal(sourceText) {
+    // Dynamische Quellenverarbeitung
+    function formatMessage(text) {
+      // Erkenne Quellen im Format [[QUELLENTEXT]]
+      return text.replace(
+        /\[\[(.*?)\]\]/g,
+        '<span class="source-ref" onclick="showSourceModal(this)">[?]' +
+          '<span class="source-tooltip">$1</span>' +
+        '</span>'
+      );
+    }
+
+    function showSourceModal(element) {
+      const sourceText = element.querySelector('.source-tooltip').textContent;
+      
       document.getElementById('source-modal-content').innerHTML = `
-        <h4>Rechtsquelle</h4>
+        <h4>Quellennachweis</h4>
         <p>${sourceText}</p>
-        <small>Quelle: <a href="https://www.gesetze-im-internet.de/bvadig/" target="_blank">BVaDiG</a></small>
+        <small>Quelle: Vom System generiert</small>
       `;
       document.getElementById('source-modal').style.display = "block";
     }
@@ -250,56 +278,7 @@
       document.getElementById('source-modal').style.display = "none";
     }
 
-    // NEU: Flexiblere Formatierung für alle Quellenformate
-    function formatMessage(text) {
-      // Erkenne alle Quellenformate (【X:Y†source】, [X:Y†source], etc.)
-      text = text.replace(
-        /(【(\d+):(\d+)†source】|\[(\d+):(\d+)†source\])/g, 
-        '<span class="source-ref" data-source="BVaDiG §$3$5 Abs.$2$4" onclick="showSourceModal(\'BVaDiG §$3$5 Abs.$2$4\')">[$2$4]</span>'
-      );
-
-      // Fallback für andere Formate (z.B. nur [1])
-      text = text.replace(
-        /\[(\d+)\]/g,
-        '<span class="source-ref" data-source="Quelle $1" onclick="showSourceModal(\'Quellennachweis $1\')">[$1]</span>'
-      );
-
-      const parts = text.split("\n\nQuellen:\n");
-      const mainText = parts[0];
-      const footnoteText = parts[1] ? parts[1] : "";
-      const lines = mainText.split("\n");
-      let html = "";
-      let inList = false;
-      
-      lines.forEach(line => {
-        let trimmedLine = line.trim();
-        trimmedLine = trimmedLine
-          .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-          .replace(/\*(.*?)\*/g, "<em>$1</em>");
-        
-        if (trimmedLine.startsWith("* ")) {
-          if (!inList) html += "<ul>";
-          inList = true;
-          html += `<li>${trimmedLine.substring(2)}</li>`;
-        } else {
-          if (inList) html += "</ul>";
-          inList = false;
-          html += trimmedLine ? `<p>${trimmedLine}</p>` : "<br>";
-        }
-      });
-      
-      if (footnoteText) {
-        html += "<div class='footnotes'><hr>";
-        footnoteText.split("\n").filter(fn => fn.trim()).forEach((fn, i) => {
-          html += `<p>${fn}</p>`;
-        });
-        html += "</div>";
-      }
-      
-      return html;
-    }
-
-    // Bestehende Funktionen (angepasst)
+    // Bestehende Funktionen
     function initializeUser() {
       userId = localStorage.getItem("userId") || "user-" + Math.random().toString(36).substr(2, 9);
       userName = localStorage.getItem("userName") || "";
@@ -383,7 +362,7 @@
       document.getElementById("chatBox").innerHTML = "";
       chatHistory = [];
       askedForName = true;
-      setTimeout(() => addMessage("bot", "Neu starten! Wie darf ich Dich nennen?"), 300);
+      setTimeout(() => addMessage("bot", "Neuer Chat gestartet! Wie darf ich Dich nennen?"), 300);
     }
   </script>
 </body>
