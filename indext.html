@@ -14,6 +14,7 @@
       display: flex;
       flex-direction: column;
       height: 100vh;
+      overflow: hidden;
     }
 
     .main-header {
@@ -22,6 +23,7 @@
       padding: 20px;
       text-align: center;
       position: relative;
+      flex-shrink: 0;
     }
     .main-header h1 {
       margin: 0;
@@ -52,6 +54,7 @@
       text-align: center;
       font-size: 14px;
       line-height: 1.4;
+      flex-shrink: 0;
     }
 
     .chat-wrapper {
@@ -61,6 +64,8 @@
       max-width: 1000px;
       margin: 0 auto;
       width: 100%;
+      padding-bottom: 80px; /* Platz für das fixe Eingabefeld auf mobilen Geräten */
+      box-sizing: border-box;
     }
     .chat-box {
       flex: 1;
@@ -72,6 +77,8 @@
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      word-wrap: break-word;
+      max-height: calc(100vh - 180px); /* passt sich an Header, Intro & Input an */
     }
     .message {
       padding: 12px 16px;
@@ -99,6 +106,7 @@
       padding: 20px;
       background-color: #fff;
       border-top: 1px solid #ddd;
+      flex-shrink: 0;
     }
     .input-container input {
       flex: 1;
@@ -106,6 +114,7 @@
       border: 1px solid #ddd;
       border-radius: 4px;
       font-size: 14px;
+      word-wrap: break-word;
     }
     .input-container button {
       margin-left: 10px;
@@ -122,49 +131,30 @@
       background-color: #005da4;
     }
 
+    /* Mobile Optimierungen */
     @media (max-width: 600px) {
+      .main-header, .intro-text {
+        padding: 10px;
+      }
       .chat-box {
         margin: 10px;
         padding: 10px;
+        max-height: calc(100vh - 180px);
       }
       .input-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        margin: 0;
+        padding: 10px;
+        box-sizing: border-box;
+        border-top: 1px solid #ddd;
+      }
+      .input-container input {
+        font-size: 14px;
         padding: 10px;
       }
-    }
-
-    /* Quellenangaben */
-    .source-ref {
-      color: #0066cc;
-      font-weight: bold;
-      cursor: pointer;
-      text-decoration: underline;
-    }
-    .source-modal {
-      display: none;
-      position: fixed;
-      z-index: 100;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.7);
-    }
-    .source-modal-content {
-      background: white;
-      margin: 10vh auto;
-      padding: 25px;
-      width: 80%;
-      max-width: 700px;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      position: relative;
-    }
-    .close-source-modal {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      font-size: 1.5em;
-      cursor: pointer;
     }
   </style>
 </head>
@@ -188,13 +178,6 @@
     </div>
   </div>
 
-  <div id="source-modal" class="source-modal" onclick="closeSourceModal()">
-    <div class="source-modal-content" onclick="event.stopPropagation()">
-      <span class="close-source-modal" onclick="closeSourceModal()">&times;</span>
-      <div id="source-modal-content"></div>
-    </div>
-  </div>
-
   <script>
     let userName = "";
     let userId = "";
@@ -209,25 +192,9 @@
       askedForName = true;
     }
 
-    // Quellenverarbeitung
+    // Quellenverarbeitung: Keine klickbaren Links mehr – Rückgabe als reiner Text.
     function formatMessage(text) {
-      // Verarbeitet Quellen im Format [[QUELLENTEXT]]
-      return text.replace(
-        /\[\[(.*?)\]\]/g,
-        '<span class="source-ref" onclick="showSourceModal(\'$1\')">[Quelle]</span>'
-      );
-    }
-
-    function showSourceModal(sourceText) {
-      document.getElementById('source-modal-content').innerHTML = `
-        <h4>Quellennachweis</h4>
-        <p>${sourceText}</p>
-      `;
-      document.getElementById('source-modal').style.display = "block";
-    }
-
-    function closeSourceModal() {
-      document.getElementById('source-modal').style.display = "none";
+      return text;
     }
 
     // Initialisierung
