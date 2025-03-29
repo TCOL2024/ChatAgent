@@ -3,9 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dein persönlicher Assistent Version 1.1 vom 27.03.2025</title>
+  <title>Dein persönlicher Assistent</title>
   <style>
-    /* Grundlayout */
     body {
       margin: 0;
       padding: 0;
@@ -17,7 +16,6 @@
       height: 100vh;
     }
 
-    /* Oberer Bereich */
     .main-header {
       background-color: #fff;
       border-bottom: 1px solid #ddd;
@@ -39,15 +37,14 @@
       cursor: pointer;
       border: none;
       border-radius: 4px;
-      background-color: #0056b3; /* Dunkelblau */
+      background-color: #0056b3;
       color: #fff;
       transition: background 0.3s ease;
     }
     .main-header button:hover {
-      background-color: #003d7a; /* Dunkleres Blau bei Hover */
+      background-color: #003d7a;
     }
 
-    /* Einleitender Text */
     .intro-text {
       background-color: #fff;
       padding: 20px;
@@ -57,7 +54,6 @@
       line-height: 1.4;
     }
 
-    /* Chatbereich */
     .chat-wrapper {
       flex: 1;
       display: flex;
@@ -98,7 +94,6 @@
       align-self: flex-start;
     }
 
-    /* Eingabebereich */
     .input-container {
       display: flex;
       padding: 20px;
@@ -127,7 +122,6 @@
       background-color: #005da4;
     }
 
-    /* Responsive */
     @media (max-width: 600px) {
       .chat-box {
         margin: 10px;
@@ -138,31 +132,22 @@
       }
     }
 
-    /* Quellenangaben */
-    .footnotes {
-      font-size: 12px;
-      color: #666;
-      margin-top: 10px;
-    }
-    .footnotes p {
-      margin: 4px 0;
-    }
-
-    /* Dynamische Quellen */
+    /* Optimierte Quellenanzeige */
     .source-ref {
       background-color: #f0f7ff;
       color: #0066cc;
       padding: 2px 6px;
       border-radius: 4px;
       cursor: pointer;
-      text-decoration: none;
       font-weight: bold;
       font-size: 0.9em;
       position: relative;
       display: inline-block;
     }
-    .source-ref:hover {
-      text-decoration: underline;
+    .source-ref::after {
+      content: "?";
+      font-size: 0.8em;
+      vertical-align: super;
     }
     .source-tooltip {
       position: absolute;
@@ -182,7 +167,6 @@
       display: block;
     }
 
-    /* Modal für Quellen */
     .source-modal {
       display: none;
       position: fixed;
@@ -213,30 +197,25 @@
   </style>
 </head>
 <body>
-  <!-- Oberer Titelbereich -->
   <div class="main-header">
     <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
     <button onclick="resetChat()">Neuen Chat starten</button>
   </div>
 
-  <!-- Einleitender Text -->
   <div class="intro-text">
     Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz
-    unterstütze ich Dich bei Fragen rund um das Personalamangement. Trainiert bin ich speziell für Fragen rund um das Berufsbildungsgesetz. Stelle daher Deine Fragen sehr gerne gezielt aus diesem Bereich. Gebe mir die Informationen so konkret wie möglich.
+    unterstütze ich Dich bei Fragen rund um das Personalamangement.
   </div>
 
-  <!-- Haupt-Chatbereich -->
   <div class="chat-wrapper">
     <div class="chat-box" id="chatBox"></div>
 
-    <!-- Eingabefeld + Button -->
     <div class="input-container">
       <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
       <button onclick="sendMessage()">Absenden</button>
     </div>
   </div>
 
-  <!-- Modal für Quellen -->
   <div id="source-modal" class="source-modal" onclick="closeSourceModal()">
     <div class="source-modal-content" onclick="event.stopPropagation()">
       <span class="close-source-modal" onclick="closeSourceModal()">&times;</span>
@@ -252,24 +231,32 @@
     const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
     let chatHistory = [];
 
-    // Dynamische Quellenverarbeitung
+    // Verbesserte Quellenverarbeitung
     function formatMessage(text) {
-      // Erkenne Quellen im Format [[QUELLENTEXT]]
+      // Verarbeitet Quellen im Format: 【BVaDiG §4 Abs.1】 oder [BGB §123]
       return text.replace(
-        /\[\[(.*?)\]\]/g,
-        '<span class="source-ref" onclick="showSourceModal(this)">[?]' +
-          '<span class="source-tooltip">$1</span>' +
-        '</span>'
+        /([【\[])([^】\]]+)([】\]])/g, 
+        function(match, p1, p2, p3) {
+          const cleanSource = p2
+            .replace(/§/g, ' ')
+            .replace(/Abs\./g, '')
+            .replace(/Art\./g, '')
+            .trim();
+          
+          return `<span class="source-ref" onclick="showSourceModal(this)">
+                    <span class="source-text">${cleanSource}</span>
+                    <span class="source-tooltip">${p2}</span>
+                  </span>`;
+        }
       );
     }
 
     function showSourceModal(element) {
       const sourceText = element.querySelector('.source-tooltip').textContent;
-      
       document.getElementById('source-modal-content').innerHTML = `
-        <h4>Quellennachweis</h4>
+        <h4>Rechtsquelle</h4>
         <p>${sourceText}</p>
-        <small>Quelle: Vom System generiert</small>
+        <small>Klicken Sie außerhalb des Fensters um zu schließen</small>
       `;
       document.getElementById('source-modal').style.display = "block";
     }
@@ -300,7 +287,6 @@
       localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
     }
 
-    // Initialisierung
     document.addEventListener("DOMContentLoaded", () => {
       initializeUser();
       const history = localStorage.getItem("chatHistory");
