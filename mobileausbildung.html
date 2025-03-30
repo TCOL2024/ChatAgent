@@ -100,10 +100,16 @@
       <h1>Mobile Ausbildung Chatbot</h1>
     </header>
     <div class="chat-area" id="chatArea">
-      <!-- Bot initial message -->
+      <!-- Einleitender Text -->
       <div class="message bot">
         <div class="message-content">
-          Hallo! Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
+          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI soll euch schnell erste Informationen geben und auch unverbindlich prüfen, ob mobile Ausbildung, sogar im Ausland, möglich ist. Füllt bitte alle abgefragten Daten vom Bot aus. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Los geht's – fühlt euch frei. Diese KI ist im Test, daher bitte aufmerksam sein.
+        </div>
+      </div>
+      <!-- Initiale Bot-Nachricht -->
+      <div class="message bot">
+        <div class="message-content">
+          Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
         </div>
       </div>
     </div>
@@ -142,7 +148,7 @@
       .then(data => {
         // Simulation der Antwort des Bots.
         // Hier kann man die Antwort aus dem data-Objekt verarbeiten.
-        let reply = "Danke für deine Nachricht. Kannst du bitte noch spezifizieren, ob du Infos oder eine Genehmigungsprüfung wünschst?";
+        let reply = "Danke für deine Nachricht. Kannst du bitte noch spezifizieren, ob du Infos oder Genehmigungsprüfung wünschst?";
         appendMessage("bot", reply);
       })
       .catch(error => {
