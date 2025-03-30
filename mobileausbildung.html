@@ -123,6 +123,7 @@
     const userInput = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
+    let lastBotAnswer = "";
 
     // Funktion, um eine neue Nachricht im Chat anzuzeigen
     function appendMessage(sender, text) {
@@ -141,7 +142,7 @@
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: message })
+        body: JSON.stringify({ message: message, last_answer: lastBotAnswer })
       })
       .then(response => response.text())
       .then(text => {
@@ -152,6 +153,7 @@
         } catch(e) {
           reply = text;
         }
+        lastBotAnswer = reply;
         appendMessage("bot", reply);
       })
       .catch(error => {
