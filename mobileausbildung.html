@@ -92,6 +92,56 @@
     .input-area button:hover {
       background-color: #003d80;
     }
+    /* Fragebogen-Stil */
+    .questionnaire {
+      border-top: 1px solid #ddd;
+      padding: 20px;
+      margin-top: 20px;
+      display: none;
+      flex-direction: column;
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    .question p {
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    .question label {
+      margin-right: 15px;
+      cursor: pointer;
+    }
+    .question input {
+      margin-right: 5px;
+    }
+    .submit-btn {
+      background-color: #004a99;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+      align-self: center;
+    }
+    .submit-btn:hover {
+      background-color: #003d80;
+    }
+    .toggle-btn {
+      margin-top: 10px;
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      font-size: 0.9em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .toggle-btn:hover {
+      background-color: #005da4;
+    }
   </style>
 </head>
 <body>
@@ -111,10 +161,56 @@
           Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
         </div>
       </div>
+      <!-- Hinweis für den Fragebogen -->
+      <div class="message bot" id="toggleQuestionnaireMsg" style="display: none;">
+        <div class="message-content">
+          Bitte fülle den folgenden Fragebogen aus:
+        </div>
+      </div>
     </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Schreibe hier deine Nachricht..." autocomplete="off">
       <button id="sendButton">Senden</button>
+      <button id="toggleQuestionnaireBtn" class="toggle-btn">Genehmigung prüfen</button>
+    </div>
+    <!-- Fragebogen für 7 Fragen -->
+    <div class="questionnaire" id="questionnaire">
+      <div class="question">
+        <p>1. Liegt ein vollständiger Ausbildungsvertrag vor?</p>
+        <label><input type="radio" name="q1" value="ja"> Ja</label>
+        <label><input type="radio" name="q1" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>2. Ist der betriebliche Ausbildungsstand erfüllt?</p>
+        <label><input type="radio" name="q2" value="ja"> Ja</label>
+        <label><input type="radio" name="q2" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>3. Sind alle technischen Voraussetzungen (VPN, Geräte, Sicherheitssoftware) gegeben?</p>
+        <label><input type="radio" name="q3" value="ja"> Ja</label>
+        <label><input type="radio" name="q3" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>4. Entsprechen die ergonomischen Anforderungen (Tisch, Stuhl, Bildschirmposition) den Vorgaben?</p>
+        <label><input type="radio" name="q4" value="ja"> Ja</label>
+        <label><input type="radio" name="q4" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>5. Wurde die Zustimmung der Ausbildungsleitung eingeholt?</p>
+        <label><input type="radio" name="q5" value="ja"> Ja</label>
+        <label><input type="radio" name="q5" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>6. Soll die Ausbildung auch im Ausland erfolgen?</p>
+        <label><input type="radio" name="q6" value="ja"> Ja</label>
+        <label><input type="radio" name="q6" value="nein"> Nein</label>
+      </div>
+      <div class="question">
+        <p>7. Möchtest du weitere Detailinformationen erhalten?</p>
+        <label><input type="radio" name="q7" value="ja"> Ja</label>
+        <label><input type="radio" name="q7" value="nein"> Nein</label>
+      </div>
+      <button class="submit-btn" id="submitQuestionnaire">Fragebogen absenden</button>
     </div>
   </div>
 
@@ -122,6 +218,10 @@
     const chatArea = document.getElementById("chatArea");
     const userInput = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
+    const toggleQuestionnaireBtn = document.getElementById("toggleQuestionnaireBtn");
+    const questionnaire = document.getElementById("questionnaire");
+    const toggleQuestionnaireMsg = document.getElementById("toggleQuestionnaireMsg");
+    const submitQuestionnaireBtn = document.getElementById("submitQuestionnaire");
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
@@ -137,14 +237,14 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // Sendet die Nachricht an den Webhook und verarbeitet die Antwort robust
-    function sendMessage(message) {
+    // Sendet eine Textnachricht an den Webhook und verarbeitet die Antwort
+    function sendTextMessage(message) {
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           message: message,
-          last_answer: lastBotAnswer // Übermitte nur den relevanten Dialogkontext
+          last_answer: lastBotAnswer
         })
       })
       .then(response => response.text())
@@ -156,7 +256,7 @@
         } catch(e) {
           reply = text;
         }
-        // Aktualisiere lastBotAnswer nur mit dem reinen Dialogtext der Antwort
+        // Aktualisiere lastBotAnswer nur mit dem reinen Text der Antwort
         lastBotAnswer = reply;
         appendMessage("bot", reply);
       })
@@ -166,21 +266,67 @@
       });
     }
 
-    // Event-Listener für den Senden-Button
+    // Event: Senden-Button im Chat
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
       if(text !== "") {
         appendMessage("user", text);
         userInput.value = "";
-        sendMessage(text);
+        sendTextMessage(text);
       }
     });
 
-    // Event-Listener für die Enter-Taste
+    // Senden per Enter-Taste
     userInput.addEventListener("keypress", (e) => {
-      if (e.key === "Enter") {
-        sendButton.click();
+      if (e.key === "Enter") sendButton.click();
+    });
+
+    // Toggle Fragebogen (anzeigen/verbergen)
+    toggleQuestionnaireBtn.addEventListener("click", () => {
+      if (questionnaire.style.display === "none" || questionnaire.style.display === "") {
+        questionnaire.style.display = "flex";
+        toggleQuestionnaireMsg.style.display = "block";
+      } else {
+        questionnaire.style.display = "none";
+        toggleQuestionnaireMsg.style.display = "none";
       }
+    });
+
+    // Absenden des Fragebogens
+    submitQuestionnaireBtn.addEventListener("click", () => {
+      const answers = {};
+      for (let i = 1; i <= 7; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        answers[`q${i}`] = selected ? selected.value : null;
+      }
+      // Sende den Fragebogen zusammen mit last_answer
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          questionnaire: answers,
+          last_answer: lastBotAnswer
+        })
+      })
+      .then(response => response.text())
+      .then(text => {
+        let reply = "";
+        try {
+          const data = JSON.parse(text);
+          reply = data.answer || text;
+        } catch(e) {
+          reply = text;
+        }
+        lastBotAnswer = reply;
+        appendMessage("bot", reply);
+        // Verberge den Fragebogen nach Absenden
+        questionnaire.style.display = "none";
+        toggleQuestionnaireMsg.style.display = "none";
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        appendMessage("bot", "Es gab einen Fehler bei der Kommunikation.");
+      });
     });
   </script>
 </body>
