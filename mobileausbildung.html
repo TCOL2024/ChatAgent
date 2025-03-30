@@ -243,6 +243,7 @@
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "text",  // Kennzeichnet die normale Textnachricht
           message: message,
           last_answer: lastBotAnswer
         })
@@ -256,7 +257,7 @@
         } catch(e) {
           reply = text;
         }
-        // Aktualisiere lastBotAnswer nur mit dem reinen Text der Antwort
+        // Aktualisiere lastBotAnswer nur mit dem reinen Antworttext
         lastBotAnswer = reply;
         appendMessage("bot", reply);
       })
@@ -292,18 +293,19 @@
       }
     });
 
-    // Absenden des Fragebogens
+    // Absenden des Fragebogens: Sende als Genehmigungsprüfung
     submitQuestionnaireBtn.addEventListener("click", () => {
       const answers = {};
       for (let i = 1; i <= 7; i++) {
         const selected = document.querySelector(`input[name="q${i}"]:checked`);
         answers[`q${i}`] = selected ? selected.value : null;
       }
-      // Sende den Fragebogen zusammen mit last_answer
+      // Sende den Fragebogen zusammen mit last_answer und Anweisung zur Genehmigungsprüfung
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          action: "genehmigungsprüfung",
           questionnaire: answers,
           last_answer: lastBotAnswer
         })
