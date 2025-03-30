@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobile Ausbildung Prüfmaske</title>
+  <style>
+    /* Grundlegende Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #eef2f3, #8e9eab);
+      color: #333;
+      padding: 20px;
+    }
+    .container {
+      max-width: 800px;
+      background-color: #fff;
+      margin: 40px auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    header {
+      background-color: #004a99;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 {
+      color: #fff;
+      font-size: 1.8em;
+    }
+    .content {
+      padding: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .form-group input[type="radio"],
+    .form-group input[type="checkbox"] {
+      margin-right: 8px;
+    }
+    .button-container {
+      text-align: center;
+      margin-top: 30px;
+    }
+    .button-container button {
+      background-color: #004a99;
+      color: #fff;
+      border: none;
+      padding: 12px 30px;
+      font-size: 1em;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .button-container button:hover {
+      background-color: #003d80;
+    }
+    .section-title {
+      margin-top: 20px;
+      margin-bottom: 10px;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #004a99;
+      border-bottom: 2px solid #004a99;
+      padding-bottom: 5px;
+    }
+    @media (max-width: 600px) {
+      .content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Prüfmaske: Mobile Ausbildung</h1>
+    </header>
+    <div class="content">
+      <form action="https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n" method="POST">
+        <!-- Persönliche Angaben -->
+        <div class="form-group">
+          <label for="name">Name des Auszubildenden:</label>
+          <input type="text" id="name" name="name" placeholder="Vor- und Nachname" required>
+        </div>
+        <div class="form-group">
+          <label for="email">E-Mail-Adresse:</label>
+          <input type="email" id="email" name="email" placeholder="deine.email@domain.de" required>
+        </div>
+        <!-- Abfrage, ob mobile Ausbildung genutzt werden soll -->
+        <div class="form-group">
+          <label>Wie möchtest du fortfahren?</label>
+          <input type="radio" id="info" name="action" value="info" required>
+          <label for="info" style="display:inline;">Informationen zur mobilen Ausbildung</label><br>
+          <input type="radio" id="genehmigung" name="action" value="genehmigung">
+          <label for="genehmigung" style="display:inline;">Genehmigung prüfen</label>
+        </div>
+        <!-- Abschnitt für Genehmigungsprüfung -->
+        <div id="genehmigung-section" style="display:none;">
+          <div class="section-title">Genehmigungsdetails</div>
+          <div class="form-group">
+            <label>Liegt ein vollständiger Ausbildungsvertrag vor?</label>
+            <input type="radio" id="vertragJa" name="vertrag" value="ja" required>
+            <label for="vertragJa" style="display:inline;">Ja</label>
+            <input type="radio" id="vertragNein" name="vertrag" value="nein">
+            <label for="vertragNein" style="display:inline;">Nein</label>
+          </div>
+          <div class="form-group">
+            <label>Ist die Mindestdauer bzw. der Ausbildungsstand erfüllt?</label>
+            <input type="radio" id="ausbildungsstandJa" name="ausbildungsstand" value="ja" required>
+            <label for="ausbildungsstandJa" style="display:inline;">Ja</label>
+            <input type="radio" id="ausbildungsstandNein" name="ausbildungsstand" value="nein">
+            <label for="ausbildungsstandNein" style="display:inline;">Nein</label>
+          </div>
+          <div class="form-group">
+            <label>Sind alle technischen Voraussetzungen (VPN, Geräte, Sicherheitssoftware) erfüllt?</label>
+            <input type="radio" id="technikJa" name="technik" value="ja" required>
+            <label for="technikJa" style="display:inline;">Ja</label>
+            <input type="radio" id="technikNein" name="technik" value="nein">
+            <label for="technikNein" style="display:inline;">Nein</label>
+          </div>
+          <div class="form-group">
+            <label>Soll die Ausbildung auch im Ausland erfolgen?</label>
+            <input type="radio" id="auslandJa" name="ausland" value="ja" required>
+            <label for="auslandJa" style="display:inline;">Ja</label>
+            <input type="radio" id="auslandNein" name="ausland" value="nein">
+            <label for="auslandNein" style="display:inline;">Nein</label>
+          </div>
+        </div>
+        <!-- Abschnitt für reine Informationsabfrage -->
+        <div id="info-section" style="display:none;">
+          <div class="section-title">Informationen zur mobilen Ausbildung</div>
+          <p>Wähle eine der folgenden Informationsoptionen:</p>
+          <div class="form-group">
+            <input type="radio" id="infoGrundlagen" name="info_option" value="grundlagen" required>
+            <label for="infoGrundlagen" style="display:inline;">Grundlagen und Voraussetzungen</label>
+          </div>
+          <div class="form-group">
+            <input type="radio" id="infoTechnik" name="info_option" value="technik">
+            <label for="infoTechnik" style="display:inline;">Technische & ergonomische Anforderungen</label>
+          </div>
+          <div class="form-group">
+            <input type="radio" id="infoDatenschutz" name="info_option" value="datenschutz">
+            <label for="infoDatenschutz" style="display:inline;">Datenschutz & Sicherheitsvorgaben</label>
+          </div>
+        </div>
+        <div class="button-container">
+          <button type="submit">Prüfung absenden</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Script um die Formularabschnitte basierend auf der Auswahl ein- bzw. auszublenden
+    const actionRadios = document.getElementsByName("action");
+    const genehmigungSection = document.getElementById("genehmigung-section");
+    const infoSection = document.getElementById("info-section");
+
+    actionRadios.forEach(radio => {
+      radio.addEventListener("change", () => {
+        if(radio.value === "genehmigung") {
+          genehmigungSection.style.display = "block";
+          infoSection.style.display = "none";
+        } else if(radio.value === "info") {
+          infoSection.style.display = "block";
+          genehmigungSection.style.display = "none";
+        }
+      });
+    });
+  </script>
+</body>
+</html>
