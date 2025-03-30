@@ -100,10 +100,10 @@
       <h1>Mobile Ausbildung Chatbot</h1>
     </header>
     <div class="chat-area" id="chatArea">
-      <!-- Bot einleitende Nachricht -->
+      <!-- Bot einleitende Nachrichten -->
       <div class="message bot">
         <div class="message-content">
-          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI soll euch schnell erste Informationen geben und auch unverbindlich prüfen, ob mobile Ausbildung, sogar im Ausland, möglich ist. Füllt bitte alle abgefragten Daten vom Bot aus. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Los geht's – fühlt euch frei. Diese KI ist im Test, daher bitte aufmerksam sein.
+          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI soll euch schnell erste Informationen geben und auch unverbindlich prüfen, ob mobile Ausbildung – sogar im Ausland – möglich ist. Füllt bitte alle abgefragten Daten vom Bot aus. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Los geht's – fühlt euch frei. Diese KI ist im Test, daher bitte aufmerksam sein.
         </div>
       </div>
       <div class="message bot">
@@ -123,9 +123,9 @@
     const userInput = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
-    let lastBotAnswer = "";
+    let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Funktion, um eine neue Nachricht im Chat anzuzeigen
+    // Zeigt eine neue Nachricht an
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -137,12 +137,15 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // Funktion, um die Nachricht an den Webhook zu senden und die Antwort robust zu verarbeiten
+    // Sendet die Nachricht an den Webhook und verarbeitet die Antwort robust
     function sendMessage(message) {
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: message, last_answer: lastBotAnswer })
+        body: JSON.stringify({
+          message: message,
+          last_answer: lastBotAnswer // Übermitte nur den relevanten Dialogkontext
+        })
       })
       .then(response => response.text())
       .then(text => {
@@ -153,6 +156,7 @@
         } catch(e) {
           reply = text;
         }
+        // Aktualisiere lastBotAnswer nur mit dem reinen Dialogtext der Antwort
         lastBotAnswer = reply;
         appendMessage("bot", reply);
       })
@@ -162,7 +166,7 @@
       });
     }
 
-    // Ereignis beim Klick auf den Senden-Button
+    // Event-Listener für den Senden-Button
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
       if(text !== "") {
@@ -172,7 +176,7 @@
       }
     });
 
-    // Ereignis beim Drücken der Enter-Taste
+    // Event-Listener für die Enter-Taste
     userInput.addEventListener("keypress", (e) => {
       if (e.key === "Enter") {
         sendButton.click();
