@@ -41,6 +41,22 @@
       color: #fff;
       font-size: 1.8em;
     }
+    #printButton {
+      position: absolute;
+      right: 20px;
+      top: 20px;
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      font-size: 0.9em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    #printButton:hover {
+      background-color: #005da4;
+    }
     .chat-area {
       flex: 1;
       padding: 20px;
@@ -62,7 +78,7 @@
       border-radius: 20px;
       line-height: 1.4;
       word-wrap: break-word;
-      white-space: pre-wrap; /* Hilft bei langen Worten */
+      white-space: pre-wrap;
     }
     .message.bot .message-content {
       background: #f0f0f0;
@@ -123,6 +139,7 @@
   <div class="chat-container">
     <header>
       <h1>Mobile Ausbildung Chatbot</h1>
+      <button id="printButton" onclick="window.print()">Drucken/PDF</button>
     </header>
     <div class="chat-area" id="chatArea">
       <!-- Bot einleitende Nachrichten -->
@@ -152,16 +169,14 @@
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Ersetzt **Text** durch <strong>Text</strong> und wandelt \n in <br> um
+    // Funktion zur Formatierung von Markdown und Zeilenumbrüchen
     function formatMessage(text) {
-      // Fett-Druck
       let formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-      // Zeilenumbrüche
       formatted = formatted.replace(/\n/g, "<br>");
       return formatted;
     }
 
-    // Neue Nachricht im Chat anzeigen
+    // Nachricht im Chat anzeigen
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -176,7 +191,6 @@
     // Sende die Nachricht an den Webhook und verarbeite die Antwort
     function sendTextMessage(message) {
       const payload = {
-        // kein "action", nur message + last_answer, wenn du es nicht benötigst
         message: message,
         last_answer: lastBotAnswer
       };
@@ -204,16 +218,33 @@
       });
     }
 
-    // Bietet passende Prompt-Vorschläge an, wenn der User bestimmte Schlüsselwörter eingibt
+    // Dynamische Prompt-Vorschläge basierend auf dem Nutzertext
+    function extractKeywords(text) {
+      const stopwords = ["ich", "und", "über", "bei", "die", "das", "der", "ein", "eine", "möchte", "mich", "für", "um", "auch"];
+      return text
+        .toLowerCase()
+        .replace(/[.,?!]/g, "")
+        .split(" ")
+        .filter(word => word.length > 3 && !stopwords.includes(word));
+    }
+
+    function generateDynamicPrompts(userMessage) {
+      const keywords = extractKeywords(userMessage);
+      const uniqueKeywords = [...new Set(keywords)];
+      let suggestions = [];
+      uniqueKeywords.forEach(keyword => {
+        suggestions.push(`Erzähle mir mehr über ${keyword}.`);
+        suggestions.push(`Welche Herausforderungen gibt es bei ${keyword}?`);
+      });
+      // Begrenze die Vorschläge auf maximal 3
+      return [...new Set(suggestions)].slice(0, 3);
+    }
+
     function offerPromptSuggestions(userMessage) {
-      if (userMessage.toLowerCase().includes("ausland")) {
+      const prompts = generateDynamicPrompts(userMessage);
+      if (prompts.length > 0) {
         promptSuggestions.style.display = "flex";
         promptSuggestions.innerHTML = "";
-        const prompts = [
-          "Ich möchte im Ausland arbeiten, dafür benötige ich weitere Infos.",
-          "Welche Voraussetzungen gelten für mobile Ausbildung im Ausland?",
-          "Erkläre mir die Besonderheiten der mobilen Ausbildung im Ausland."
-        ];
         prompts.forEach(promptText => {
           const btn = document.createElement("button");
           btn.classList.add("prompt-btn");
@@ -229,10 +260,10 @@
       }
     }
 
-    // Event: Senden-Button für Texteingabe
+    // Event: Senden-Button
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
-      if(text !== "") {
+      if (text !== "") {
         appendMessage("user", text);
         userInput.value = "";
         sendTextMessage(text);
