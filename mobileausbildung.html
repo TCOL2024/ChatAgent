@@ -709,7 +709,7 @@
         button.addEventListener("click", () => {
           userInput.value = prompt;
           handleSendMessage();
-          promptSuggestions.innerHTML = "";
+          promptSuggestions.innerHTML = ""; // Löscht die Vorschläge, sobald ein Prompt genutzt wurde
         });
         
         promptSuggestions.appendChild(button);
@@ -737,7 +737,7 @@
       });
     }
     
-    // Event-Listener
+    // Event-Listener zum Senden der Nachricht
     sendButton.addEventListener("click", handleSendMessage);
     
     userInput.addEventListener("keypress", (e) => {
@@ -765,12 +765,10 @@
       localStorage.setItem("darkMode", document.body.classList.contains("dark-mode"));
     });
     
-    // Falls dennoch Event-Delegation benötigt wird (optional)
-    document.addEventListener("click", (e) => {
-      if (e.target && e.target.classList.contains("prompt-btn")) {
-        userInput.value = e.target.textContent;
-        handleSendMessage();
-        promptSuggestions.innerHTML = "";
+    // Re-render Prompt-Suggestions, wenn das Eingabefeld geleert wird
+    userInput.addEventListener("input", () => {
+      if(userInput.value.trim() === "") {
+        renderPromptButtons();
       }
     });
   </script>
