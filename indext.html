@@ -194,7 +194,7 @@
     <div class="intro-text">
         Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalamangement.<br>
         Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-        Frage einfach unten ein oder nutzen Sie die Chat-Funktionen.
+        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet konkret: ... .
     </div>
 
     <!-- Haupt-Chatbereich -->
@@ -426,7 +426,7 @@
             lastBotAnswer = "";
             document.getElementById("chatBox").innerHTML = "";
             setTimeout(() => {
-                const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen?";
+                const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen? Dann nenne mir diese jetzt gerne";
                 addMessage("bot", welcomeMessage);
             }, 500);
         }
