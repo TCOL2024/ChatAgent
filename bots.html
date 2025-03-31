@@ -1,96 +1,245 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Übersicht BOT-Lösungen</title>
-    <!-- Lokales Favicon und CSS -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico" />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body data-theme="dark-primary">
-    <!-- Header -->
-    <header class="header">
-      <div class="header__inner grid">
-        <div class="header__wrapper">
-          <a href="index.html" title="Home" class="header__home-link">
-            <!-- Platzhalter-Logo -->
-            <img src="logo.png" alt="Logo" style="max-height: 40px;">
-          </a>
-          <h1 class="header__title">Übersicht BOT-Lösungen</h1>
-        </div>
-      </div>
-    </header>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Übersicht BOT-Lösungen</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
 
-    <!-- Main Content: Bot-Buttons -->
-    <main>
-      <div class="container">
-        <section class="bot-section">
-          <div class="grid-inner bot-buttons">
-            <a href="https://tcol2024.github.io/ChatAgent/mobileausbildung.html" 
-               class="button button--large" 
-               target="_blank" rel="noopener noreferrer">
-              Prozessualer Bot (Mit KI-Prüflogik)
-            </a>
-            <a href="https://tcol2024.github.io/ChatAgent/indext.html" 
-               class="button button--large" 
-               target="_blank" rel="noopener noreferrer">
-              Persönlicher Assistent mit Schwerpunkt Ausbildung, Prüferseminare
-            </a>
-            <a href="https://tcol2024.github.io/ChatAgent/IndexG.html" 
-               class="button button--large" 
-               target="_blank" rel="noopener noreferrer">
-              Bot zur Entfaltung von Kreativität
-            </a>
-            <a href="https://tcol2024.github.io/ChatAgent/IndexBlau1.html" 
-               class="button button--large" 
-               target="_blank" rel="noopener noreferrer">
-              Testbot im Probiermodus
-            </a>
-          </div>
-        </section>
-      </div>
-    </main>
+  <!-- Einfache Styles, um das Layout an den Screenshot anzunähern -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
 
-    <!-- Footer -->
-    <footer class="footer">
-      <div class="footer__wrapper">
-        <div class="grid">
-          <div class="grid-inner">
-            <div class="footer__content">
-              <h3 class="footer__headline">Wir bringen Zukunft ans Licht.</h3>
-              <div class="footer__address">
-                <p>
-                  Musterstraße 1, 12345 Musterstadt<br />
-                  Beispielstraße 2, 23456 Beispielstadt<br />
-                  Demoweg 3, 34567 Demostadt
-                </p>
-              </div>
-            </div>
-            <nav class="footer__links" aria-label="Footer Navigation">
-              <ul>
-                <li>
-                  <a class="link" href="impressum.html" target="_blank" rel="noopener noreferrer">
-                    Impressum
-                  </a>
-                </li>
-                <li>
-                  <a class="link" href="datenschutz.html" target="_blank" rel="noopener noreferrer">
-                    Datenschutz
-                  </a>
-                </li>
-                <li>
-                  <a class="link" href="agb.html" target="_blank" rel="noopener noreferrer">
-                    AGB
-                  </a>
-                </li>
-              </ul>
-            </nav>
-          </div>
-        </div>
-      </div>
-    </footer>
+    body {
+      background-color: #1b0f40; /* dunkler Hintergrund */
+      color: #fff;              /* helle Schrift */
+    }
 
-    <script src="main.js" defer></script>
-  </body>
+    .container {
+      width: 90%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 0;
+    }
+
+    header {
+      background: transparent;
+      padding: 10px 0;
+    }
+
+    header .container {
+      display: flex;
+      align-items: center;
+    }
+
+    header img {
+      max-height: 40px;
+      margin-right: 20px;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    /* Intro-Bereich mit dem kurzen Text */
+    .intro {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .intro h2 {
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    .intro p {
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    /* Grid mit den Themen und Plus-Icons */
+    .services {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .service-item {
+      background-color: #2a1860;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s;
+      position: relative;
+      border: 1px solid #ffffff30;
+    }
+
+    .service-item:hover {
+      transform: scale(1.03);
+    }
+
+    .plus-icon {
+      display: inline-block;
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      background-color: #fff;
+      color: #1b0f40;
+      border-radius: 50%;
+      font-weight: bold;
+      margin-bottom: 10px;
+      font-size: 1.2rem;
+    }
+
+    .service-title {
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* Showcase-Bereich (Bots) */
+    .showcase {
+      text-align: center;
+      margin: 40px 0;
+    }
+
+    .showcase h1 {
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .showcase p {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+    }
+
+    .showcase a {
+      display: inline-block;
+      margin: 10px;
+      padding: 12px 24px;
+      background-color: #fff;
+      color: #1b0f40;
+      text-decoration: none;
+      font-weight: bold;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+
+    .showcase a:hover {
+      background-color: #ccc;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <a href="index.html" title="Home">
+        <img src="logo.png" alt="Logo">
+      </a>
+      <h1>Übersicht BOT-Lösungen</h1>
+    </div>
+  </header>
+
+  <!-- Kurzer Intro-Text -->
+  <section class="intro">
+    <h2>Sie träumen von einem KI-getriebenen Unternehmen?</h2>
+    <p>Wir freuen uns, mit unserem umfangreichen Wissen Ihren Traum Wirklichkeit werden zu lassen.</p>
+  </section>
+
+  <!-- Services/Produkte mit Plus-Icons -->
+  <div class="container services">
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Advanced Analytics &amp; Data</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Business Intelligence &amp; Analytics</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Business Process Management</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Cloud Transformation</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Composable Analytics mit SAP</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Data Engineering</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Data Warehousing mit SAP</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Datenvisualisierung</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">doc.assist Patientendokumentation</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">SAP HR Analytics</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">KI &amp; Automation</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">KI &amp; Ethik</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">KI Legal Tech</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Predictive Maintenance</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Process Mining</div>
+    </div>
+    <div class="service-item">
+      <div class="plus-icon">+</div>
+      <div class="service-title">Robotic Process Automation</div>
+    </div>
+  </div>
+
+  <!-- Bots-Showcase -->
+  <div class="container showcase">
+    <h1>Welcome to the Future of AI</h1>
+    <p>Our AI Bots are designed to revolutionize the way you interact with technology.</p>
+    <a href="https://tcol2024.github.io/ChatAgent/mobileausbildung.html" target="_blank" rel="noopener noreferrer">
+      Prozessualer Bot (Mit KI-Prüflogik)
+    </a>
+    <a href="https://tcol2024.github.io/ChatAgent/indext.html" target="_blank" rel="noopener noreferrer">
+      Persönlicher Assistent mit Schwerpunkt Ausbildung, Prüferseminare
+    </a>
+    <a href="https://tcol2024.github.io/ChatAgent/IndexG.html" target="_blank" rel="noopener noreferrer">
+      Bot zur Entfaltung von Kreativität
+    </a>
+    <a href="https://tcol2024.github.io/ChatAgent/IndexBlau1.html" target="_blank" rel="noopener noreferrer">
+      Testbot im Probiermodus
+    </a>
+  </div>
+
+</body>
 </html>
