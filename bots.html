@@ -1,39 +1,96 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
+  <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Übersicht BOT-Lösungen</title>
+    <!-- Lokales Favicon und CSS -->
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-theme="dark-primary">
     <!-- Header -->
-    <header>
-        <div class="container">
-            <a href="index.html" title="Home">
-                <img src="logo.png" alt="Logo" style="max-height: 40px;">
-            </a>
-            <h1>Übersicht BOT-Lösungen</h1>
+    <header class="header">
+      <div class="header__inner grid">
+        <div class="header__wrapper">
+          <a href="index.html" title="Home" class="header__home-link">
+            <!-- Platzhalter-Logo -->
+            <img src="logo.png" alt="Logo" style="max-height: 40px;">
+          </a>
+          <h1 class="header__title">Übersicht BOT-Lösungen</h1>
         </div>
+      </div>
     </header>
 
     <!-- Main Content: Bot-Buttons -->
-    <div class="container showcase">
-        <h1>Welcome to the Future of AI</h1>
-        <p>Our AI Bots are designed to revolutionize the way you interact with technology.</p>
-        <a href="https://tcol2024.github.io/ChatAgent/mobileausbildung.html" target="_blank" rel="noopener noreferrer">
-            Prozessualer Bot (Mit KI-Prüflogik)
-        </a>
-        <a href="https://tcol2024.github.io/ChatAgent/indext.html" target="_blank" rel="noopener noreferrer">
-            Persönlicher Assistent mit Schwerpunkt Ausbildung, Prüferseminare
-        </a>
-        <a href="https://tcol2024.github.io/ChatAgent/IndexG.html" target="_blank" rel="noopener noreferrer">
-            Bot zur Entfaltung von Kreativität
-        </a>
-        <a href="https://tcol2024.github.io/ChatAgent/IndexBlau1.html" target="_blank" rel="noopener noreferrer">
-            Testbot im Probiermodus
-        </a>
-    </div>
+    <main>
+      <div class="container">
+        <section class="bot-section">
+          <div class="grid-inner bot-buttons">
+            <a href="https://tcol2024.github.io/ChatAgent/mobileausbildung.html" 
+               class="button button--large" 
+               target="_blank" rel="noopener noreferrer">
+              Prozessualer Bot (Mit KI-Prüflogik)
+            </a>
+            <a href="https://tcol2024.github.io/ChatAgent/indext.html" 
+               class="button button--large" 
+               target="_blank" rel="noopener noreferrer">
+              Persönlicher Assistent mit Schwerpunkt Ausbildung, Prüferseminare
+            </a>
+            <a href="https://tcol2024.github.io/ChatAgent/IndexG.html" 
+               class="button button--large" 
+               target="_blank" rel="noopener noreferrer">
+              Bot zur Entfaltung von Kreativität
+            </a>
+            <a href="https://tcol2024.github.io/ChatAgent/IndexBlau1.html" 
+               class="button button--large" 
+               target="_blank" rel="noopener noreferrer">
+              Testbot im Probiermodus
+            </a>
+          </div>
+        </section>
+      </div>
+    </main>
 
-</body>
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="footer__wrapper">
+        <div class="grid">
+          <div class="grid-inner">
+            <div class="footer__content">
+              <h3 class="footer__headline">Wir bringen Zukunft ans Licht.</h3>
+              <div class="footer__address">
+                <p>
+                  Musterstraße 1, 12345 Musterstadt<br />
+                  Beispielstraße 2, 23456 Beispielstadt<br />
+                  Demoweg 3, 34567 Demostadt
+                </p>
+              </div>
+            </div>
+            <nav class="footer__links" aria-label="Footer Navigation">
+              <ul>
+                <li>
+                  <a class="link" href="impressum.html" target="_blank" rel="noopener noreferrer">
+                    Impressum
+                  </a>
+                </li>
+                <li>
+                  <a class="link" href="datenschutz.html" target="_blank" rel="noopener noreferrer">
+                    Datenschutz
+                  </a>
+                </li>
+                <li>
+                  <a class="link" href="agb.html" target="_blank" rel="noopener noreferrer">
+                    AGB
+                  </a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="main.js" defer></script>
+  </body>
 </html>
