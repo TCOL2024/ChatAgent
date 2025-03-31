@@ -113,14 +113,18 @@
       word-wrap: break-word;
       white-space: pre-wrap;
       text-align: left;
+      /* Left-align text */
+      text-align: left;
     }
     .message.bot .message-content {
       background: #e0e0e0;
       color: #333;
+      border-bottom-left-radius: 0; /* Pointed bottom left */
     }
     .message.user .message-content {
       background: #004a99;
       color: #fff;
+      border-bottom-right-radius: 0; /* Pointed bottom right */
     }
     .input-area {
       display: flex;
@@ -135,6 +139,9 @@
       border: 1px solid #ccc;
       border-radius: 4px;
       outline: none;
+      /* Enable line break and use Courier font */
+      white-space: pre-wrap;
+      font-family: "Courier", monospace;
     }
     .input-area button {
       background-color: #004a99;
