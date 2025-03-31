@@ -72,6 +72,8 @@
     .input-area {
       display: flex;
       border-top: 1px solid #ddd;
+      align-items: center;
+      padding: 5px;
     }
     .input-area input {
       flex: 1;
@@ -88,11 +90,12 @@
       font-size: 1em;
       cursor: pointer;
       transition: background-color 0.3s ease;
+      margin-left: 5px;
     }
     .input-area button:hover {
       background-color: #003d80;
     }
-    /* Fragebogen-Stil */
+    /* Stil für den Fragebogen */
     .questionnaire {
       border-top: 1px solid #ddd;
       padding: 20px;
@@ -129,7 +132,6 @@
       background-color: #003d80;
     }
     .toggle-btn {
-      margin-top: 10px;
       background-color: #0078d7;
       color: #fff;
       border: none;
@@ -138,6 +140,7 @@
       cursor: pointer;
       border-radius: 4px;
       transition: background-color 0.3s ease;
+      margin-left: 5px;
     }
     .toggle-btn:hover {
       background-color: #005da4;
@@ -153,7 +156,7 @@
       <!-- Bot einleitende Nachrichten -->
       <div class="message bot">
         <div class="message-content">
-          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI soll euch schnell erste Informationen geben und auch unverbindlich prüfen, ob mobile Ausbildung – sogar im Ausland – möglich ist. Füllt bitte alle abgefragten Daten vom Bot aus. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Los geht's – fühlt euch frei. Diese KI ist im Test, daher bitte aufmerksam sein.
+          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI gibt euch erste Informationen und prüft unverbindlich, ob mobile Ausbildung – auch im Ausland – möglich ist. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Diese KI ist ein Testsystem.
         </div>
       </div>
       <div class="message bot">
@@ -161,10 +164,10 @@
           Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
         </div>
       </div>
-      <!-- Hinweis für den Fragebogen -->
+      <!-- Hinweis: Wird angezeigt, wenn der Fragebogen eingeblendet wird -->
       <div class="message bot" id="toggleQuestionnaireMsg" style="display: none;">
         <div class="message-content">
-          Bitte fülle den folgenden Fragebogen aus:
+          Bitte beantworte den folgenden Fragebogen:
         </div>
       </div>
     </div>
@@ -173,7 +176,7 @@
       <button id="sendButton">Senden</button>
       <button id="toggleQuestionnaireBtn" class="toggle-btn">Genehmigung prüfen</button>
     </div>
-    <!-- Fragebogen für 7 Fragen -->
+    <!-- Fragebogen für Genehmigungsprüfung -->
     <div class="questionnaire" id="questionnaire">
       <div class="question">
         <p>1. Liegt ein vollständiger Ausbildungsvertrag vor?</p>
@@ -191,12 +194,12 @@
         <label><input type="radio" name="q3" value="nein"> Nein</label>
       </div>
       <div class="question">
-        <p>4. Entsprechen die ergonomischen Anforderungen (Tisch, Stuhl, Bildschirmposition) den Vorgaben?</p>
+        <p>4. Entsprechen die ergonomischen Anforderungen (Tisch, Stuhl, Bildschirmpositionierung) den Vorgaben?</p>
         <label><input type="radio" name="q4" value="ja"> Ja</label>
         <label><input type="radio" name="q4" value="nein"> Nein</label>
       </div>
       <div class="question">
-        <p>5. Wurde die Zustimmung der Ausbildungsleitung eingeholt?</p>
+        <p>5. Wurde die Zustimmung der Ausbildungsleitung bzw. des Betriebsrats eingeholt?</p>
         <label><input type="radio" name="q5" value="ja"> Ja</label>
         <label><input type="radio" name="q5" value="nein"> Nein</label>
       </div>
@@ -225,7 +228,7 @@
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Zeigt eine neue Nachricht an
+    // Neue Nachricht im Chat anzeigen
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -237,16 +240,17 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // Sendet eine Textnachricht an den Webhook und verarbeitet die Antwort
+    // Sende normale Textnachrichten (Informationsanfragen)
     function sendTextMessage(message) {
+      const payload = {
+        action: "text",
+        message: message,
+        last_answer: lastBotAnswer
+      };
       fetch(webhookURL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "text",  // Kennzeichnet die normale Textnachricht
-          message: message,
-          last_answer: lastBotAnswer
-        })
+        body: JSON.stringify(payload)
       })
       .then(response => response.text())
       .then(text => {
@@ -257,7 +261,6 @@
         } catch(e) {
           reply = text;
         }
-        // Aktualisiere lastBotAnswer nur mit dem reinen Antworttext
         lastBotAnswer = reply;
         appendMessage("bot", reply);
       })
@@ -267,7 +270,45 @@
       });
     }
 
-    // Event: Senden-Button im Chat
+    // Sende den Fragebogen als Genehmigungsprüfung
+    function sendQuestionnaire() {
+      const answers = {};
+      for (let i = 1; i <= 7; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        answers[`q${i}`] = selected ? selected.value : null;
+      }
+      const payload = {
+        action: "genehmigungsprüfung",
+        questionnaire: answers,
+        last_answer: lastBotAnswer
+      };
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.text())
+      .then(text => {
+        let reply = "";
+        try {
+          const data = JSON.parse(text);
+          reply = data.answer || text;
+        } catch(e) {
+          reply = text;
+        }
+        lastBotAnswer = reply;
+        appendMessage("bot", reply);
+        // Fragebogen ausblenden
+        questionnaire.style.display = "none";
+        toggleQuestionnaireMsg.style.display = "none";
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        appendMessage("bot", "Es gab einen Fehler bei der Kommunikation.");
+      });
+    }
+
+    // Event-Listener für den Senden-Button (normale Texteingabe)
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
       if(text !== "") {
@@ -282,7 +323,7 @@
       if (e.key === "Enter") sendButton.click();
     });
 
-    // Toggle Fragebogen (anzeigen/verbergen)
+    // Fragebogen ein-/ausblenden
     toggleQuestionnaireBtn.addEventListener("click", () => {
       if (questionnaire.style.display === "none" || questionnaire.style.display === "") {
         questionnaire.style.display = "flex";
@@ -293,42 +334,9 @@
       }
     });
 
-    // Absenden des Fragebogens: Sende als Genehmigungsprüfung
+    // Event-Listener für das Absenden des Fragebogens
     submitQuestionnaireBtn.addEventListener("click", () => {
-      const answers = {};
-      for (let i = 1; i <= 7; i++) {
-        const selected = document.querySelector(`input[name="q${i}"]:checked`);
-        answers[`q${i}`] = selected ? selected.value : null;
-      }
-      // Sende den Fragebogen zusammen mit last_answer und Anweisung zur Genehmigungsprüfung
-      fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "genehmigungsprüfung",
-          questionnaire: answers,
-          last_answer: lastBotAnswer
-        })
-      })
-      .then(response => response.text())
-      .then(text => {
-        let reply = "";
-        try {
-          const data = JSON.parse(text);
-          reply = data.answer || text;
-        } catch(e) {
-          reply = text;
-        }
-        lastBotAnswer = reply;
-        appendMessage("bot", reply);
-        // Verberge den Fragebogen nach Absenden
-        questionnaire.style.display = "none";
-        toggleQuestionnaireMsg.style.display = "none";
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        appendMessage("bot", "Es gab einen Fehler bei der Kommunikation.");
-      });
+      sendQuestionnaire();
     });
   </script>
 </body>
