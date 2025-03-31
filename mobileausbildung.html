@@ -71,9 +71,7 @@
     }
     .input-area {
       display: flex;
-      align-items: center;
       border-top: 1px solid #ddd;
-      padding: 5px;
     }
     .input-area input {
       flex: 1;
@@ -90,71 +88,9 @@
       font-size: 1em;
       cursor: pointer;
       transition: background-color 0.3s ease;
-      margin-left: 5px;
     }
     .input-area button:hover {
       background-color: #003d80;
-    }
-    /* Stil für den Fragebogen */
-    .questionnaire {
-      border-top: 1px solid #ddd;
-      padding: 20px;
-      margin-top: 20px;
-      display: none;
-      flex-direction: column;
-      background: #f9f9f9;
-    }
-    .question {
-      margin-bottom: 20px;
-    }
-    .question p {
-      margin-bottom: 10px;
-      font-weight: bold;
-      font-size: 15px;
-    }
-    .options {
-      display: flex;
-      gap: 20px;
-    }
-    .options label {
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      font-size: 14px;
-    }
-    .options input[type="radio"] {
-      margin-right: 8px;
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-    }
-    .submit-btn {
-      background-color: #004a99;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      font-size: 1em;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-      align-self: center;
-    }
-    .submit-btn:hover {
-      background-color: #003d80;
-    }
-    .toggle-btn {
-      background-color: #0078d7;
-      color: #fff;
-      border: none;
-      padding: 8px 16px;
-      font-size: 0.9em;
-      cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-      margin-left: 5px;
-    }
-    .toggle-btn:hover {
-      background-color: #005da4;
     }
   </style>
 </head>
@@ -175,33 +111,76 @@
           Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
         </div>
       </div>
-      <!-- Hinweis für den Fragebogen -->
-      <div class="message bot" id="toggleQuestionnaireMsg" style="display: none;">
-        <div class="message-content">
-          Bitte beantworte die folgenden Fragen zur Genehmigungsprüfung:
-        </div>
-      </div>
     </div>
     <div class="input-area">
       <input type="text" id="userInput" placeholder="Schreibe hier deine Nachricht..." autocomplete="off">
       <button id="sendButton">Senden</button>
-      <button id="toggleQuestionnaireBtn" class="toggle-btn">Genehmigung prüfen</button>
     </div>
-    <!-- Fragebogen für Genehmigungsprüfung -->
-    <div class="questionnaire" id="questionnaire">
-      <div class="question">
-        <p>1. Liegt ein vollständiger Ausbildungsvertrag vor?</p>
-        <div class="options">
-          <label><input type="radio" name="q1" value="Ja"> Ja</label>
-          <label><input type="radio" name="q1" value="Nein"> Nein</label>
-        </div>
-      </div>
-      <div class="question">
-        <p>2. Ist der betriebliche Ausbildungsstand erfüllt?</p>
-        <div class="options">
-          <label><input type="radio" name="q2" value="Ja"> Ja</label>
-          <label><input type="radio" name="q2" value="Nein"> Nein</label>
-        </div>
-      </div>
-      <div class="question">
-        <p
+  </div>
+
+  <script>
+    const chatArea = document.getElementById("chatArea");
+    const userInput = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+    const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
+    let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
+
+    // Neue Nachricht im Chat anzeigen
+    function appendMessage(sender, text) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+      const messageContent = document.createElement("div");
+      messageContent.classList.add("message-content");
+      messageContent.innerText = text;
+      messageDiv.appendChild(messageContent);
+      chatArea.appendChild(messageDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+
+    // Sende die Nachricht an den Webhook und verarbeite die Antwort
+    function sendTextMessage(message) {
+      const payload = {
+        action: "text",
+        message: message,
+        last_answer: lastBotAnswer
+      };
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      })
+      .then(response => response.text())
+      .then(text => {
+        let reply = "";
+        try {
+          const data = JSON.parse(text);
+          reply = data.answer || text;
+        } catch(e) {
+          reply = text;
+        }
+        lastBotAnswer = reply;
+        appendMessage("bot", reply);
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        appendMessage("bot", "Es gab einen Fehler bei der Kommunikation.");
+      });
+    }
+
+    // Event: Senden-Button für Texteingabe
+    sendButton.addEventListener("click", () => {
+      const text = userInput.value.trim();
+      if(text !== "") {
+        appendMessage("user", text);
+        userInput.value = "";
+        sendTextMessage(text);
+      }
+    });
+
+    // Event: Senden per Enter-Taste
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter") sendButton.click();
+    });
+  </script>
+</body>
+</html>
