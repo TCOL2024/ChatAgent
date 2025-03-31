@@ -34,17 +34,16 @@
     header {
       background-color: #004a99;
       padding: 20px;
-      text-align: center;
-      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
     header h1 {
       color: #fff;
       font-size: 1.8em;
+      margin: 0;
     }
     #printButton {
-      position: absolute;
-      right: 20px;
-      top: 20px;
       background-color: #0078d7;
       color: #fff;
       border: none;
@@ -150,7 +149,7 @@
       </div>
       <div class="message bot">
         <div class="message-content">
-          Möchtest du dich über mobile Ausbildung informieren oder eine Genehmigung prüfen lassen?
+          wollen wir los legen?
         </div>
       </div>
     </div>
@@ -169,14 +168,14 @@
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Funktion zur Formatierung von Markdown und Zeilenumbrüchen
+    // Ersetzt **Text** durch <strong>Text</strong> und \n durch <br>
     function formatMessage(text) {
       let formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
       formatted = formatted.replace(/\n/g, "<br>");
       return formatted;
     }
 
-    // Nachricht im Chat anzeigen
+    // Neue Nachricht im Chat anzeigen
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -236,7 +235,6 @@
         suggestions.push(`Erzähle mir mehr über ${keyword}.`);
         suggestions.push(`Welche Herausforderungen gibt es bei ${keyword}?`);
       });
-      // Begrenze die Vorschläge auf maximal 3
       return [...new Set(suggestions)].slice(0, 3);
     }
 
