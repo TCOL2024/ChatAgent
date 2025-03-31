@@ -29,11 +29,13 @@
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      position: relative;
     }
     header {
       background-color: #004a99;
       padding: 20px;
       text-align: center;
+      position: relative;
     }
     header h1 {
       color: #fff;
@@ -92,6 +94,27 @@
     .input-area button:hover {
       background-color: #003d80;
     }
+    /* Stil für Prompt-Vorschläge */
+    .prompt-suggestions {
+      margin-top: 10px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 0 20px 20px;
+    }
+    .prompt-btn {
+      background-color: #0078d7;
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      font-size: 0.9em;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    .prompt-btn:hover {
+      background-color: #005da4;
+    }
   </style>
 </head>
 <body>
@@ -103,7 +126,7 @@
       <!-- Bot einleitende Nachrichten -->
       <div class="message bot">
         <div class="message-content">
-          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI gibt euch erste Informationen und prüft unverbindlich, ob mobile Ausbildung – auch im Ausland – möglich ist. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Diese KI ist ein Testsystem.
+          Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI gibt euch erste **Informationen** und prüft unverbindlich, ob mobile Ausbildung – auch im Ausland – möglich ist. Die Daten werden vertraulich behandelt. Grundlage ist die geltende Datenschutzvereinbarung. Diese KI ist ein Testsystem.
         </div>
       </div>
       <div class="message bot">
@@ -116,28 +139,35 @@
       <input type="text" id="userInput" placeholder="Schreibe hier deine Nachricht..." autocomplete="off">
       <button id="sendButton">Senden</button>
     </div>
+    <div class="prompt-suggestions" id="promptSuggestions" style="display:none;"></div>
   </div>
 
   <script>
     const chatArea = document.getElementById("chatArea");
     const userInput = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
+    const promptSuggestions = document.getElementById("promptSuggestions");
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Neue Nachricht im Chat anzeigen
+    // Funktion zur Formatierung von Markdown (fett) -> **Text** zu <strong>Text</strong>
+    function formatMessage(text) {
+      return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+    }
+
+    // Funktion: Nachricht im Chat anzeigen
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
       const messageContent = document.createElement("div");
       messageContent.classList.add("message-content");
-      messageContent.innerText = text;
+      messageContent.innerHTML = formatMessage(text);
       messageDiv.appendChild(messageContent);
       chatArea.appendChild(messageDiv);
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // Sende die Nachricht an den Webhook und verarbeite die Antwort
+    // Funktion: Sende Textnachricht an den Webhook und verarbeite die Antwort
     function sendTextMessage(message) {
       const payload = {
         action: "text",
@@ -160,6 +190,7 @@
         }
         lastBotAnswer = reply;
         appendMessage("bot", reply);
+        offerPromptSuggestions(message);
       })
       .catch(error => {
         console.error("Error:", error);
@@ -167,10 +198,37 @@
       });
     }
 
-    // Event: Senden-Button für Texteingabe
+    // Funktion: Biete passende Prompt-Vorschläge an, wenn der User bestimmte Keywords eingibt
+    function offerPromptSuggestions(userMessage) {
+      // Beispiel: Falls "ausland" im Text vorkommt
+      if (userMessage.toLowerCase().includes("ausland")) {
+        promptSuggestions.style.display = "flex";
+        promptSuggestions.innerHTML = "";
+        // Beispielvorschläge
+        const prompts = [
+          "Ich möchte im Ausland arbeiten, dafür benötige ich weitere Infos.",
+          "Welche Voraussetzungen gelten für mobile Ausbildung im Ausland?",
+          "Erkläre mir die Besonderheiten der mobilen Ausbildung im Ausland."
+        ];
+        prompts.forEach(promptText => {
+          const btn = document.createElement("button");
+          btn.classList.add("prompt-btn");
+          btn.innerText = promptText;
+          btn.onclick = function() {
+            userInput.value = promptText;
+            promptSuggestions.style.display = "none";
+          };
+          promptSuggestions.appendChild(btn);
+        });
+      } else {
+        promptSuggestions.style.display = "none";
+      }
+    }
+
+    // Event: Senden-Button (normale Texteingabe)
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
-      if(text !== "") {
+      if (text !== "") {
         appendMessage("user", text);
         userInput.value = "";
         sendTextMessage(text);
