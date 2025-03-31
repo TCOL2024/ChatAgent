@@ -112,13 +112,17 @@
             box-sizing: border-box;
             align-items: center;
         }
-        .input-container input {
+        .input-container textarea {
             flex: 1;
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 20px;
             font-size: 14px;
             margin-right: 10px;
+            resize: none;
+            height: 40px; /* Initialhöhe, kann angepasst werden */
+            overflow: auto; /* Ermöglicht Scrollen bei langen Nachrichten */
+            box-sizing: border-box;
         }
         .input-container button {
             padding: 12px 20px;
@@ -162,7 +166,7 @@
             #print-button {
                 padding: 8px 16px;
             }
-            .input-container input {
+            .input-container textarea {
                 padding: 8px;
             }
         }
@@ -194,7 +198,7 @@
     <div class="intro-text">
         Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalamangement.<br>
         Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet konkret: ... .
+        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet konkret:[...]
     </div>
 
     <!-- Haupt-Chatbereich -->
@@ -203,7 +207,7 @@
 
         <!-- Eingabefeld + Button -->
         <div class="input-container">
-            <input type="text" id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)">
+            <textarea id="userInput" placeholder="Ihre Nachricht..." onkeypress="handleKeyPress(event)"></textarea>
             <button onclick="sendMessage()">Absenden</button>
         </div>
     </div>
@@ -339,7 +343,7 @@
             // Wenn kein Chatverlauf existiert, starte mit der Begrüßung
             if (chatHistory.length === 0) {
                 setTimeout(() => {
-                    const welcomeMessage = "Hallo " + userName + ", schön, dass Du diesen Bot nutzt. Viel Spaß beim Testen. Legen wir los. Formuliere Deine erste Frage, so ausführlicher, desto besser :-)";
+                    const welcomeMessage = "Hallo " + userName + ", schön, dass Du diesen Bot nutzt. Viel Spaß beim Testen. Legen wir los. Formuliere Deine erste Frage, so ausführlicher, desto besser.";
                     addMessage("bot", welcomeMessage);
                     askedForName = true;
                 }, 500);
@@ -347,7 +351,10 @@
         });
 
         function handleKeyPress(event) {
-            if (event.key === "Enter") sendMessage();
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
 
         async function sendMessage() {
