@@ -61,6 +61,8 @@
       padding: 12px 16px;
       border-radius: 20px;
       line-height: 1.4;
+      word-wrap: break-word;
+      white-space: pre-wrap; /* Hilft bei langen Worten */
     }
     .message.bot .message-content {
       background: #f0f0f0;
@@ -150,12 +152,16 @@
     const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
     let lastBotAnswer = ""; // Enthält den reinen Dialogkontext der letzten Bot-Antwort
 
-    // Funktion zur Formatierung von Markdown (fett) -> **Text** zu <strong>Text</strong>
+    // Ersetzt **Text** durch <strong>Text</strong> und wandelt \n in <br> um
     function formatMessage(text) {
-      return text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      // Fett-Druck
+      let formatted = text.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      // Zeilenumbrüche
+      formatted = formatted.replace(/\n/g, "<br>");
+      return formatted;
     }
 
-    // Funktion: Nachricht im Chat anzeigen
+    // Neue Nachricht im Chat anzeigen
     function appendMessage(sender, text) {
       const messageDiv = document.createElement("div");
       messageDiv.classList.add("message", sender);
@@ -167,10 +173,10 @@
       chatArea.scrollTop = chatArea.scrollHeight;
     }
 
-    // Funktion: Sende Textnachricht an den Webhook und verarbeite die Antwort
+    // Sende die Nachricht an den Webhook und verarbeite die Antwort
     function sendTextMessage(message) {
       const payload = {
-        action: "text",
+        // kein "action", nur message + last_answer, wenn du es nicht benötigst
         message: message,
         last_answer: lastBotAnswer
       };
@@ -198,13 +204,11 @@
       });
     }
 
-    // Funktion: Biete passende Prompt-Vorschläge an, wenn der User bestimmte Keywords eingibt
+    // Bietet passende Prompt-Vorschläge an, wenn der User bestimmte Schlüsselwörter eingibt
     function offerPromptSuggestions(userMessage) {
-      // Beispiel: Falls "ausland" im Text vorkommt
       if (userMessage.toLowerCase().includes("ausland")) {
         promptSuggestions.style.display = "flex";
         promptSuggestions.innerHTML = "";
-        // Beispielvorschläge
         const prompts = [
           "Ich möchte im Ausland arbeiten, dafür benötige ich weitere Infos.",
           "Welche Voraussetzungen gelten für mobile Ausbildung im Ausland?",
@@ -225,10 +229,10 @@
       }
     }
 
-    // Event: Senden-Button (normale Texteingabe)
+    // Event: Senden-Button für Texteingabe
     sendButton.addEventListener("click", () => {
       const text = userInput.value.trim();
-      if (text !== "") {
+      if(text !== "") {
         appendMessage("user", text);
         userInput.value = "";
         sendTextMessage(text);
