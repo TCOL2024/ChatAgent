@@ -50,7 +50,7 @@
     }
 
     .mac-window {
-      width: 900px;
+      width: 1020px;
       max-width: 95%;
       background: var(--mac-window-bg);
       border-radius: 10px;
@@ -118,53 +118,124 @@
     }
 
     .sidebar {
-      width: 200px;
+      width: 260px;
       background: var(--mac-sidebar-bg);
       border-right: 1px solid var(--mac-border);
-      padding: 15px 0;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
-
-    .sidebar-section {
-      padding: 0 15px 15px;
+    
+    .sidebar-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--mac-border);
     }
-
-    .sidebar-title {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--mac-text-secondary);
-      margin-bottom: 8px;
-    }
-
-    .sidebar-item {
-      display: flex;
-      align-items: center;
-      padding: 6px 15px;
-      border-radius: 5px;
-      color: var(--mac-text);
-      font-size: 13px;
-      margin-bottom: 3px;
-      cursor: pointer;
-    }
-
-    .sidebar-item:hover {
-      background-color: rgba(0,0,0,0.05);
-    }
-
-    .sidebar-item.active {
-      background-color: rgba(0,122,255,0.1);
-      color: var(--primary-color);
-    }
-
-    .sidebar-item-icon {
-      margin-right: 8px;
-      width: 16px;
-      height: 16px;
+    
+    .new-chat-btn {
       display: flex;
       align-items: center;
       justify-content: center;
+      width: 100%;
+      padding: 8px 16px;
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .new-chat-btn:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .new-chat-btn-icon {
+      margin-right: 8px;
+      font-size: 14px;
+    }
+    
+    .sidebar-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 0;
+    }
+
+    .chat-group {
+      margin-bottom: 16px;
+    }
+
+    .group-title {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--mac-text-secondary);
+      padding: 6px 16px;
+      margin-bottom: 4px;
+    }
+
+    .chat-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      color: var(--mac-text);
+      font-size: 13px;
+      cursor: pointer;
+      position: relative;
+      border-radius: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .chat-item-content {
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .chat-item:hover {
+      background-color: rgba(0,0,0,0.04);
+    }
+    
+    .chat-item:hover .chat-item-actions {
+      display: flex;
+    }
+
+    .chat-item.active {
+      background-color: rgba(0,122,255,0.1);
+      color: var(--primary-color);
+    }
+    
+    .chat-item-icon {
+      margin-right: 8px;
+      flex-shrink: 0;
+    }
+    
+    .chat-item-actions {
+      display: none;
+      position: absolute;
+      right: 12px;
+      align-items: center;
+    }
+    
+    .chat-action-btn {
+      background: none;
+      border: none;
+      color: var(--mac-text-secondary);
+      padding: 4px;
+      margin-left: 2px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    
+    .chat-action-btn:hover {
+      background-color: rgba(0,0,0,0.1);
+      color: var(--mac-text);
     }
 
     .main-content {
@@ -172,6 +243,25 @@
       display: flex;
       flex-direction: column;
       background-color: var(--mac-window-bg);
+    }
+    
+    .chat-info {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--mac-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    
+    .chat-info-title {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--mac-text);
+    }
+    
+    .chat-info-date {
+      font-size: 12px;
+      color: var(--mac-text-secondary);
     }
 
     .chat-box {
@@ -182,6 +272,37 @@
       flex-direction: column;
       gap: 12px;
       scroll-behavior: smooth;
+    }
+    
+    .empty-chat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: var(--mac-text-secondary);
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .empty-chat-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      color: var(--primary-color);
+      opacity: 0.7;
+    }
+    
+    .empty-chat-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--mac-text);
+    }
+    
+    .empty-chat-text {
+      font-size: 14px;
+      max-width: 460px;
+      line-height: 1.6;
     }
 
     .message-container {
@@ -246,13 +367,13 @@
     .input-container {
       display: flex;
       border-top: 1px solid var(--mac-border);
-      padding: 15px;
+      padding: 15px 20px;
       background: var(--mac-window-bg);
     }
 
     .input-container input {
       flex: 1;
-      padding: 10px 12px;
+      padding: 10px 14px;
       border: 1px solid var(--mac-border);
       border-radius: 20px;
       outline: none;
@@ -371,42 +492,106 @@
       }
     }
     
-    /* Toolbar */
-    .toolbar {
-      height: 30px;
-      padding: 0 15px;
+    /* Modals */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0,0,0,0.5);
       display: flex;
-      align-items: center;
-      background-color: var(--mac-window-bg);
-      border-bottom: 1px solid var(--mac-border);
-    }
-    
-    .toolbar-button {
-      background: none;
-      border: none;
-      color: var(--mac-text-secondary);
-      font-size: 18px;
-      cursor: pointer;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
       justify-content: center;
-      border-radius: 4px;
-      margin-right: 10px;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
     }
     
-    .toolbar-button:hover {
-      background-color: rgba(0,0,0,0.05);
+    .modal.active {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .modal-content {
+      background-color: var(--mac-window-bg);
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 90%;
+      max-width: 400px;
+      padding: 24px;
+      color: var(--mac-text);
+      animation: fadeInUp 0.3s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .modal-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
       color: var(--mac-text);
     }
     
-    .toolbar-spacer {
-      flex: 1;
+    .modal-body {
+      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.5;
     }
     
-    #theme-toggle {
-      margin-left: auto;
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    .modal-btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .modal-btn-cancel {
+      background-color: transparent;
+      border: 1px solid var(--mac-border);
+      color: var(--mac-text);
+    }
+    
+    .modal-btn-cancel:hover {
+      background-color: rgba(0,0,0,0.05);
+    }
+    
+    .modal-btn-confirm {
+      background-color: var(--primary-color);
+      border: none;
+      color: white;
+    }
+    
+    .modal-btn-confirm:hover {
+      background-color: var(--primary-hover);
+    }
+    
+    .modal-btn-danger {
+      background-color: #FF5F57;
+      border: none;
+      color: white;
+    }
+    
+    .modal-btn-danger:hover {
+      background-color: #E33E32;
     }
     
     /* Status bar */
@@ -431,12 +616,37 @@
       }
       
       .sidebar {
-        display: none;
+        position: absolute;
+        left: 0;
+        top: 38px;
+        bottom: 0;
+        z-index: 100;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        width: 280px;
+      }
+      
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      
+      .mobile-menu-toggle {
+        display: block !important;
       }
       
       .message-container {
         max-width: 90%;
       }
+    }
+    
+    .mobile-menu-toggle {
+      display: none;
+      background: none;
+      border: none;
+      font-size: 18px;
+      color: var(--mac-text);
+      margin-right: 10px;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -448,46 +658,40 @@
         <div class="window-control minimize"></div>
         <div class="window-control maximize"></div>
       </div>
+      <button class="mobile-menu-toggle" id="mobileMenuToggle">☰</button>
       <div class="window-title">Chat Assistent</div>
       <div style="width: 51px;"></div> <!-- Spacer for visual balance -->
     </div>
     
     <div class="app-container">
-      <div class="sidebar">
-        <div class="sidebar-section">
-          <div class="sidebar-title">Favoriten</div>
-          <div class="sidebar-item active">
-            <div class="sidebar-item-icon">💬</div>
-            Neuer Chat
-          </div>
-          <div class="sidebar-item">
-            <div class="sidebar-item-icon">📝</div>
-            Notizen
-          </div>
+      <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <button class="new-chat-btn" id="newChatBtn">
+            <span class="new-chat-btn-icon">+</span>
+            <span>Neuer Chat</span>
+          </button>
         </div>
-        
-        <div class="sidebar-section">
-          <div class="sidebar-title">Aktuelle Chats</div>
-          <div class="sidebar-item">
-            <div class="sidebar-item-icon">👤</div>
-            Chat mit KI
-          </div>
-          <div class="sidebar-item">
-            <div class="sidebar-item-icon">❓</div>
-            Hilfe-Chat
-          </div>
+        <div class="sidebar-content" id="sidebarContent">
+          <!-- Chat-Gruppen werden hier dynamisch eingefügt -->
         </div>
       </div>
       
       <div class="main-content">
-        <div class="toolbar">
-          <button class="toolbar-button" title="Neu">+</button>
-          <button class="toolbar-button" title="Suchen">🔍</button>
-          <div class="toolbar-spacer"></div>
-          <button class="toolbar-button" id="theme-toggle" title="Darkmodus umschalten">🌙</button>
+        <div class="chat-info" id="chatInfo">
+          <div class="chat-info-title">Neuer Chat</div>
+          <div class="chat-info-date" id="chatDate"></div>
         </div>
         
-        <div class="chat-box" id="chatBox"></div>
+        <div class="chat-box" id="chatBox">
+          <!-- Willkommensanzeige für neuen Chat -->
+          <div class="empty-chat" id="emptyChat">
+            <div class="empty-chat-icon">💬</div>
+            <div class="empty-chat-title">Wie kann ich dir helfen?</div>
+            <div class="empty-chat-text">
+              Starte eine neue Unterhaltung mit dem Chat Assistenten. Deine Chats werden automatisch in der Seitenleiste gespeichert.
+            </div>
+          </div>
+        </div>
         
         <div class="input-container">
           <input type="text" id="userInput" placeholder="Deine Nachricht..." onkeypress="handleKeyPress(event)" />
@@ -500,132 +704,325 @@
       </div>
     </div>
   </div>
+  
+  <!-- Modal für Chat löschen -->
+  <div class="modal" id="deleteChatModal">
+    <div class="modal-content">
+      <div class="modal-title">Chat löschen</div>
+      <div class="modal-body">
+        Möchtest du diesen Chat wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden.
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn modal-btn-cancel" id="cancelDeleteBtn">Abbrechen</button>
+        <button class="modal-btn modal-btn-danger" id="confirmDeleteBtn">Löschen</button>
+      </div>
+    </div>
+  </div>
 
   <script>
+    // Chat-System und Verlaufsverwaltung
     let userName = "";
     let userInitial = ""; // Speichert den ersten Buchstaben des Benutzernamens
+    let allChats = []; // Speichert alle Chat-Sitzungen
+    let currentChatId = null; // Aktuelle Chat-ID
+    let chatNameAsked = false; // Flag, ob der Name bereits abgefragt wurde
     
-    // Dark Mode-Erkennung und -Umschaltung
-    function checkDarkMode() {
-      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-        document.getElementById('macWindow').classList.add('dark-mode');
-        document.getElementById('theme-toggle').textContent = '☀️';
+    // Zeitformatierungsfunktionen
+    const formatDate = (date) => {
+      return new Date(date).toLocaleDateString('de-DE', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    };
+    
+    const formatTime = (date) => {
+      return new Date(date).toLocaleTimeString('de-DE', {
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    };
+    
+    // Chat-Zeitraum bestimmen
+    const getChatTimeframe = (timestamp) => {
+      const now = new Date();
+      const chatDate = new Date(timestamp);
+      const diffDays = Math.floor((now - chatDate) / (1000 * 60 * 60 * 24));
+      
+      if (diffDays === 0) {
+        return 'Heute';
+      } else if (diffDays === 1) {
+        return 'Gestern';
+      } else if (diffDays < 7) {
+        return 'Letzte 7 Tage';
+      } else if (diffDays < 30) {
+        return 'Diesen Monat';
+      } else {
+        return 'Ältere Chats';
       }
-    }
+    };
     
-    // Dark Mode-Event-Listener
-    if (window.matchMedia) {
-      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
-        if (event.matches) {
-          document.getElementById('macWindow').classList.add('dark-mode');
-          document.getElementById('theme-toggle').textContent = '☀️';
+    // Chat-Sitzung erstellen
+    const createChat = () => {
+      const chatId = 'chat_' + Date.now();
+      const chatTitle = `Neuer Chat`;
+      const createdAt = Date.now();
+      
+      const newChat = {
+        id: chatId,
+        title: chatTitle,
+        messages: [],
+        createdAt: createdAt,
+        updatedAt: createdAt
+      };
+      
+      allChats.unshift(newChat); // Neuen Chat am Anfang einfügen
+      currentChatId = chatId;
+      
+      // Neuer Chat ist aktiv, also leeren wir den Chat-Bereich
+      document.getElementById('chatBox').innerHTML = '';
+      document.getElementById('emptyChat').style.display = 'flex';
+      document.getElementById('chatInfo').querySelector('.chat-info-title').textContent = chatTitle;
+      document.getElementById('chatDate').textContent = formatDate(createdAt) + ' ' + formatTime(createdAt);
+      
+      chatNameAsked = false; // Namen-Abfrage zurücksetzen
+      
+      // Seitenleiste aktualisieren
+      renderSidebar();
+      
+      return newChat;
+    };
+    
+    // Nachricht zu Chat hinzufügen
+    const addMessageToChat = (chatId, sender, text) => {
+      const chat = allChats.find(c => c.id === chatId);
+      if (!chat) return;
+      
+      // Nachricht zum Chat hinzufügen
+      chat.messages.push({
+        id: 'msg_' + Date.now(),
+        sender: sender,
+        text: text,
+        timestamp: Date.now()
+      });
+      
+      // Zeitstempel aktualisieren
+      chat.updatedAt = Date.now();
+      
+      // Wenn es die erste Nachricht ist und vom Benutzer, setzen wir den Chat-Titel
+      if (chat.messages.length === 1 && sender === 'user' && chat.title === 'Neuer Chat') {
+        // Kürzen wenn nötig
+        chat.title = text.length > 30 ? text.substring(0, 27) + '...' : text;
+        document.getElementById('chatInfo').querySelector('.chat-info-title').textContent = chat.title;
+      }
+      
+      // Seitenleiste aktualisieren
+      renderSidebar();
+      
+      return chat;
+    };
+    
+    // Chat löschen
+    const deleteChat = (chatId) => {
+      const chatIndex = allChats.findIndex(c => c.id === chatId);
+      if (chatIndex === -1) return;
+      
+      // Chat aus der Liste entfernen
+      allChats.splice(chatIndex, 1);
+      
+      // Wenn der aktuelle Chat gelöscht wurde, neuen Chat erstellen
+      if (currentChatId === chatId) {
+        if (allChats.length > 0) {
+          // Wechsle zum ersten Chat in der Liste
+          currentChatId = allChats[0].id;
+          loadChat(currentChatId);
         } else {
-          document.getElementById('macWindow').classList.remove('dark-mode');
-          document.getElementById('theme-toggle').textContent = '🌙';
+          // Erstelle neuen Chat, wenn keine mehr vorhanden
+          createChat();
+        }
+      }
+      
+      // Seitenleiste aktualisieren
+      renderSidebar();
+    };
+    
+    // Chat laden
+    const loadChat = (chatId) => {
+      const chat = allChats.find(c => c.id === chatId);
+      if (!chat) return;
+      
+      currentChatId = chatId;
+      
+      // Chat-Box leeren
+      const chatBox = document.getElementById('chatBox');
+      chatBox.innerHTML = '';
+      
+      // Chat-Info aktualisieren
+      document.getElementById('chatInfo').querySelector('.chat-info-title').textContent = chat.title;
+      document.getElementById('chatDate').textContent = formatDate(chat.createdAt) + ' ' + formatTime(chat.createdAt);
+      
+      // Wenn es keine Nachrichten gibt, zeige die Empty-Chat-Ansicht
+      if (chat.messages.length === 0) {
+        document.getElementById('emptyChat').style.display = 'flex';
+      } else {
+        document.getElementById('emptyChat').style.display = 'none';
+        
+        // Nachrichten rendern
+        chat.messages.forEach(message => {
+          if (message.sender === 'user') {
+            renderUserMessage(message.text);
+          } else {
+            renderBotMessage(message.text);
+          }
+        });
+      }
+      
+      // Seitenleiste aktualisieren (um aktiven Chat zu markieren)
+      renderSidebar();
+    };
+    
+    // Sidebar rendern
+    const renderSidebar = () => {
+      const sidebarContent = document.getElementById('sidebarContent');
+      sidebarContent.innerHTML = '';
+      
+      // Gruppiere Chats nach Zeitraum
+      const groupedChats = {};
+      
+      allChats.forEach(chat => {
+        const timeframe = getChatTimeframe(chat.createdAt);
+        if (!groupedChats[timeframe]) {
+          groupedChats[timeframe] = [];
+        }
+        groupedChats[timeframe].push(chat);
+      });
+      
+      // Sortierung der Zeiträume
+      const timeframeOrder = ['Heute', 'Gestern', 'Letzte 7 Tage', 'Diesen Monat', 'Ältere Chats'];
+      
+      // Für jeden Zeitraum eine Gruppe erstellen
+      timeframeOrder.forEach(timeframe => {
+        if (groupedChats[timeframe] && groupedChats[timeframe].length > 0) {
+          // Gruppe erstellen
+          const groupElement = document.createElement('div');
+          groupElement.classList.add('chat-group');
+          
+          // Titel erstellen
+          const titleElement = document.createElement('div');
+          titleElement.classList.add('group-title');
+          titleElement.textContent = timeframe;
+          groupElement.appendChild(titleElement);
+          
+          // Chats in dieser Gruppe hinzufügen
+          groupedChats[timeframe].forEach(chat => {
+            const chatItem = document.createElement('div');
+            chatItem.classList.add('chat-item');
+            if (chat.id === currentChatId) {
+              chatItem.classList.add('active');
+            }
+            
+            chatItem.innerHTML = `
+              <div class="chat-item-icon">💬</div>
+              <div class="chat-item-content">${chat.title}</div>
+              <div class="chat-item-actions">
+                <button class="chat-action-btn delete-chat-btn" data-id="${chat.id}">🗑️</button>
+              </div>
+            `;
+            
+            // Event-Listener für Chat-Klick
+            chatItem.addEventListener('click', (e) => {
+              // Nicht ausführen, wenn auf den Löschen-Button geklickt wurde
+              if (e.target.classList.contains('delete-chat-btn') || 
+                  e.target.closest('.delete-chat-btn')) {
+                return;
+              }
+              
+              loadChat(chat.id);
+            });
+            
+            groupElement.appendChild(chatItem);
+          });
+          
+          sidebarContent.appendChild(groupElement);
         }
       });
-    }
+      
+      // Event-Listener für Löschen-Buttons
+      document.querySelectorAll('.delete-chat-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+          e.stopPropagation(); // Verhindert Bubble-Up zum Elternelement
+          
+          const chatId = button.getAttribute('data-id');
+          showDeleteChatModal(chatId);
+        });
+      });
+    };
     
-    // Theme Toggle-Button
-    document.getElementById('theme-toggle').addEventListener('click', function() {
-      const macWindow = document.getElementById('macWindow');
-      if (macWindow.classList.contains('dark-mode')) {
-        macWindow.classList.remove('dark-mode');
-        this.textContent = '🌙';
-      } else {
-        macWindow.classList.add('dark-mode');
-        this.textContent = '☀️';
-      }
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
-      checkDarkMode();
+    // Chat-Lösch-Modal anzeigen
+    const showDeleteChatModal = (chatId) => {
+      const modal = document.getElementById('deleteChatModal');
+      modal.classList.add('active');
       
-      setTimeout(() => {
-        let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
-        addMessage("bot", welcomeMessage);
-      }, 800);
-    });
-
-    function handleKeyPress(event) {
-      if (event.key === "Enter") {
-        sendMessage();
-      }
-    }
-
-    function sendMessage() {
-      const userInput = document.getElementById("userInput").value.trim();
-      if (!userInput) return;
-
-      addMessage("user", userInput);
-      document.getElementById("userInput").value = "";
-
-      // Fokus auf das Eingabefeld setzen
-      document.getElementById("userInput").focus();
+      // Event-Listener für Bestätigungs-Button
+      const confirmBtn = document.getElementById('confirmDeleteBtn');
+      confirmBtn.onclick = () => {
+        deleteChat(chatId);
+        modal.classList.remove('active');
+      };
       
-      // Status aktualisieren
-      document.getElementById("status").textContent = "Nachricht gesendet...";
-
-      // Bei der ersten Eingabe wird der Name gesetzt
-      if (!userName) {
-        userName = userInput;
-        userInitial = userName.charAt(0).toUpperCase(); // Ersten Buchstaben für Avatar speichern
-        let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
-        setTimeout(() => {
-          document.getElementById("status").textContent = "Bereit";
-          addMessage("bot", greeting);
-        }, 800);
-        return;
-      }
-
-      // Ladeanimation hinzufügen
-      const chatBox = document.getElementById("chatBox");
-      const messageContainer = document.createElement("div");
-      messageContainer.classList.add("message-container");
-      messageContainer.id = "loading-indicator";
-
-      const avatar = document.createElement("div");
-      avatar.classList.add("avatar", "bot-avatar");
-      avatar.textContent = "B";
-
-      const loadingIndicator = document.createElement("div");
-      loadingIndicator.classList.add("message", "bot-message", "typing-indicator");
-      loadingIndicator.innerHTML = "<span></span><span></span><span></span>";
-
+      // Event-Listener für Abbrechen-Button
+      const cancelBtn = document.getElementById('cancelDeleteBtn');
+      cancelBtn.onclick = () => {
+        modal.classList.remove('active');
+      };
+    };
+    
+    // User-Nachricht rendern
+    const renderUserMessage = (text) => {
+      const chatBox = document.getElementById('chatBox');
+      document.getElementById('emptyChat').style.display = 'none';
+      
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message-container', 'user-container');
+      
+      const avatar = document.createElement('div');
+      avatar.classList.add('avatar', 'user-avatar');
+      avatar.textContent = userInitial || "D";
+      
+      const message = document.createElement('div');
+      message.classList.add('message', 'user-message');
+      message.textContent = text;
+      
       messageContainer.appendChild(avatar);
-      messageContainer.appendChild(loadingIndicator);
+      messageContainer.appendChild(message);
+      
       chatBox.appendChild(messageContainer);
       chatBox.scrollTop = chatBox.scrollHeight;
-
-      // Beispielhafter Webhook-Aufruf; passe die URL bei Bedarf an
-      const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
-      fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`)
-        .then(response => response.text())
-        .then(data => {
-          // Ladeanimation entfernen
-          const loadingIndicator = document.getElementById("loading-indicator");
-          if (loadingIndicator) {
-            chatBox.removeChild(loadingIndicator);
-          }
-          document.getElementById("status").textContent = "Antwort erhalten";
-          addMessage("bot", data);
-          
-          // Nach kurzer Zeit Status zurücksetzen
-          setTimeout(() => {
-            document.getElementById("status").textContent = "Bereit";
-          }, 3000);
-        })
-        .catch(error => {
-          // Ladeanimation entfernen
-          const loadingIndicator = document.getElementById("loading-indicator");
-          if (loadingIndicator) {
-            chatBox.removeChild(loadingIndicator);
-          }
-          document.getElementById("status").textContent = "Fehler aufgetreten";
-          addMessage("bot", "Entschuldigung, es gab ein Problem bei der Verarbeitung deiner Anfrage. Bitte versuche es erneut.");
-        });
-    }
-
+    };
+    
+    // Bot-Nachricht rendern
+    const renderBotMessage = (text) => {
+      const chatBox = document.getElementById('chatBox');
+      document.getElementById('emptyChat').style.display = 'none';
+      
+      const messageContainer = document.createElement('div');
+      messageContainer.classList.add('message-container');
+      
+      const avatar = document.createElement('div');
+      avatar.classList.add('avatar', 'bot-avatar');
+      avatar.textContent = "B";
+      
+      const message = document.createElement('div');
+      message.classList.add('message', 'bot-message');
+      message.innerHTML = formatMessage(text);
+      
+      messageContainer.appendChild(avatar);
+      messageContainer.appendChild(message);
+      
+      chatBox.appendChild(messageContainer);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    };
+    
     /**
      * Wandelt den Text in formatiertes HTML um.
      * Teilt den Haupttext und die Fußnoten (Quellen) anhand des Separators "\n\nQuellen:\n".
@@ -681,49 +1078,141 @@
       }
       return html;
     }
-
-    /**
-     * Fügt eine neue Nachricht in die Chat-Box ein.
-     * Bei Bot-Nachrichten wird der Text durch formatMessage gejagt.
-     */
-    function addMessage(sender, text) {
+    
+    // Dark Mode-Erkennung und -Umschaltung
+    function checkDarkMode() {
+      if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.getElementById('macWindow').classList.add('dark-mode');
+      }
+    }
+    
+    // Dark Mode-Event-Listener
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', event => {
+        if (event.matches) {
+          document.getElementById('macWindow').classList.add('dark-mode');
+        } else {
+          document.getElementById('macWindow').classList.remove('dark-mode');
+        }
+      });
+    }
+    
+    function handleKeyPress(event) {
+      if (event.key === "Enter") {
+        sendMessage();
+      }
+    }
+    
+    function sendMessage() {
+      const userInput = document.getElementById("userInput").value.trim();
+      if (!userInput) return;
+      
+      document.getElementById("userInput").value = "";
+      document.getElementById("userInput").focus();
+      
+      // Stelle sicher, dass wir einen aktuellen Chat haben
+      if (!currentChatId) {
+        createChat();
+      }
+      
+      // Füge die Nachricht zum UI und zum Chat-Objekt hinzu
+      renderUserMessage(userInput);
+      addMessageToChat(currentChatId, 'user', userInput);
+      
+      // Status aktualisieren
+      document.getElementById("status").textContent = "Nachricht gesendet...";
+      
+      // Wenn wir noch keinen Namen haben und der Name noch nicht abgefragt wurde
+      if (!userName && !chatNameAsked) {
+        chatNameAsked = true;
+        userName = userInput;
+        userInitial = userName.charAt(0).toUpperCase();
+        
+        let greeting = `Hallo ${userName}, nun stelle mir bitte Deine Frage.`;
+        setTimeout(() => {
+          document.getElementById("status").textContent = "Bereit";
+          renderBotMessage(greeting);
+          addMessageToChat(currentChatId, 'bot', greeting);
+        }, 800);
+        return;
+      }
+      
+      // Ladeanimation hinzufügen
       const chatBox = document.getElementById("chatBox");
       const messageContainer = document.createElement("div");
       messageContainer.classList.add("message-container");
-      
-      if (sender === "user") {
-        messageContainer.classList.add("user-container");
-      }
+      messageContainer.id = "loading-indicator";
 
-      // Avatar erstellen
       const avatar = document.createElement("div");
-      avatar.classList.add("avatar");
-      
-      if (sender === "user") {
-        avatar.classList.add("user-avatar");
-        avatar.textContent = userInitial || "D"; // Benutzer-Initial oder Standard-D
-      } else {
-        avatar.classList.add("bot-avatar");
-        avatar.textContent = "B"; // Bot
-      }
+      avatar.classList.add("avatar", "bot-avatar");
+      avatar.textContent = "B";
 
-      // Nachricht erstellen
-      const message = document.createElement("div");
-      message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+      const loadingIndicator = document.createElement("div");
+      loadingIndicator.classList.add("message", "bot-message", "typing-indicator");
+      loadingIndicator.innerHTML = "<span></span><span></span><span></span>";
 
-      if (sender === "bot") {
-        message.innerHTML = formatMessage(text);
-      } else {
-        message.textContent = text;
-      }
-
-      // Nachrichtencontainer zusammenbauen
       messageContainer.appendChild(avatar);
-      messageContainer.appendChild(message);
-      
+      messageContainer.appendChild(loadingIndicator);
       chatBox.appendChild(messageContainer);
       chatBox.scrollTop = chatBox.scrollHeight;
+      
+      // Beispielhafter Webhook-Aufruf; passe die URL bei Bedarf an
+      const webhookUrl = "https://hook.us2.make.com/28v27trtikh287mce0f63qb39a7t65pn";
+      fetch(`${webhookUrl}?name=${encodeURIComponent(userName)}&message=${encodeURIComponent(userInput)}&status=ok`)
+        .then(response => response.text())
+        .then(data => {
+          // Ladeanimation entfernen
+          const loadingIndicator = document.getElementById("loading-indicator");
+          if (loadingIndicator) {
+            chatBox.removeChild(loadingIndicator);
+          }
+          document.getElementById("status").textContent = "Antwort erhalten";
+          renderBotMessage(data);
+          addMessageToChat(currentChatId, 'bot', data);
+          
+          // Nach kurzer Zeit Status zurücksetzen
+          setTimeout(() => {
+            document.getElementById("status").textContent = "Bereit";
+          }, 3000);
+        })
+        .catch(error => {
+          // Ladeanimation entfernen
+          const loadingIndicator = document.getElementById("loading-indicator");
+          if (loadingIndicator) {
+            chatBox.removeChild(loadingIndicator);
+          }
+          document.getElementById("status").textContent = "Fehler aufgetreten";
+          
+          const errorMessage = "Entschuldigung, es gab ein Problem bei der Verarbeitung deiner Anfrage. Bitte versuche es erneut.";
+          renderBotMessage(errorMessage);
+          addMessageToChat(currentChatId, 'bot', errorMessage);
+        });
     }
+    
+    // Event-Listener
+    document.addEventListener("DOMContentLoaded", function () {
+      checkDarkMode();
+      
+      // Ersten Chat erstellen
+      createChat();
+      
+      // Event-Listener für "Neuer Chat"-Button
+      document.getElementById('newChatBtn').addEventListener('click', () => {
+        createChat();
+      });
+      
+      // Mobile-Menü-Toggle
+      document.getElementById('mobileMenuToggle').addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('show');
+      });
+      
+      // Begrüßungsnachricht nach kurzer Zeit anzeigen
+      setTimeout(() => {
+        let welcomeMessage = "Schön, dass Du diesen Bot nutzt. Ich möchte Dich gerne persönlich ansprechen. Verrate mir bitte Deinen Namen.";
+        renderBotMessage(welcomeMessage);
+        addMessageToChat(currentChatId, 'bot', welcomeMessage);
+      }, 800);
+    });
   </script>
 </body>
 </html>
