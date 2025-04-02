@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -195,7 +195,7 @@
 </head>
 <body>
   <header class="main-header">
-    <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+    <h1 id="mainTitle">Willkommen in Deinem Chat zu Personalmanagement</h1>
     <div class="header-actions">
       <button onclick="toggleTheme()">🌗</button>
       <select id="langSwitcher" onchange="switchLanguage(this.value)">
@@ -209,19 +209,10 @@
       <button onclick="resetChat()">🔄</button>
     </div>
   </header>
-  <div class="intro-text" id="introText">
-    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.
-    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-    Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z. B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]"
-  </div>
+  <div class="intro-text" id="introText"></div>
   <main class="chat-container">
     <div class="chat-box" id="chatBox"></div>
-    <div class="suggestions" id="suggestions">
-      <button class="suggestion-btn" onclick="handleSuggestion('Was sind gute Führungsstile?')">Was sind gute Führungsstile?</button>
-      <button class="suggestion-btn" onclick="handleSuggestion('Wie gelingt Onboarding?')">Wie gelingt Onboarding?</button>
-      <button class="suggestion-btn" onclick="handleSuggestion('Was ist ein guter Weiterbildungsplan?')">Was ist ein guter Weiterbildungsplan?</button>
-      <button class="suggestion-btn" onclick="handleSuggestion('Wie spreche ich eine Kündigung richtig an?')">Wie spreche ich eine Kündigung richtig an?</button>
-    </div>
+    <div class="suggestions" id="suggestions"></div>
   </main>
   <div class="input-container">
     <div class="input-wrapper">
@@ -230,8 +221,109 @@
     </div>
   </div>
   <script>
-    const sendButton = document.getElementById("sendButton");
+    const chatBox = document.getElementById("chatBox");
     const userInput = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+    const introText = document.getElementById("introText");
+    const langTexts = {
+      de: "Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.\nStelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.\nFrage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z. B. 'Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]'",
+      en: "Welcome to your chatbot. I'm here to support you with your questions on human resources management.\nAsk your question as specifically as possible. I'm still learning, so I might not know everything yet.\nJust type below and let me know who you are. For example: 'I'm a participant in the management course and I have a question about training: [...]'",
+      es: "Bienvenido a tu chatbot. Estoy aquí para ayudarte con tus preguntas sobre la gestión del personal.\nHaz tu pregunta lo más específica posible. Todavía estoy en fase de entrenamiento, así que puede que no lo sepa todo.\nSimplemente escribe abajo y dime quién eres. Por ejemplo: 'Soy estudiante del curso de dirección y tengo una pregunta sobre formación: [...]'",
+      tr: "Chatbot'una hoş geldin. İnsan kaynakları yönetimi hakkında sorularını yanıtlamak için buradayım.\nSorunu mümkün olduğunca açık bir şekilde sor. Hala öğrenme aşamasındayım, bu yüzden her şeyi bilmiyor olabilirim.\nAşağıya yazman yeterli. Örneğin: 'Yönetim kursuna katılan bir öğrenciyim ve eğitimle ilgili bir sorum var: [...]'"
+    };
+
+    const suggestions = [
+      "Was sind gute Führungsstile?",
+      "Wie gelingt Onboarding?",
+      "Was ist ein guter Weiterbildungsplan?",
+      "Wie spreche ich eine Kündigung richtig an?"
+    ];
+
+    function showSuggestions() {
+      const container = document.getElementById("suggestions");
+      container.innerHTML = "";
+      suggestions.forEach(text => {
+        const btn = document.createElement("button");
+        btn.className = "suggestion-btn";
+        btn.textContent = text;
+        btn.onclick = () => handleUserMessage(text);
+        container.appendChild(btn);
+      });
+    }
+
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === "dark" ? "light" : "dark";
+    }
+
+    function switchLanguage(lang) {
+      introText.textContent = langTexts[lang];
+    }
+
+    function resetChat() {
+      chatBox.innerHTML = "";
+      localStorage.removeItem("userName");
+      askForName();
+    }
+
+    function exportPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+      const messages = chatBox.querySelectorAll(".message");
+      messages.forEach(el => {
+        const sender = el.classList.contains("user") ? "Du" : "KI";
+        const text = el.querySelector(".bubble").innerText;
+        doc.text(`${sender}: ${text}`, 10, y);
+        y += 10;
+      });
+      doc.setFontSize(8);
+      doc.text("Testmodus – bitte sorgfältig prüfen. Alle Angaben sind unverbindlich.", 10, y + 10);
+      doc.save("chat.pdf");
+    }
+
+    function askForName() {
+      showBotResponse("Hallo, wie darf ich Dich ansprechen?");
+    }
+
+    function getInitials(name) {
+      return name.split(" ").map(w => w[0]).join("").toUpperCase();
+    }
+
+    function handleUserMessage(message) {
+      const name = localStorage.getItem("userName") || "Du";
+      addMessage("user", message, name);
+      if (!localStorage.getItem("userName")) {
+        localStorage.setItem("userName", message);
+        setTimeout(() => showBotResponse(`Danke, ${message}. Was kann ich für Dich tun?`), 500);
+        return;
+      }
+      showBotResponse("🤖 ...");
+      fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, question: message })
+      })
+      .then(res => res.text())
+      .then(data => {
+        document.querySelector(".message.bot .bubble").innerHTML = marked.parse(data);
+      });
+    }
+
+    function addMessage(sender, text, name) {
+      const msgDiv = document.createElement("div");
+      msgDiv.className = `message ${sender}`;
+      const avatarDiv = document.createElement("div");
+      avatarDiv.className = "avatar";
+      avatarDiv.textContent = sender === "user" ? getInitials(name) : "KI";
+      const bubbleDiv = document.createElement("div");
+      bubbleDiv.className = "bubble";
+      bubbleDiv.innerHTML = sender === "bot" ? marked.parse(text) : text;
+      msgDiv.appendChild(avatarDiv);
+      msgDiv.appendChild(bubbleDiv);
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
 
     sendButton.addEventListener("click", () => {
       const msg = userInput.value.trim();
@@ -241,40 +333,22 @@
       }
     });
 
-    function handleSuggestion(text) {
-      userInput.value = text;
-      sendButton.click();
-    }
+    userInput.addEventListener("keypress", e => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendButton.click();
+      }
+    });
 
-    function handleUserMessage(message) {
-      const chatBox = document.getElementById("chatBox");
-      const msgDiv = document.createElement("div");
-      msgDiv.classList.add("message", "user");
-      msgDiv.innerHTML = `<div class='avatar'>DU</div><div class='bubble'>${message}</div>`;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      showBotResponse("🤖 ...");
-      fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: message })
-      })
-      .then(res => res.text())
-      .then(data => {
-        const bubble = document.querySelector(".message.bot .bubble");
-        bubble.innerHTML = marked.parse(data);
-      });
-    }
-
-    function showBotResponse(text) {
-      const chatBox = document.getElementById("chatBox");
-      const botDiv = document.createElement("div");
-      botDiv.classList.add("message", "bot");
-      botDiv.innerHTML = `<div class='avatar'>KI</div><div class='bubble'>${text}</div>`;
-      chatBox.appendChild(botDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
+    window.addEventListener("load", () => {
+      switchLanguage("de");
+      showSuggestions();
+      if (localStorage.getItem("userName")) {
+        showBotResponse(`Willkommen zurück, ${localStorage.getItem("userName")}. Was möchtest Du wissen?`);
+      } else {
+        askForName();
+      }
+    });
   </script>
 </body>
 </html>
