@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dein persönlicher Assistent</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary-color: #6366f1;
@@ -134,6 +135,11 @@
       gap: 12px;
     }
 
+    .message.user {
+      flex-direction: row-reverse;
+      justify-content: flex-end;
+    }
+
     .avatar {
       background-color: var(--primary-dark);
       color: white;
@@ -154,6 +160,36 @@
       padding: 12px 16px;
       border-radius: var(--radius);
       max-width: 80%;
+      white-space: pre-wrap;
+    }
+
+    .message.user .bubble {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 8px 0 16px;
+      justify-content: center;
+    }
+
+    .suggestion-btn {
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      color: var(--text-color);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .suggestion-btn:hover {
+      background: var(--primary-color);
+      color: white;
     }
 
     .input-container {
@@ -213,145 +249,141 @@
 </head>
 <body>
   <header class="main-header">
-    <h1 id="main-title">Willkommen in Deinem Chat zu Personalmanagement</h1>
+    <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
     <div class="header-actions">
-      <button id="lang-toggle" class="btn btn-outline">
-        <i class="fas fa-language"></i> English
-      </button>
-      <button id="theme-toggle" class="btn btn-outline">
-        <i class="fas fa-moon"></i> Darkmode
-      </button>
-      <button id="print-button" class="btn btn-outline" onclick="window.print()">
-        <i class="fas fa-print"></i> Drucken
-      </button>
       <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
         <i class="fas fa-redo-alt"></i> Reset
+      </button>
+      <button class="btn btn-outline" onclick="toggleTheme()">
+        <i class="fas fa-moon"></i>
       </button>
     </div>
   </header>
 
-  <div class="intro-text" id="intro-text"></div>
+  <div class="intro-text">
+    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
+    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.<br>
+    Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]"
+  </div>
 
   <main class="chat-container">
     <div class="chat-box" id="chatBox"></div>
+    <div class="suggestions" id="suggestions">
+      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Was sind gute Führungsstile?</button>
+      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Wie gelingt Onboarding?</button>
+      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Was ist ein guter Weiterbildungsplan?</button>
+      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Wie spreche ich eine Kündigung richtig an?</button>
+    </div>
   </main>
 
   <div class="input-container">
     <div class="input-wrapper">
       <div class="textarea-wrapper">
-        <textarea id="userInput" placeholder="Deine Nachricht..." rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+        <textarea id="userInput" placeholder="Deine Nachricht..." rows="1"></textarea>
       </div>
-      <button class="send-button" id="sendButton" onclick="sendMessage()">
+      <button class="send-button" id="sendButton">
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>
   </div>
 
   <script>
-    const themeToggle = document.getElementById("theme-toggle");
-    const langToggle = document.getElementById("lang-toggle");
-    const html = document.documentElement;
-    const intro = document.getElementById("intro-text");
     const chatBox = document.getElementById("chatBox");
+    const input = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
 
-    let userName = localStorage.getItem("userName") || null;
+    let userName = localStorage.getItem("userName") || "";
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const savedTheme = localStorage.getItem("theme");
-      const savedLang = localStorage.getItem("lang") || "de";
-      if (savedTheme) html.setAttribute("data-theme", savedTheme);
-      if (savedLang) switchLanguage(savedLang);
+    function toggleTheme() {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
+    }
 
-      if (!userName) {
-        botMessage("Hallo, schön, dass Du diesen Bot nutzt. Wie heißt Du eigentlich?");
-      } else {
-        botMessage(`Willkommen zurück, ${userName}. Wie kann ich Dir helfen?`, getInitials(userName));
-      }
-    });
+    function resetChat() {
+      chatBox.innerHTML = "";
+      localStorage.removeItem("userName");
+      userName = "";
+      welcomeUser();
+    }
 
-    function botMessage(text, initials = "🤖") {
-      const wrapper = document.createElement("div");
-      wrapper.classList.add("message");
+    function welcomeUser() {
+      const welcome = userName
+        ? `Willkommen zurück, ${userName}. Was möchtest Du wissen?`
+        : "Hallo, wie darf ich Dich ansprechen?";
+      addMessage("bot", welcome);
+    }
 
-      const avatar = document.createElement("div");
-      avatar.classList.add("avatar");
-      avatar.textContent = initials;
+    function addMessage(sender, text) {
+      const messageEl = document.createElement("div");
+      messageEl.classList.add("message", sender);
 
-      const bubble = document.createElement("div");
-      bubble.classList.add("bubble");
-      bubble.textContent = text;
+      const avatarEl = document.createElement("div");
+      avatarEl.classList.add("avatar");
+      avatarEl.textContent = sender === "user" ? getInitials(userName || "Du") : "KI";
 
-      wrapper.appendChild(avatar);
-      wrapper.appendChild(bubble);
-      chatBox.appendChild(wrapper);
+      const bubbleEl = document.createElement("div");
+      bubbleEl.classList.add("bubble");
+      bubbleEl.textContent = text;
+
+      messageEl.appendChild(avatarEl);
+      messageEl.appendChild(bubbleEl);
+      chatBox.appendChild(messageEl);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     function getInitials(name) {
       return name.split(" ").map(n => n[0]).join("").toUpperCase();
     }
 
-    themeToggle.addEventListener("click", () => {
-      const newTheme = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
-      html.setAttribute("data-theme", newTheme);
-      localStorage.setItem("theme", newTheme);
-      themeToggle.innerHTML = newTheme === "dark" ? '<i class="fas fa-sun"></i> Lightmode' : '<i class="fas fa-moon"></i> Darkmode';
-    });
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
 
-    langToggle.addEventListener("click", () => {
-      const newLang = document.documentElement.lang === "de" ? "en" : "de";
-      switchLanguage(newLang);
-      localStorage.setItem("lang", newLang);
-    });
+      addMessage("user", message);
+      input.value = "";
 
-    function switchLanguage(lang) {
-      document.documentElement.lang = lang;
-      document.getElementById("main-title").textContent = lang === "en"
-        ? "Welcome to your Chat about HR Management"
-        : "Willkommen in Deinem Chat zu Personalmanagement";
+      if (!userName) {
+        userName = message;
+        localStorage.setItem("userName", userName);
+        setTimeout(() => addMessage("bot", `Danke, ${userName}. Wie kann ich Dir helfen?`), 500);
+        return;
+      }
+
+      addMessage("bot", "Denke nach...");
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: userName, question: message })
+        });
+        const data = await response.text();
+        setTimeout(() => {
+          chatBox.lastChild.remove();
+          addMessage("bot", data);
+        }, 1000);
+      } catch (err) {
+        console.error(err);
+        chatBox.lastChild.remove();
+        addMessage("bot", "Es gab ein Problem. Bitte versuche es erneut.");
+      }
     }
 
-    function autoResize(textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
+    function sendMessageFromSuggestion(text) {
+      input.value = text;
+      sendMessage();
     }
 
-    function handleKeyPress(e) {
+    sendButton.addEventListener("click", sendMessage);
+    input.addEventListener("keypress", e => {
       if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
         sendMessage();
       }
-    }
+    });
 
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value.trim();
-      if (!text) return;
-
-      botMessage(text, getInitials(userName || "Du"));
-
-      if (!userName) {
-        userName = text;
-        localStorage.setItem("userName", userName);
-        botMessage(`Freut mich, ${userName}. Wie kann ich Dir helfen?`, "🤖");
-      } else {
-        fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: userName, question: text })
-        })
-          .then(res => res.text())
-          .then(answer => botMessage(answer, "🤖"))
-          .catch(() => botMessage("Fehler beim Abrufen der Antwort.", "🤖"));
-      }
-
-      input.value = "";
-      autoResize(input);
-    }
-
-    function resetChat() {
-      chatBox.innerHTML = "";
-      localStorage.removeItem("userName");
-    }
+    welcomeUser();
   </script>
 </body>
 </html>
