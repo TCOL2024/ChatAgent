@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="de" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -7,28 +7,27 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <style>
     :root {
-      --primary-color: #6366f1;
-      --primary-dark: #4f46e5;
+      --primary-color: #4f46e5;
+      --primary-dark: #4338ca;
       --secondary-color: #f3f4f6;
       --text-color: #1f2937;
       --light-text: #6b7280;
       --background: #f9fafb;
       --card-bg: #ffffff;
       --border-color: #e5e7eb;
-      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
       --radius: 12px;
       --transition: all 0.3s ease;
-      --max-width: 1200px;
     }
 
     [data-theme="dark"] {
-      --primary-color: #a78bfa;
-      --primary-dark: #8b5cf6;
+      --primary-color: #818cf8;
+      --primary-dark: #6366f1;
       --secondary-color: #1f2937;
       --text-color: #f3f4f6;
-      --light-text: #d1d5db;
+      --light-text: #9ca3af;
       --background: #111827;
       --card-bg: #1f2937;
       --border-color: #374151;
@@ -36,131 +35,78 @@
 
     body {
       font-family: 'Inter', sans-serif;
-      color: var(--text-color);
       background-color: var(--background);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
+      color: var(--text-color);
       margin: 0;
     }
 
     .main-header {
       background-color: var(--card-bg);
-      border-bottom: 1px solid var(--border-color);
-      padding: 16px 20px;
+      padding: 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      box-shadow: var(--shadow);
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 12px;
-    }
-
-    .btn {
-      padding: 8px 12px;
-      border-radius: var(--radius);
-      font-weight: 500;
-      font-size: 0.875rem;
-      cursor: pointer;
-      border: none;
-      transition: var(--transition);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-outline {
-      background-color: transparent;
-      border: 1px solid var(--border-color);
-      color: var(--text-color);
-    }
-
-    .btn-outline:hover {
-      background-color: var(--secondary-color);
-    }
-
-    .btn-danger {
-      background-color: #ef4444;
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background-color: #dc2626;
+      border-bottom: 1px solid var(--border-color);
     }
 
     .intro-text {
-      background-color: var(--card-bg);
-      padding: 20px;
-      margin: 16px auto;
-      max-width: var(--max-width);
-      width: calc(100% - 32px);
+      background: var(--card-bg);
+      margin: 1rem;
+      padding: 1rem;
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      text-align: center;
-      font-size: 0.875rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      font-size: 0.9rem;
       color: var(--light-text);
-      line-height: 1.5;
     }
 
     .chat-container {
-      flex: 1;
-      max-width: var(--max-width);
-      width: calc(100% - 32px);
-      margin: 0 auto 80px;
-      position: relative;
+      max-width: 900px;
+      margin: auto;
+      padding: 1rem;
     }
 
     .chat-box {
-      background-color: var(--card-bg);
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      padding: 24px;
-      margin-bottom: 16px;
+      padding: 1rem;
+      max-height: 70vh;
       overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      min-height: 60vh;
-      max-height: calc(100vh - 300px);
     }
 
     .message {
       display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
       align-items: flex-start;
-      gap: 12px;
     }
 
     .message.user {
-      flex-direction: row-reverse;
       justify-content: flex-end;
     }
 
-    .avatar {
-      background-color: var(--primary-dark);
+    .message.user .avatar {
+      order: 2;
+      background-color: var(--primary-color);
       color: white;
-      width: 36px;
-      height: 36px;
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
+      background: #ccc;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 0.875rem;
-      flex-shrink: 0;
     }
 
     .bubble {
+      max-width: 70%;
       background-color: var(--secondary-color);
-      color: var(--text-color);
-      padding: 12px 16px;
+      padding: 0.75rem;
       border-radius: var(--radius);
-      max-width: 80%;
       white-space: pre-wrap;
     }
 
@@ -169,28 +115,18 @@
       color: white;
     }
 
-    .suggestions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin: 8px 0 16px;
-      justify-content: center;
+    .bubble table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
     }
 
-    .suggestion-btn {
-      background: var(--secondary-color);
+    .bubble table, .bubble th, .bubble td {
       border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 6px 12px;
-      font-size: 0.8rem;
-      color: var(--text-color);
-      cursor: pointer;
-      transition: var(--transition);
     }
 
-    .suggestion-btn:hover {
-      background: var(--primary-color);
-      color: white;
+    .bubble th, .bubble td {
+      padding: 0.5rem;
     }
 
     .input-container {
@@ -198,53 +134,62 @@
       bottom: 0;
       left: 0;
       right: 0;
-      padding: 16px;
       background-color: var(--card-bg);
       border-top: 1px solid var(--border-color);
-      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
-      z-index: 10;
+      padding: 1rem;
     }
 
     .input-wrapper {
-      max-width: var(--max-width);
-      margin: 0 auto;
+      max-width: 900px;
+      margin: auto;
       display: flex;
-      align-items: flex-end;
-      gap: 12px;
-      position: relative;
+      gap: 1rem;
     }
 
-    .textarea-wrapper {
+    textarea {
       flex: 1;
+      padding: 0.75rem;
+      font-family: inherit;
       border-radius: var(--radius);
       border: 1px solid var(--border-color);
-      background-color: var(--card-bg);
-      overflow: hidden;
-    }
-
-    #userInput {
-      width: 100%;
-      padding: 12px 16px;
-      border: none;
-      background: transparent;
-      font-size: 0.9375rem;
-      color: var(--text-color);
-      resize: none;
-      font-family: inherit;
     }
 
     .send-button {
-      background-color: var(--primary-color);
+      background: var(--primary-color);
+      border: none;
       color: white;
       border-radius: 50%;
-      width: 48px;
-      height: 48px;
+      width: 44px;
+      height: 44px;
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      border: none;
-      box-shadow: var(--shadow);
+    }
+
+    .header-actions select,
+    .header-actions button {
+      margin-left: 0.5rem;
+      padding: 0.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      background: var(--secondary-color);
+    }
+
+    .suggestions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      justify-content: center;
+    }
+
+    .suggestion-btn {
+      padding: 0.5rem 1rem;
+      background: var(--secondary-color);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      cursor: pointer;
     }
   </style>
 </head>
@@ -252,160 +197,84 @@
   <header class="main-header">
     <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
     <div class="header-actions">
-      <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
-        <i class="fas fa-redo-alt"></i> Reset
-      </button>
-      <button class="btn btn-outline" onclick="toggleTheme()">
-        <i class="fas fa-moon"></i>
-      </button>
-      <button class="btn btn-outline" onclick="exportToPDF()">
-        <i class="fas fa-file-pdf"></i>
-      </button>
+      <button onclick="toggleTheme()">🌗</button>
+      <select id="langSwitcher" onchange="switchLanguage(this.value)">
+        <option value="de">🇩🇪 DE</option>
+        <option value="en">🇬🇧 EN</option>
+        <option value="es">🇪🇸 ES</option>
+        <option value="tr">🇹🇷 TR</option>
+      </select>
+      <button onclick="window.print()">🖨</button>
+      <button onclick="exportPDF()">📄</button>
+      <button onclick="resetChat()">🔄</button>
     </div>
   </header>
-
-  <div class="intro-text">
-    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
-    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.<br>
-    Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]"
+  <div class="intro-text" id="introText">
+    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.
+    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
+    Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z. B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]"
   </div>
-
   <main class="chat-container">
     <div class="chat-box" id="chatBox"></div>
     <div class="suggestions" id="suggestions">
-      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Was sind gute Führungsstile?</button>
-      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Wie gelingt Onboarding?</button>
-      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Was ist ein guter Weiterbildungsplan?</button>
-      <button class="suggestion-btn" onclick="sendMessageFromSuggestion(this.innerText)">Wie spreche ich eine Kündigung richtig an?</button>
+      <button class="suggestion-btn" onclick="handleSuggestion('Was sind gute Führungsstile?')">Was sind gute Führungsstile?</button>
+      <button class="suggestion-btn" onclick="handleSuggestion('Wie gelingt Onboarding?')">Wie gelingt Onboarding?</button>
+      <button class="suggestion-btn" onclick="handleSuggestion('Was ist ein guter Weiterbildungsplan?')">Was ist ein guter Weiterbildungsplan?</button>
+      <button class="suggestion-btn" onclick="handleSuggestion('Wie spreche ich eine Kündigung richtig an?')">Wie spreche ich eine Kündigung richtig an?</button>
     </div>
   </main>
-
   <div class="input-container">
     <div class="input-wrapper">
-      <div class="textarea-wrapper">
-        <textarea id="userInput" placeholder="Deine Nachricht..." rows="1"></textarea>
-      </div>
-      <button class="send-button" id="sendButton">
-        <i class="fas fa-paper-plane"></i>
-      </button>
+      <textarea id="userInput" placeholder="Deine Nachricht..."></textarea>
+      <button class="send-button" id="sendButton"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
-
   <script>
-    const chatBox = document.getElementById("chatBox");
-    const input = document.getElementById("userInput");
     const sendButton = document.getElementById("sendButton");
-    const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+    const userInput = document.getElementById("userInput");
 
-    let userName = localStorage.getItem("userName") || "";
-
-    function toggleTheme() {
-      const html = document.documentElement;
-      html.dataset.theme = html.dataset.theme === 'dark' ? 'light' : 'dark';
-    }
-
-    function resetChat() {
-      chatBox.innerHTML = "";
-      localStorage.removeItem("userName");
-      userName = "";
-      welcomeUser();
-    }
-
-    function welcomeUser() {
-      const welcome = userName
-        ? `Willkommen zurück, ${userName}. Was möchtest Du wissen?`
-        : "Hallo, wie darf ich Dich ansprechen?";
-      addMessage("bot", welcome);
-    }
-
-    function addMessage(sender, text) {
-      const messageEl = document.createElement("div");
-      messageEl.classList.add("message", sender);
-
-      const avatarEl = document.createElement("div");
-      avatarEl.classList.add("avatar");
-      avatarEl.textContent = sender === "user" ? getInitials(userName || "Du") : "KI";
-
-      const bubbleEl = document.createElement("div");
-      bubbleEl.classList.add("bubble");
-      bubbleEl.textContent = text;
-
-      messageEl.appendChild(avatarEl);
-      messageEl.appendChild(bubbleEl);
-      chatBox.appendChild(messageEl);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function getInitials(name) {
-      return name.split(" ").map(n => n[0]).join("").toUpperCase();
-    }
-
-    async function sendMessage() {
-      const message = input.value.trim();
-      if (!message) return;
-
-      addMessage("user", message);
-      input.value = "";
-
-      if (!userName) {
-        userName = message;
-        localStorage.setItem("userName", userName);
-        setTimeout(() => addMessage("bot", `Danke, ${userName}. Wie kann ich Dir helfen?`), 500);
-        return;
-      }
-
-      addMessage("bot", "Denke nach...");
-
-      try {
-        const response = await fetch(webhookUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: userName, question: message })
-        });
-        const data = await response.text();
-        setTimeout(() => {
-          chatBox.lastChild.remove();
-          addMessage("bot", data);
-        }, 1000);
-      } catch (err) {
-        console.error(err);
-        chatBox.lastChild.remove();
-        addMessage("bot", "Es gab ein Problem. Bitte versuche es erneut.");
-      }
-    }
-
-    function sendMessageFromSuggestion(text) {
-      input.value = text;
-      sendMessage();
-    }
-
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-
-      doc.setFont("Inter", "normal");
-      const messages = chatBox.querySelectorAll(".message");
-      messages.forEach((el, index) => {
-        const sender = el.classList.contains("user") ? userName : "KI";
-        const text = el.querySelector(".bubble").innerText;
-        const content = `${sender}: ${text}`;
-        doc.text(content, 10, y);
-        y += 10;
-      });
-
-      doc.save("chat.pdf");
-    }
-
-    sendButton.addEventListener("click", sendMessage);
-    input.addEventListener("keypress", e => {
-      if (e.key === "Enter" && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
+    sendButton.addEventListener("click", () => {
+      const msg = userInput.value.trim();
+      if (msg) {
+        handleUserMessage(msg);
+        userInput.value = "";
       }
     });
 
-    welcomeUser();
+    function handleSuggestion(text) {
+      userInput.value = text;
+      sendButton.click();
+    }
+
+    function handleUserMessage(message) {
+      const chatBox = document.getElementById("chatBox");
+      const msgDiv = document.createElement("div");
+      msgDiv.classList.add("message", "user");
+      msgDiv.innerHTML = `<div class='avatar'>DU</div><div class='bubble'>${message}</div>`;
+      chatBox.appendChild(msgDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      showBotResponse("🤖 ...");
+      fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: message })
+      })
+      .then(res => res.text())
+      .then(data => {
+        const bubble = document.querySelector(".message.bot .bubble");
+        bubble.innerHTML = marked.parse(data);
+      });
+    }
+
+    function showBotResponse(text) {
+      const chatBox = document.getElementById("chatBox");
+      const botDiv = document.createElement("div");
+      botDiv.classList.add("message", "bot");
+      botDiv.innerHTML = `<div class='avatar'>KI</div><div class='bubble'>${text}</div>`;
+      chatBox.appendChild(botDiv);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
   </script>
 </body>
 </html>
