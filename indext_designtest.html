@@ -1,322 +1,357 @@
 <!DOCTYPE html>
 <html lang="de" data-theme="light">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-dark: #4338ca;
-            --secondary-color: #f3f4f6;
-            --text-color: #1f2937;
-            --light-text: #6b7280;
-            --background: #f9fafb;
-            --card-bg: #ffffff;
-            --border-color: #e5e7eb;
-            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            --radius: 12px;
-            --transition: all 0.3s ease;
-            --max-width: 1200px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dein persönlicher Assistent</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #6366f1;
+      --primary-dark: #4f46e5;
+      --secondary-color: #f3f4f6;
+      --text-color: #1f2937;
+      --light-text: #6b7280;
+      --background: #f9fafb;
+      --card-bg: #ffffff;
+      --border-color: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --radius: 12px;
+      --transition: all 0.3s ease;
+      --max-width: 1200px;
+    }
 
-        [data-theme="dark"] {
-            --primary-color: #8b5cf6;
-            --primary-dark: #7c3aed;
-            --secondary-color: #1f2937;
-            --text-color: #f3f4f6;
-            --light-text: #d1d5db;
-            --background: #111827;
-            --card-bg: #1f2937;
-            --border-color: #374151;
-        }
+    [data-theme="dark"] {
+      --primary-color: #a78bfa;
+      --primary-dark: #8b5cf6;
+      --secondary-color: #1f2937;
+      --text-color: #f3f4f6;
+      --light-text: #d1d5db;
+      --background: #111827;
+      --card-bg: #1f2937;
+      --border-color: #374151;
+    }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            color: var(--text-color);
-            background-color: var(--background);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            margin: 0;
-        }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: var(--text-color);
+      background-color: var(--background);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      margin: 0;
+    }
 
-        .main-header {
-            background-color: var(--card-bg);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-        }
+    .main-header {
+      background-color: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow);
+    }
 
-        .header-actions {
-            display: flex;
-            gap: 12px;
-        }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
 
-        .btn {
-            padding: 8px 12px;
-            border-radius: var(--radius);
-            font-weight: 500;
-            font-size: 0.875rem;
-            cursor: pointer;
-            border: none;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
+    .btn {
+      padding: 8px 12px;
+      border-radius: var(--radius);
+      font-weight: 500;
+      font-size: 0.875rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
-        }
+    .btn-outline {
+      background-color: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-color);
+    }
 
-        .btn-outline:hover {
-            background-color: var(--secondary-color);
-        }
+    .btn-outline:hover {
+      background-color: var(--secondary-color);
+    }
 
-        .btn-danger {
-            background-color: #ef4444;
-            color: white;
-        }
+    .btn-danger {
+      background-color: #ef4444;
+      color: white;
+    }
 
-        .btn-danger:hover {
-            background-color: #dc2626;
-        }
+    .btn-danger:hover {
+      background-color: #dc2626;
+    }
 
-        .intro-text {
-            background-color: var(--card-bg);
-            padding: 20px;
-            margin: 16px auto;
-            max-width: var(--max-width);
-            width: calc(100% - 32px);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            text-align: center;
-            font-size: 0.875rem;
-            color: var(--light-text);
-            line-height: 1.5;
-        }
+    .intro-text {
+      background-color: var(--card-bg);
+      padding: 20px;
+      margin: 16px auto;
+      max-width: var(--max-width);
+      width: calc(100% - 32px);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--light-text);
+      line-height: 1.5;
+    }
 
-        .chat-container {
-            flex: 1;
-            max-width: var(--max-width);
-            width: calc(100% - 32px);
-            margin: 0 auto 80px;
-            position: relative;
-        }
+    .chat-container {
+      flex: 1;
+      max-width: var(--max-width);
+      width: calc(100% - 32px);
+      margin: 0 auto 80px;
+      position: relative;
+    }
 
-        .chat-box {
-            background-color: var(--card-bg);
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            padding: 24px;
-            margin-bottom: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-            min-height: 60vh;
-            max-height: calc(100vh - 300px);
-        }
+    .chat-box {
+      background-color: var(--card-bg);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      margin-bottom: 16px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 60vh;
+      max-height: calc(100vh - 300px);
+    }
 
-        .input-container {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            padding: 16px;
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
-            z-index: 10;
-        }
+    .message {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
 
-        .input-wrapper {
-            max-width: var(--max-width);
-            margin: 0 auto;
-            display: flex;
-            align-items: flex-end;
-            gap: 12px;
-            position: relative;
-        }
+    .avatar {
+      background-color: var(--primary-dark);
+      color: white;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
 
-        .textarea-wrapper {
-            flex: 1;
-            border-radius: var(--radius);
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            overflow: hidden;
-        }
+    .bubble {
+      background-color: var(--secondary-color);
+      color: var(--text-color);
+      padding: 12px 16px;
+      border-radius: var(--radius);
+      max-width: 80%;
+    }
 
-        #userInput {
-            width: 100%;
-            padding: 12px 16px;
-            border: none;
-            background: transparent;
-            font-size: 0.9375rem;
-            color: var(--text-color);
-            resize: none;
-            font-family: inherit;
-        }
+    .input-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      background-color: var(--card-bg);
+      border-top: 1px solid var(--border-color);
+      box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+      z-index: 10;
+    }
 
-        .send-button {
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border: none;
-            box-shadow: var(--shadow);
-        }
-    </style>
+    .input-wrapper {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      position: relative;
+    }
+
+    .textarea-wrapper {
+      flex: 1;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      overflow: hidden;
+    }
+
+    #userInput {
+      width: 100%;
+      padding: 12px 16px;
+      border: none;
+      background: transparent;
+      font-size: 0.9375rem;
+      color: var(--text-color);
+      resize: none;
+      font-family: inherit;
+    }
+
+    .send-button {
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+      box-shadow: var(--shadow);
+    }
+  </style>
 </head>
 <body>
-    <header class="main-header">
-        <h1 id="main-title">Willkommen in Deinem Chat zu Personalmanagement</h1>
-        <div class="header-actions">
-            <button id="lang-toggle" class="btn btn-outline">
-                <i class="fas fa-language"></i> English
-            </button>
-            <button id="theme-toggle" class="btn btn-outline">
-                <i class="fas fa-moon"></i> Darkmode
-            </button>
-            <button id="print-button" class="btn btn-outline" onclick="window.print()">
-                <i class="fas fa-print"></i> Drucken
-            </button>
-            <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
-                <i class="fas fa-redo-alt"></i> Reset
-            </button>
-        </div>
-    </header>
-
-    <div class="intro-text" id="intro-text">
-        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.
-        <br>Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-        <br>Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]"
+  <header class="main-header">
+    <h1 id="main-title">Willkommen in Deinem Chat zu Personalmanagement</h1>
+    <div class="header-actions">
+      <button id="lang-toggle" class="btn btn-outline">
+        <i class="fas fa-language"></i> English
+      </button>
+      <button id="theme-toggle" class="btn btn-outline">
+        <i class="fas fa-moon"></i> Darkmode
+      </button>
+      <button id="print-button" class="btn btn-outline" onclick="window.print()">
+        <i class="fas fa-print"></i> Drucken
+      </button>
+      <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
+        <i class="fas fa-redo-alt"></i> Reset
+      </button>
     </div>
+  </header>
 
-    <main class="chat-container">
-        <div class="chat-box" id="chatBox"></div>
-    </main>
+  <div class="intro-text" id="intro-text"></div>
 
-    <div class="input-container">
-        <div class="input-wrapper">
-            <div class="textarea-wrapper">
-                <textarea id="userInput" placeholder="Deine Nachricht..." rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
-            </div>
-            <button class="send-button" id="sendButton" onclick="sendMessage()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
+  <main class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+  </main>
+
+  <div class="input-container">
+    <div class="input-wrapper">
+      <div class="textarea-wrapper">
+        <textarea id="userInput" placeholder="Deine Nachricht..." rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+      </div>
+      <button class="send-button" id="sendButton" onclick="sendMessage()">
+        <i class="fas fa-paper-plane"></i>
+      </button>
     </div>
+  </div>
 
-    <script>
-        const themeToggle = document.getElementById("theme-toggle");
-        const langToggle = document.getElementById("lang-toggle");
-        const html = document.documentElement;
+  <script>
+    const themeToggle = document.getElementById("theme-toggle");
+    const langToggle = document.getElementById("lang-toggle");
+    const html = document.documentElement;
+    const intro = document.getElementById("intro-text");
+    const chatBox = document.getElementById("chatBox");
 
-        // Laden gespeicherter Einstellungen
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedTheme = localStorage.getItem("theme");
-            const savedLang = localStorage.getItem("lang");
+    let userName = localStorage.getItem("userName") || null;
 
-            if (savedTheme) {
-                html.setAttribute("data-theme", savedTheme);
-                themeToggle.innerHTML = savedTheme === "dark" ? '<i class="fas fa-sun"></i> Lightmode' : '<i class="fas fa-moon"></i> Darkmode';
-            }
+    document.addEventListener("DOMContentLoaded", () => {
+      const savedTheme = localStorage.getItem("theme");
+      const savedLang = localStorage.getItem("lang") || "de";
+      if (savedTheme) html.setAttribute("data-theme", savedTheme);
+      if (savedLang) switchLanguage(savedLang);
 
-            if (savedLang) {
-                switchLanguage(savedLang);
-            }
-        });
+      if (!userName) {
+        botMessage("Hallo, schön, dass Du diesen Bot nutzt. Wie heißt Du eigentlich?");
+      } else {
+        botMessage(`Willkommen zurück, ${userName}. Wie kann ich Dir helfen?`, getInitials(userName));
+      }
+    });
 
-        themeToggle.addEventListener("click", () => {
-            const current = html.getAttribute("data-theme") === "dark";
-            const newTheme = current ? "light" : "dark";
-            html.setAttribute("data-theme", newTheme);
-            localStorage.setItem("theme", newTheme);
-            themeToggle.innerHTML = newTheme === "dark" ? '<i class="fas fa-sun"></i> Lightmode' : '<i class="fas fa-moon"></i> Darkmode';
-        });
+    function botMessage(text, initials = "🤖") {
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("message");
 
-        langToggle.addEventListener("click", () => {
-            const newLang = document.documentElement.lang === "de" ? "en" : "de";
-            switchLanguage(newLang);
-            localStorage.setItem("lang", newLang);
-        });
+      const avatar = document.createElement("div");
+      avatar.classList.add("avatar");
+      avatar.textContent = initials;
 
-        function switchLanguage(lang) {
-            document.documentElement.lang = lang;
-            if (lang === "en") {
-                document.getElementById("main-title").textContent = "Welcome to your Chat about HR Management";
-                document.getElementById("intro-text").innerHTML = `Welcome! This chatbot assists you with questions about HR topics.<br>Please ask specific questions. The AI is still in training.<br>Describe your role, e.g., \"I'm a course participant and my question is: [...]\"`;
-                langToggle.innerHTML = '<i class="fas fa-language"></i> Deutsch';
-            } else {
-                document.getElementById("main-title").textContent = "Willkommen in Deinem Chat zu Personalmanagement";
-                document.getElementById("intro-text").innerHTML = `Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.<br>Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. \"Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung, meine Frage lautet konkret: [...]\"`;
-                langToggle.innerHTML = '<i class="fas fa-language"></i> English';
-            }
-        }
+      const bubble = document.createElement("div");
+      bubble.classList.add("bubble");
+      bubble.textContent = text;
 
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = (textarea.scrollHeight) + 'px';
-        }
+      wrapper.appendChild(avatar);
+      wrapper.appendChild(bubble);
+      chatBox.appendChild(wrapper);
+    }
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                sendMessage();
-            }
-        }
+    function getInitials(name) {
+      return name.split(" ").map(n => n[0]).join("").toUpperCase();
+    }
 
-        function sendMessage() {
-            const input = document.getElementById("userInput");
-            const text = input.value.trim();
-            if (!text) return;
+    themeToggle.addEventListener("click", () => {
+      const newTheme = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
+      html.setAttribute("data-theme", newTheme);
+      localStorage.setItem("theme", newTheme);
+      themeToggle.innerHTML = newTheme === "dark" ? '<i class="fas fa-sun"></i> Lightmode' : '<i class="fas fa-moon"></i> Darkmode';
+    });
 
-            const chatBox = document.getElementById("chatBox");
-            const msg = document.createElement("div");
-            msg.textContent = text;
-            chatBox.appendChild(msg);
-            input.value = "";
-            autoResize(input);
+    langToggle.addEventListener("click", () => {
+      const newLang = document.documentElement.lang === "de" ? "en" : "de";
+      switchLanguage(newLang);
+      localStorage.setItem("lang", newLang);
+    });
 
-            fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ question: text })
-            })
-            .then(res => res.text())
-            .then(answer => {
-                const reply = document.createElement("div");
-                reply.textContent = answer;
-                chatBox.appendChild(reply);
-            })
-            .catch(() => {
-                const err = document.createElement("div");
-                err.textContent = "Fehler beim Abrufen der Antwort.";
-                chatBox.appendChild(err);
-            });
-        }
+    function switchLanguage(lang) {
+      document.documentElement.lang = lang;
+      document.getElementById("main-title").textContent = lang === "en"
+        ? "Welcome to your Chat about HR Management"
+        : "Willkommen in Deinem Chat zu Personalmanagement";
+    }
 
-        function resetChat() {
-            document.getElementById("chatBox").innerHTML = "";
-            localStorage.removeItem("userName");
-            localStorage.removeItem("chatHistory");
-        }
-    </script>
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    function handleKeyPress(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    }
+
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
+
+      botMessage(text, getInitials(userName || "Du"));
+
+      if (!userName) {
+        userName = text;
+        localStorage.setItem("userName", userName);
+        botMessage(`Freut mich, ${userName}. Wie kann ich Dir helfen?`, "🤖");
+      } else {
+        fetch("https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name: userName, question: text })
+        })
+          .then(res => res.text())
+          .then(answer => botMessage(answer, "🤖"))
+          .catch(() => botMessage("Fehler beim Abrufen der Antwort.", "🤖"));
+      }
+
+      input.value = "";
+      autoResize(input);
+    }
+
+    function resetChat() {
+      chatBox.innerHTML = "";
+      localStorage.removeItem("userName");
+    }
+  </script>
 </body>
 </html>
