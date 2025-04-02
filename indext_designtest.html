@@ -6,6 +6,7 @@
   <title>Dein persönlicher Assistent</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
     :root {
       --primary-color: #6366f1;
@@ -257,6 +258,9 @@
       <button class="btn btn-outline" onclick="toggleTheme()">
         <i class="fas fa-moon"></i>
       </button>
+      <button class="btn btn-outline" onclick="exportToPDF()">
+        <i class="fas fa-file-pdf"></i>
+      </button>
     </div>
   </header>
 
@@ -373,6 +377,24 @@
     function sendMessageFromSuggestion(text) {
       input.value = text;
       sendMessage();
+    }
+
+    function exportToPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+
+      doc.setFont("Inter", "normal");
+      const messages = chatBox.querySelectorAll(".message");
+      messages.forEach((el, index) => {
+        const sender = el.classList.contains("user") ? userName : "KI";
+        const text = el.querySelector(".bubble").innerText;
+        const content = `${sender}: ${text}`;
+        doc.text(content, 10, y);
+        y += 10;
+      });
+
+      doc.save("chat.pdf");
     }
 
     sendButton.addEventListener("click", sendMessage);
