@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</title>
+  <!-- Verhindert favicon.ico-Fehler -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
     :root {
       --bg: #fff;
@@ -60,14 +62,14 @@
 
     async function sendMessage(text) {
       if (isFetching) return;
-      // Anzeige User-Nachricht
+
+      console.log('Sende Frage:', text);
       const userMsg = document.createElement('div');
       userMsg.className = 'message user';
       userMsg.textContent = text;
       chat.appendChild(userMsg);
       scrollToBottom();
 
-      // Lade-Indikator
       const loader = document.createElement('div');
       loader.className = 'message bot loading';
       loader.textContent = '...';
@@ -79,19 +81,24 @@
 
       try {
         const response = await fetch(webhookUrl, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: text })
         });
-        if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
+        console.log('HTTP-Status:', response.status);
+        if (!response.ok) throw new Error(`Netzwerk-Antwort war nicht ok: ${response.status}`);
+
         const data = await response.json();
+        console.log('Empfangene Daten:', data);
+
         loader.remove();
-        // Fallback, falls answer fehlt
         let content = data.answer || (data.body && data.body.answer) || JSON.stringify(data);
         const botMsg = document.createElement('div');
         botMsg.className = 'message bot';
         botMsg.innerHTML = content.replace(/\n/g, '<br>');
         chat.appendChild(botMsg);
       } catch (err) {
+        console.error('Fehler beim Fetch:', err);
         loader.remove();
         const errMsg = document.createElement('div');
         errMsg.className = 'message bot';
