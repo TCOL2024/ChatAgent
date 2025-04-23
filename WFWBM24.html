@@ -574,14 +574,14 @@
                         html += "<ul>";
                     }
                     const bulletPoint = trimmedLine.substring(2);
-                    html += <li>${bulletPoint}</li>;
+                    html += `<li>${bulletPoint}</li>`;
                 } else {
                     if (inList) {
                         inList = false;
                         html += "</ul>";
                     }
                     if (trimmedLine !== "") {
-                        html += <p>${trimmedLine}</p>;
+                        html += `<p>${trimmedLine}</p>`;
                     } else {
                         html += "<br>";
                     }
@@ -736,7 +736,7 @@
                     userName = userInput;
                     localStorage.setItem("userName", userName);
                     setTimeout(() => {
-                        addMessage("bot", Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?);
+                        addMessage("bot", `Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);
                         isWaitingForResponse = false;
                         sendButton.disabled = false;
                         sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
