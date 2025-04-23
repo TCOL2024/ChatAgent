@@ -469,9 +469,9 @@
 
     <!-- Intro text with explanation -->
     <div class="intro-text">
-        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
+        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Thema Betriebliches Management und Führung & Zusammenarbeit.<br>
         Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
-        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet konkret:[...]
+        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Wirtschaftsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet:[...]
     </div>
 
     <!-- Main chat container -->
@@ -498,7 +498,7 @@
         let userId = "";
         let askedForName = false;
         let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
-        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
+        const webhookUrl = "https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8"; // Dein Make-Webhook
         let isWaitingForResponse = false;
 
         // Chatverlauf als Array, das im LocalStorage gespeichert wird
@@ -600,7 +600,7 @@
                 if (footnotes.length > 0) {
                     html += "<div class='footnotes'>";
                     footnotes.forEach((fn, index) => {
-                        html += <p>Quelle ${index + 1}: ${fn.trim()}</p>;
+                        html += `<p>Quelle ${index + 1}: ${fn.trim()}</p>`;
                     });
                     html += "</div>";
                 }
@@ -652,11 +652,11 @@
             // Typing indicator
             const indicator = document.createElement("div");
             indicator.classList.add("typing-indicator");
-            indicator.innerHTML = 
+            indicator.innerHTML = `
                 <div class="dot"></div>
                 <div class="dot"></div>
                 <div class="dot"></div>
-            ;
+            `;
             
             indicatorContainer.appendChild(avatar);
             indicatorContainer.appendChild(indicator);
@@ -768,7 +768,7 @@
                 removeTypingIndicator();
 
                 if (!response.ok) {
-                    throw new Error(HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse});
+                    throw new Error(`HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse}`);
                 }
 
                 let jsonResponse;
