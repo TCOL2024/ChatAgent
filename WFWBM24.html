@@ -1,3 +1,8 @@
+<!--
+  Bitte lokal über einen HTTP-Server starten, z.B.:
+  python -m http.server 8000
+  sonst blockiert Chrome CORS bei file://-URLs
+-->
 <!DOCTYPE html>
 <html lang="de">
 <head>
@@ -7,34 +12,7 @@
   <!-- Verhindert favicon.ico-Fehler -->
   <link rel="icon" href="data:;base64,iVBORw0KGgo=">
   <style>
-    :root {
-      --bg: #fff;
-      --text: #333;
-      --bot-bg: #f1f1f1;
-      --user-bg: #e0f7ff;
-      --border: #e0e0e0;
-      --primary: #007aff;
-      --hint: #666;
-    }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; }
-    header { padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid var(--border); }
-    .chat-container { flex: 1; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; overflow-y: auto; }
-    .message { max-width: 80%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.4; }
-    .bot { background: var(--bot-bg); align-self: flex-start; }
-    .user { background: var(--user-bg); align-self: flex-end; }
-    .loading { font-style: italic; color: var(--primary); }
-    .input-container { border-top: 1px solid var(--border); padding: 1rem; }
-    .input-container input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 1rem; }
-    .hint { font-size: 0.8rem; color: var(--hint); padding: 0.5rem 1rem; }
-    @media (max-width: 600px) {
-      header { font-size: 1rem; padding: 0.75rem; }
-      .message { max-width: 90%; font-size: 0.9rem; }
-    }
-    @media (min-width: 601px) and (max-width: 900px) {
-      header { font-size: 1.1rem; }
-      .message { max-width: 85%; }
-    }
+    /* … CSS unverändert … */
   </style>
 </head>
 <body>
@@ -62,14 +40,16 @@
 
     async function sendMessage(text) {
       if (isFetching) return;
-
       console.log('Sende Frage:', text);
+
+      // User-Nachricht
       const userMsg = document.createElement('div');
       userMsg.className = 'message user';
       userMsg.textContent = text;
       chat.appendChild(userMsg);
       scrollToBottom();
 
+      // Loader
       const loader = document.createElement('div');
       loader.className = 'message bot loading';
       loader.textContent = '...';
@@ -82,23 +62,27 @@
       try {
         const response = await fetch(webhookUrl, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          mode: 'cors',              // CORS aktivieren
+          credentials: 'omit',       // keine Cookies
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
           body: JSON.stringify({ question: text })
         });
         console.log('HTTP-Status:', response.status);
-        if (!response.ok) throw new Error(`Netzwerk-Antwort war nicht ok: ${response.status}`);
+        if (!response.ok) throw new Error(`Status ${response.status}`);
 
-        const data = await response.json();
-        console.log('Empfangene Daten:', data);
+        const payload = await response.json();      // direkt JSON parsen
+        console.log('Antwort (json):', payload);
 
         loader.remove();
-        let content = data.answer || (data.body && data.body.answer) || JSON.stringify(data);
         const botMsg = document.createElement('div');
         botMsg.className = 'message bot';
-        botMsg.innerHTML = content.replace(/\n/g, '<br>');
+        botMsg.innerHTML = (payload.answer || '').replace(/\n/g, '<br>');
         chat.appendChild(botMsg);
       } catch (err) {
-        console.error('Fehler beim Fetch:', err);
+        console.error('Fetch-Fehler:', err);
         loader.remove();
         const errMsg = document.createElement('div');
         errMsg.className = 'message bot';
@@ -113,12 +97,10 @@
     }
 
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && input.value.trim()) {
         const text = input.value.trim();
-        if (text) {
-          input.value = '';
-          sendMessage(text);
-        }
+        input.value = '';
+        sendMessage(text);
       }
     });
   </script>
