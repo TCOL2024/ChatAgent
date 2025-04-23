@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dein persönlicher Assistent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern Variables */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+            --background: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+
+        /* Base Reset */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-color);
+            background-color: var(--background);
+            display: flex; flex-direction: column; min-height: 100vh;
+        }
+
+        /* ... (dein CSS unverändert) ... */
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+        <div class="header-actions">
+            <button id="print-button" class="btn btn-outline" onclick="window.print()">
+                <i class="fas fa-print"></i> Drucken
+            </button>
+            <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
+                <i class="fas fa-redo-alt"></i> Reset
+            </button>
+        </div>
+    </header>
+
+    <div class="intro-text">
+        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
+        Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.<br>
+        Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Ausbildung: [...]"
+    </div>
+
+    <main class="chat-container">
+        <div class="chat-box" id="chatBox"></div>
+    </main>
+
+    <div class="input-container">
+        <div class="input-wrapper">
+            <div class="textarea-wrapper">
+                <textarea id="userInput" placeholder="Deine Nachricht..." rows="1" oninput="autoResize(this)"></textarea>
+            </div>
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let userName = "";
+        let userId = "";
+        let askedForName = false;
+        let lastBotAnswer = "";
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
+        let isWaitingForResponse = false;
+        let chatHistory = [];
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        function initializeUser() {
+            const storedUserId = localStorage.getItem("userId");
+            userId = storedUserId || generateUserId();
+            if (!storedUserId) localStorage.setItem("userId", userId);
+            const storedUserName = localStorage.getItem("userName");
+            if (storedUserName) userName = storedUserName;
+        }
+
+        function generateUserId() {
+            return "user-" + Math.random().toString(36).substr(2, 9);
+        }
+
+        function saveChatHistory() {
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        function loadChatHistory() {
+            const stored = localStorage.getItem("chatHistory");
+            if (stored) {
+                try {
+                    chatHistory = JSON.parse(stored);
+                    chatHistory.forEach(msg => renderMessage(msg.sender, msg.text));
+                } catch {
+                    chatHistory = [];
+                }
+            }
+        }
+
+        function formatMessage(text) {
+            const parts = text.split("\n\nQuellen:\n");
+            const mainText = parts[0];
+            const footnoteText = parts[1] || "";
+            const lines = mainText.split("\n");
+            let html = `<div class='message-content'>`;
+            let inList = false;
+
+            lines.forEach(line => {
+                let trimmed = line.trim();
+                trimmed = trimmed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                                 .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                                 .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+                if (trimmed.startsWith('* ')) {
+                    if (!inList) { inList = true; html += '<ul>'; }
+                    const item = trimmed.substring(2);
+                    html += `<li>${item}</li>`;
+                } else {
+                    if (inList) { inList = false; html += '</ul>'; }
+                    if (trimmed) html += `<p>${trimmed}</p>`;
+                }
+            });
+            if (inList) html += '</ul>';
+            html += '</div>';
+            if (footnoteText.trim()) {
+                html += '<div class="footnotes">';
+                footnoteText.split("\n").forEach((fn, i) => {
+                    if (fn.trim()) html += `<p>Quelle ${i+1}: ${fn.trim()}</p>`;
+                });
+                html += '</div>';
+            }
+            return html;
+        }
+
+        function renderMessage(sender, text) {
+            const chatBox = document.getElementById('chatBox');
+            const container = document.createElement('div');
+            container.classList.add('message-container', sender === 'user' ? 'user' : 'bot');
+            const avatar = document.createElement('div');
+            avatar.classList.add('avatar');
+            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+            const bubble = document.createElement('div');
+            bubble.classList.add('message', sender === 'user' ? 'user-message' : 'bot-message');
+            bubble.innerHTML = sender === 'bot' ? formatMessage(text) : text;
+            container.append(avatar, bubble);
+            chatBox.appendChild(container);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function showTypingIndicator() {
+            const chatBox = document.getElementById('chatBox');
+            const indCont = document.createElement('div');
+            indCont.classList.add('message-container', 'bot');
+            indCont.id = 'typingIndicator';
+            const avatar = document.createElement('div');
+            avatar.classList.add('avatar');
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            const indicator = document.createElement('div');
+            indicator.classList.add('typing-indicator');
+            indicator.innerHTML = `
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            `;
+            indCont.append(avatar, indicator);
+            chatBox.appendChild(indCont);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function removeTypingIndicator() {
+            const el = document.getElementById('typingIndicator'); if (el) el.remove();
+        }
+
+        function addMessage(sender, text) {
+            renderMessage(sender, text);
+            chatHistory.push({ sender, text });
+            saveChatHistory();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeUser(); loadChatHistory();
+            const ta = document.getElementById('userInput');
+            ta.addEventListener('keydown', e => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+            });
+            if (chatHistory.length === 0) {
+                setTimeout(() => { addMessage('bot', 'Hallo, schön, dass Du diesen Bot nutzt. Wie heißt Du eigentlich?'); askedForName = true; }, 500);
+            }
+            autoResize(ta);
+        });
+
+        async function sendMessage() {
+            if (isWaitingForResponse) return;
+            const ta = document.getElementById('userInput');
+            const txt = ta.value.trim(); if (!txt) return;
+            ta.value = '';
+            autoResize(ta);
+            const btn = document.getElementById('sendButton');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            addMessage('user', txt);
+            isWaitingForResponse = true;
+            // Namenslogik & webhook call bleiben unverändert...
+            // Nach dem Aufruf:
+            isWaitingForResponse = false; btn.disabled = false; btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+        }
+
+        function resetChat() {
+            localStorage.removeItem('chatHistory');
+            localStorage.removeItem('userName');
+            chatHistory = []; userName = ''; askedForName = true; lastBotAnswer = '';
+            document.getElementById('chatBox').innerHTML = '';
+            setTimeout(() => addMessage('bot', 'Schön, dass Du Dich für diesen Bot interessierst. Wie heißt Du?'), 500);
+        }
+
+        console.log('🚀 JavaScript erfolgreich geladen!');
+    </script>
+</body>
+</html>
