@@ -5,17 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</title>
   <style>
+    :root {
+      --bg: #fff;
+      --text: #333;
+      --bot-bg: #f1f1f1;
+      --user-bg: #e0f7ff;
+      --border: #e0e0e0;
+      --primary: #007aff;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, sans-serif; background: #fff; color: #333; display: flex; flex-direction: column; height: 100vh; }
-    header { padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid #e0e0e0; }
+    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid var(--border); }
     .chat-container { flex: 1; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; overflow-y: auto; }
     .message { max-width: 80%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.4; }
-    .bot { background: #f1f1f1; align-self: flex-start; }
-    .user { background: #e0f7ff; align-self: flex-end; }
-    .input-container { border-top: 1px solid #e0e0e0; padding: 1rem; }
-    .input-container input {
-      width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 1rem;
-    }
+    .bot { background: var(--bot-bg); align-self: flex-start; }
+    .user { background: var(--user-bg); align-self: flex-end; }
+    .loading { font-style: italic; color: var(--primary); }
+    .input-container { border-top: 1px solid var(--border); padding: 1rem; }
+    .input-container input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 1rem; }
     @media (max-width: 600px) {
       header { font-size: 1rem; padding: 0.75rem; }
       .message { max-width: 90%; font-size: 0.9rem; }
@@ -28,36 +35,47 @@
 </head>
 <body>
   <header id="header">Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</header>
-  <div class="chat-container" id="chat">
-    <div class="message bot" id="welcome">
-      Hallo, schön, dass Du den Bot nutzt. Teile mir kurz mit, was ich für Dich tun kann.<br>
-      Sei so genau wie möglich in Deiner Fragestellung. Stelle bei Rückfragen zu Antworten gezielt Deine Frage und nicht zu oberflächlich.
-    </div>
-  </div>
+  <div class="chat-container" id="chat" aria-live="polite"></div>
   <div class="input-container">
-    <input type="text" id="input" placeholder="Stelle irgendeine Frage" autocomplete="off" />
+    <input type="text" id="input" placeholder="Stelle irgendeine Frage" autocomplete="off" autofocus />
   </div>
   <script>
     const webhookUrl = 'https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8';
     const header = document.getElementById('header');
-    const welcome = document.getElementById('welcome');
     const chat = document.getElementById('chat');
     const input = document.getElementById('input');
     let firstMessage = true;
+    let isFetching = false;
+
+    function scrollToBottom() {
+      const last = chat.lastElementChild;
+      if (last) last.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
 
     async function sendMessage(text) {
-      // Entferne Willkommens-Nachricht beim ersten Senden
+      if (isFetching) return;
+      // Erstes Verschwinden der Begrüßung
       if (firstMessage) {
-        welcome.remove();
+        header.textContent = '';
         firstMessage = false;
       }
 
-      // User-Nachricht
+      // Anzeige User-Nachricht
       const userMsg = document.createElement('div');
-      userMsg.classList.add('message', 'user');
+      userMsg.className = 'message user';
       userMsg.textContent = text;
       chat.appendChild(userMsg);
-      chat.scrollTop = chat.scrollHeight;
+      scrollToBottom();
+
+      // Lade-Indikator
+      const loader = document.createElement('div');
+      loader.className = 'message bot loading';
+      loader.textContent = '...';
+      chat.appendChild(loader);
+      scrollToBottom();
+
+      isFetching = true;
+      input.disabled = true;
 
       try {
         const response = await fetch(webhookUrl, {
@@ -66,23 +84,32 @@
         });
         if (!response.ok) throw new Error('Netzwerk-Antwort war nicht ok');
         const data = await response.json();
+        loader.remove();
         const botMsg = document.createElement('div');
-        botMsg.classList.add('message', 'bot');
+        botMsg.className = 'message bot';
         botMsg.innerHTML = data.answer.replace(/\n/g, '<br>');
         chat.appendChild(botMsg);
       } catch (err) {
+        loader.remove();
         const errMsg = document.createElement('div');
-        errMsg.classList.add('message', 'bot');
+        errMsg.className = 'message bot';
         errMsg.textContent = 'Entschuldige, es gab ein Problem beim Senden Deiner Anfrage.';
         chat.appendChild(errMsg);
+      } finally {
+        isFetching = false;
+        input.disabled = false;
+        input.focus();
+        scrollToBottom();
       }
-      chat.scrollTop = chat.scrollHeight;
     }
 
     input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        sendMessage(input.value.trim());
-        input.value = '';
+      if (e.key === 'Enter') {
+        const text = input.value.trim();
+        if (text) {
+          input.value = '';
+          sendMessage(text);
+        }
       }
     });
   </script>
