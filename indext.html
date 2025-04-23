@@ -1,142 +1,131 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
-    <!-- Verhindere favicon 404 -->
-    <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* (Stile unverändert) */
-        /* Modern Variables */
-        :root { /* ... */ }
-        * { margin:0;padding:0;box-sizing:border-box; }
-        body { font-family: 'Inter', sans-serif; background-color: #f9fafb; display:flex;flex-direction:column; min-height:100vh; }
-        .main-header { /* ... */ }
-        .intro-text { /* ... */ }
-        .chat-container { /* ... */ }
-        .chat-box { /* ... */ }
-        .message-container { /* ... */ }
-        .avatar { /* ... */ }
-        .message { /* ... */ }
-        .input-container { /* ... */ }
-        .textarea-wrapper { /* ... */ }
-        #userInput { /* ... */ }
-        .send-button { /* ... */ }
-        .typing-indicator { /* ... */ }
-        .dot { /* ... */ }
-        @keyframes bounce { /* ... */ }
-        @keyframes pulse { /* ... */ }
-        /* Media Queries & Print Styles omitted for brevity */
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</title>
+  <!-- Verhindert favicon.ico-Fehler -->
+  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
+  <style>
+    :root {
+      --bg: #fff;
+      --text: #333;
+      --bot-bg: #f1f1f1;
+      --user-bg: #e0f7ff;
+      --border: #e0e0e0;
+      --primary: #007aff;
+      --hint: #666;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; flex-direction: column; height: 100vh; }
+    header { padding: 1rem; text-align: center; font-size: 1.2rem; font-weight: bold; border-bottom: 1px solid var(--border); }
+    .chat-container { flex: 1; display: flex; flex-direction: column; padding: 1rem; gap: 1rem; overflow-y: auto; }
+    .message { max-width: 80%; padding: 0.75rem 1rem; border-radius: 1rem; line-height: 1.4; }
+    .bot { background: var(--bot-bg); align-self: flex-start; }
+    .user { background: var(--user-bg); align-self: flex-end; }
+    .loading { font-style: italic; color: var(--primary); }
+    .input-container { border-top: 1px solid var(--border); padding: 1rem; }
+    .input-container input { width: 100%; padding: 0.75rem 1rem; font-size: 1rem; border: 1px solid var(--border); border-radius: 1rem; }
+    .hint { font-size: 0.8rem; color: var(--hint); padding: 0.5rem 1rem; }
+    @media (max-width: 600px) {
+      header { font-size: 1rem; padding: 0.75rem; }
+      .message { max-width: 90%; font-size: 0.9rem; }
+    }
+    @media (min-width: 601px) and (max-width: 900px) {
+      header { font-size: 1.1rem; }
+      .message { max-width: 85%; }
+    }
+  </style>
 </head>
 <body>
-    <header class="main-header">
-        <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
-        <div class="header-actions">
-            <button id="print-button" class="btn btn-outline" onclick="window.print()">
-                <i class="fas fa-print"></i> Drucken
-            </button>
-            <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
-                <i class="fas fa-redo-alt"></i> Reset
-            </button>
-        </div>
-    </header>
-    <div class="intro-text">
-        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
-        Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
+  <header>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</header>
+  <div class="chat-container" id="chat" aria-live="polite">
+    <div class="message bot">
+      Hallo, schön, dass Du den Bot nutzt. Teile mir kurz mit, was ich für Dich tun kann.<br>
+      Sei so genau wie möglich in Deiner Fragestellung. Stelle bei Rückfragen gezielt Deine Frage und nicht zu oberflächlich.
     </div>
-    <main class="chat-container">
-        <div class="chat-box" id="chatBox"></div>
-    </main>
-    <div class="input-container">
-        <div class="input-wrapper">
-            <div class="textarea-wrapper">
-                <textarea id="userInput" placeholder="Deine Nachricht..." rows="1"
-                    onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
-            </div>
-            <button class="send-button" id="sendButton" onclick="sendMessage()">
-                <i class="fas fa-paper-plane"></i>
-            </button>
-        </div>
-    </div>
-    <script>
-        console.log('🚀 Chatbot-Skript geladen');
-        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp";
-        let isWaitingForResponse = false;
-        let chatHistory = [];
-        
-        function autoResize(textarea) {
-            textarea.style.height = 'auto';
-            textarea.style.height = textarea.scrollHeight + 'px';
-        }
-        
-        function renderMessage(sender, text) {
-            const chatBox = document.getElementById("chatBox");
-            const container = document.createElement("div");
-            container.className = `message-container ${sender}`;
-            const avatar = document.createElement("div");
-            avatar.className = 'avatar';
-            avatar.innerHTML = sender === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
-            const message = document.createElement("div");
-            message.className = sender === 'user' ? 'message user-message' : 'message bot-message';
-            message.innerHTML = text;
-            container.append(avatar, message);
-            chatBox.appendChild(container);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
-        
-        async function sendMessage() {
-            if (isWaitingForResponse) return;
-            const textarea = document.getElementById("userInput");
-            const text = textarea.value.trim();
-            if (!text) return;
-            textarea.value = '';
-            autoResize(textarea);
-            renderMessage('user', text);
-            isWaitingForResponse = true;
-            document.getElementById('sendButton').disabled = true;
+  </div>
+  <div class="input-container">
+    <input type="text" id="input" placeholder="Stelle irgendeine Frage" autocomplete="off" autofocus />
+  </div>
+  <div class="hint">Bot im Trainingsmodus – Antworten können unvollständig oder fehlerhaft sein. Verlasse Dich nie blind auf die Ergebnisse, sondern prüfe diese.</div>
+  <script>
+    const webhookUrl = 'https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8';
+    const chat = document.getElementById('chat');
+    const input = document.getElementById('input');
+    let isFetching = false;
 
-            // Typing indicator
-            const typing = document.createElement('div');
-            typing.className = 'message-container bot';
-            typing.id = 'typing';
-            typing.innerHTML = `<div class="avatar"><i class="fas fa-robot"></i></div><div class="typing-indicator"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>`;
-            document.getElementById('chatBox').appendChild(typing);
-            
-            try {
-                console.log('Sende an Webhook:', text);
-                const res = await fetch(webhookUrl, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ question: text })
-                });
-                console.log('Status:', res.status);
-                const payload = await res.text();
-                console.log('Antwort (raw):', payload);
-                if (!res.ok) throw new Error(`Status ${res.status}`);
-                let data;
-                try { data = JSON.parse(payload); } catch { data = { answer: payload }; }
-                document.getElementById('typing').remove();
-                renderMessage('bot', data.answer.replace(/\n/g, '<br>'));
-            } catch (e) {
-                console.error('Fetch-Fehler:', e);
-                document.getElementById('typing').remove();
-                renderMessage('bot', 'Entschuldige, beim Senden gab es ein Problem.');
-            } finally {
-                isWaitingForResponse = false;
-                document.getElementById('sendButton').disabled = false;
-            }
-        }
-        
-        function handleKeyPress(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        }
-    </script>
+    function scrollToBottom() {
+      const last = chat.lastElementChild;
+      if (last) last.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function sendMessage(text) {
+      if (isFetching) return;
+      console.log('Sende Frage:', text);
+
+      // User-Nachricht
+      const userMsg = document.createElement('div');
+      userMsg.className = 'message user';
+      userMsg.textContent = text;
+      chat.appendChild(userMsg);
+      scrollToBottom();
+
+      // Loader
+      const loader = document.createElement('div');
+      loader.className = 'message bot loading';
+      loader.textContent = '...';
+      chat.appendChild(loader);
+      scrollToBottom();
+
+      isFetching = true;
+      input.disabled = true;
+
+      try {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          mode: 'cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: text })
+        });
+        console.log('HTTP-Status:', response.status);
+        if (!response.ok) throw new Error(`Status ${response.status}`);
+
+        const payload = await response.text();
+        console.log('Antwort (raw):', payload);
+
+        loader.remove();
+        // Try JSON.parse, fallback to raw text
+        let answer;
+        try { answer = JSON.parse(payload).answer; }
+        catch { answer = payload; }
+
+        const botMsg = document.createElement('div');
+        botMsg.className = 'message bot';
+        botMsg.innerHTML = answer.replace(/\n/g, '<br>');
+        chat.appendChild(botMsg);
+      } catch (err) {
+        console.error('Fetch-Fehler:', err);
+        loader.remove();
+        const errMsg = document.createElement('div');
+        errMsg.className = 'message bot';
+        errMsg.textContent = 'Entschuldige, es gab ein Problem beim Senden Deiner Anfrage.';
+        chat.appendChild(errMsg);
+      } finally {
+        isFetching = false;
+        input.disabled = false;
+        input.focus();
+        scrollToBottom();
+      }
+    }
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && input.value.trim()) {
+        const text = input.value.trim();
+        input.value = '';
+        sendMessage(text);
+      }
+    });
+  </script>
 </body>
 </html>
