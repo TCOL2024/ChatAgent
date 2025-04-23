@@ -7,35 +7,25 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* ------------------- Farbvariablen ------------------- */
-    :root{
-      --primary:#4f46e5;--primary-dark:#4338ca;
-      --bg:#f9fafb;--card:#ffffff;
-      --txt:#1f2937;--txt-light:#6b7280;
-      --border:#e5e7eb;--radius:12px;
-      --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
-      --header-h:70px;--max-w:1200px;--tr:all .25s ease;
-    }
-    [data-theme="dark"]{
-      --primary:#6366f1;--primary-dark:#4f46e5;
-      --bg:#111827;--card:#1f2937;--txt:#f9fafb;--txt-light:#d1d5db;--border:#374151;
-      --shadow:0 4px 6px -1px rgba(0,0,0,.3),0 2px 4px -1px rgba(0,0,0,.2);
-    }
+    /* ---------- Farb‑Variablen ---------- */
+    :root{--primary:#4f46e5;--primary-dark:#4338ca;--bg:#f9fafb;--card:#fff;--txt:#1f2937;--txt-light:#6b7280;--border:#e5e7eb;--radius:12px;--shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);--header-h:70px;--max-w:1200px;--tr:.25s ease}
+    [data-theme="dark"]{--primary:#6366f1;--primary-dark:#4f46e5;--bg:#111827;--card:#1f2937;--txt:#f9fafb;--txt-light:#d1d5db;--border:#374151;--shadow:0 4px 6px -1px rgba(0,0,0,.3),0 2px 4px -1px rgba(0,0,0,.2)}
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     html,body{height:100%}
     body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);display:flex;flex-direction:column;min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
 
-    /* ------------------- Header ------------------- */
+    /* ---------- Header ---------- */
     .header{position:sticky;top:0;z-index:100;display:flex;justify-content:space-between;align-items:center;height:var(--header-h);padding:0 20px;background:var(--card);box-shadow:var(--shadow);border-bottom:1px solid var(--border)}
-    .header h1{font-size:1.15rem;color:var(--primary)}
+    .header h1{font-size:1.1rem;color:var(--primary)}
     .burger{display:none;flex-direction:column;justify-content:space-between;width:24px;height:18px;border:none;background:transparent;cursor:pointer}
-    .burger span{height:2px;width:100%;background:var(--txt);transition:var(--tr)}
-    .btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:none;border-radius:var(--radius);font-size:.85rem;cursor:pointer;transition:var(--tr)}
+    .burger span{height:2px;width:100%;background:var(--txt);transition:all var(--tr)}
+    .header-actions{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+    .btn{display:flex;align-items:center;gap:6px;padding:8px 14px;border:none;border-radius:var(--radius);font-size:.8rem;cursor:pointer;transition:all var(--tr)}
     .btn-outline{background:transparent;border:1px solid var(--border);color:var(--txt)}.btn-outline:hover{background:var(--border)}
     .btn-danger{background:#ef4444;color:#fff}.btn-danger:hover{background:#dc2626}
     .theme{width:40px;height:40px;border:1px solid var(--border);border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--bg);cursor:pointer}
 
-    /* ------------------- Overlay & Side‑Nav ------------------- */
+    /* ---------- Overlay & Side‑Nav ---------- */
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);opacity:0;visibility:hidden;transition:var(--tr);z-index:90}
     .overlay.active{opacity:1;visibility:visible}
     .sidenav{position:fixed;left:-300px;top:0;width:300px;height:100%;background:var(--card);box-shadow:var(--shadow);padding:20px;transition:left .3s;z-index:95;overflow-y:auto}
@@ -44,14 +34,14 @@
     .navlink:hover,.navlink.active{background:var(--border);color:var(--primary)}
     .nav-divider{height:1px;background:var(--border);margin:10px 0}
 
-    /* ------------------- Layout ------------------- */
+    /* ---------- Layout & Cards ---------- */
     .wrapper{width:100%;max-width:var(--max-w);margin:16px auto;padding:0 16px}
     .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
     .hidden{display:none}
 
     /* Progress */
     .bars{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-top:16px}
-    .bar-head{display:flex;justify-content:space-between;font-size:.85rem}
+    .bar-head{display:flex;justify-content:space-between;font-size:.8rem}
     .bar{background:var(--border);height:8px;border-radius:4px;overflow:hidden}
     .fill{background:var(--primary);height:100%;width:0;transition:width .5s}
 
@@ -81,7 +71,7 @@
     .send{background:var(--primary);color:#fff}
     .mic{background:var(--border);color:var(--txt)}.mic.active{background:var(--primary);color:#fff}
 
-    @media(max-width:768px){.burger{display:flex}}
+    @media(max-width:768px){.burger{display:flex}.header h1{font-size:1rem}}
   </style>
 </head>
 <body>
@@ -109,8 +99,9 @@
   </nav>
 
   <!-- Intro -->
-  <section class="wrapper card intro-text">
-    Willkommen! Stelle konkrete Fragen zu <strong>Betriebliches Management</strong>, <strong>Führung & Zusammenarbeit</strong>.
+  <section class="wrapper card intro-text" id="intro">
+    <p>Herzlich willkommen! Ich bin dein Assistent für <strong>Betriebliches Management</strong>, <strong>Führung</strong> und <strong>Zusammenarbeit</strong>.</p>
+    <p>Bitte stelle deine Fragen so konkret wie möglich. Zunächst: Wie heißt du?</p>
   </section>
 
   <!-- Progress -->
@@ -124,7 +115,7 @@
   <section class="wrapper card hidden" id="faq">
     <h2>FAQ</h2>
     <div class="faq-item"><div class="faq-q">Was umfasst „Betriebliches Management"? <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-a">Unternehmensführung, Controlling, Projekt‑ und Qualitätsmanagement u.v.m.</div></div>
-    <div class="faq-item"><div class="faq-q">Tipps zur Prüfungsvorbereitung <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-a">Erstelle Zusammenfassungen, übe mit Altklausuren und simuliere Prüfungszeiten.</div></div>
+    <div class="faq-item"><div class="faq-q">Wie nutze ich den Chat optimal? <i class="fas fa-chevron-down faq-icon"></i></div><div class="faq-a">Formuliere konkrete Fragen, bitte um Beispiele und prüfe meine Antworten kritisch.</div></div>
   </section>
 
   <!-- Chat -->
@@ -134,44 +125,53 @@
   <div class="input-area"><div class="in-wrap"><textarea id="ask" rows="1" placeholder="Deine Nachricht…" onkeypress="enterSend(event)"></textarea><button class="mic" id="mic"><i class="fas fa-microphone"></i></button><button class="send" id="send"><i class="fas fa-paper-plane"></i></button></div></div>
 
   <script>
+    /* ---------- Global ---------- */
+    const webhookUrl="https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8";
+    let userName="", askedName=true, waiting=false, lastBot="";
+    const chatBox=document.getElementById('chat');
+    const topics={"Betriebliches Management":0,"Führung":0,"Zusammenarbeit":0};
+
     /* ---------- Burger & Nav ---------- */
     const burger=document.getElementById('burger'),side=document.getElementById('sidenav'),ovl=document.getElementById('overlay');
-    burger.addEventListener('click',()=>{side.classList.add('active');ovl.classList.add('active')});
-    ovl.addEventListener('click',closeNav);
+    burger.addEventListener('click',()=>{side.classList.add('active');ovl.classList.add('active')});ovl.addEventListener('click',closeNav);
     function closeNav(){side.classList.remove('active');ovl.classList.remove('active')}
 
     /* ---------- Theme ---------- */
-    const themeBtn=document.getElementById('theme');themeBtn.addEventListener('click',()=>{const dark=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',dark?'light':'dark');themeBtn.innerHTML=`<i class='fas fa-${dark?'moon':'sun'}'></i>`});
+    const themeBtn=document.getElementById('theme');themeBtn.addEventListener('click',()=>{const d=document.documentElement.getAttribute('data-theme')==='dark';document.documentElement.setAttribute('data-theme',d?'light':'dark');themeBtn.innerHTML=`<i class='fas fa-${d?'moon':'sun'}'></i>`});
 
     /* ---------- Section Switch ---------- */
-    const views={chat:'chat',progress:'progress',faq:'faq'};
-    for(const v in views){document.getElementById('nav-'+v).addEventListener('click',e=>{e.preventDefault();show(v)})}
-    function show(view){for(const v in views){document.getElementById('nav-'+v).classList.toggle('active',v===view);document.getElementById(views[v])?.classList.toggle('hidden',v!==view)}closeNav()}
+    const views={chat:'chatWrap',progress:'progress',faq:'faq'};for(const v in views){document.getElementById('nav-'+v).addEventListener('click',e=>{e.preventDefault();switchView(v)})}
+    function switchView(view){for(const v in views){document.getElementById('nav-'+v).classList.toggle('active',v===view);document.getElementById(views[v]).classList.toggle('hidden',v!==view)}closeNav()}
 
     /* ---------- FAQ Accordion ---------- */
     document.querySelectorAll('.faq-q').forEach(q=>q.addEventListener('click',()=>q.parentElement.classList.toggle('open')));
 
-    /* ---------- Chat Demo ---------- */
-    const chatBox=document.getElementById('chat');const topics={"Betriebliches Management":0,"Führung":0,"Zusammenarbeit":0};
+    /* ---------- Chat Helpers ---------- */
     function append(sender,msg){const wrap=document.createElement('div');wrap.className='msg-wrap '+sender;wrap.innerHTML=`<div class='avatar ${sender}'><i class='fas fa-${sender==='bot'?'robot':'user'}'></i></div><div class='msg ${sender}'>${msg}</div>`;chatBox.append(wrap);chatBox.scrollTop=chatBox.scrollHeight}
     function track(topic){if(!(topic in topics))return;topics[topic]=Math.min(topics[topic]+10,100);renderBars()}
-    function renderBars(){document.getElementById('topicCount').textContent=Object.values(topics).filter(v=>v>0).length;const bars=document.getElementById('bars');bars.innerHTML='';Object.entries(topics).forEach(([k,v])=>{bars.insertAdjacentHTML('beforeend',`<div><div class='bar-head'><span>${k}</span><span>${v}%</span></div><div class='bar'><div class='fill' style='width:${v}%'></div></div></div>`)});}renderBars();
+    function renderBars(){document.getElementById('topicCount').textContent=Object.values(topics).filter(v=>v>0).length;const bars=document.getElementById('bars');bars.innerHTML='';Object.entries(topics).forEach(([k,v])=>{bars.insertAdjacentHTML('beforeend',`<div><div class='bar-head'><span>${k}</span><span>${v}%</span></div><div class='bar'><div class='fill' style='width:${v}%'></div></div></div>`)});}
+    renderBars();
 
     /* ---------- Messaging ---------- */
     document.getElementById('send').addEventListener('click',sendMsg);function enterSend(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg()}}
-    function sendMsg(){const t=document.getElementById('ask');const txt=t.value.trim();if(!txt)return;t.value='';append('user',txt);setTimeout(()=>{append('bot','Demo-Antwort: <em>'+txt+'</em>');track('Betriebliches Management')},500)}
+    async function sendMsg(){if(waiting)return;const area=document.getElementById('ask');const txt=area.value.trim();if(!txt)return;area.value='';append('user',txt);
+      if(askedName){userName=txt;askedName=false;append('bot',`Danke ${userName}! Wie kann ich dir helfen?`);return;}
+      waiting=true;append('bot','<em>…denke…</em>');
+      try{const res=await fetch(webhookUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo',name:userName||'Unbekannt',question:txt,last_answer:lastBot})});const ans=await res.text();chatBox.lastChild.remove();append('bot',ans);lastBot=ans;track('Betriebliches Management');}catch{chatBox.lastChild.remove();append('bot','Server‑Fehler. Versuch es später erneut.');}waiting=false;}
 
     /* ---------- Reset ---------- */
-    const resetBtn=document.getElementById('reset');document.getElementById('nav-reset').addEventListener('click',resetChat);function resetChat(){chatBox.innerHTML='';for(const k in topics){topics[k]=0}renderBars()}
-    resetBtn.addEventListener('click',resetChat);
+    function resetChat(){chatBox.innerHTML='';for(const k in topics){topics[k]=0}renderBars();askedName=true;userName="";append('bot','Hallo! Wie heißt du?')}
+    document.getElementById('reset').addEventListener('click',resetChat);document.getElementById('nav-reset').addEventListener('click',()=>{resetChat();closeNav()});
 
     /* ---------- Speech Recognition ---------- */
-    const micBtn=document.getElementById('mic');let listening=false;let recognition
-    if('webkitSpeechRecognition'in window||'SpeechRecognition'in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='de-DE';recognition.onresult=e=>{document.getElementById('ask').value=e.results[0][0].transcript;document.getElementById('ask').focus()};recognition.onerror=stopMic;recognition.onend=stopMic;}else{micBtn.style.display='none'}
-    micBtn.addEventListener('click',()=>listening?stopMic():startMic());function startMic(){if(!recognition)return;recognition.start();listening=true;micBtn.classList.add('active');micBtn.innerHTML='<i class="fas fa-stop"></i>'}
-    function stopMic(){if(!recognition)return;try{recognition.stop()}catch{}listening=false;micBtn.classList.remove('active');micBtn.innerHTML='<i class="fas fa-microphone"></i>'}
+    const mic=document.getElementById('mic');let recognition,listening=false;if('webkitSpeechRecognition'in window||'SpeechRecognition'in window){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;recognition=new SR();recognition.lang='de-DE';recognition.onresult=e=>{document.getElementById('ask').value=e.results[0][0].transcript};recognition.onend=()=>stopMic();recognition.onerror=()=>stopMic();}else{mic.style.display='none'}
+    mic.addEventListener('click',()=>listening?stopMic():startMic());function startMic(){recognition?.start();listening=true;mic.classList.add('active');mic.innerHTML='<i class="fas fa-stop"></i>'}
+    function stopMic(){try{recognition.stop()}catch{}listening=false;mic.classList.remove('active');mic.innerHTML='<i class="fas fa-microphone"></i>'}
 
-    /* ---------- Responsive Burger visibility ---------- */
+    /* ---------- Initial Greeting ---------- */
+    append('bot','Hallo! Wie heißt du?');
+
+    /* ---------- Responsive burger visibility ---------- */
     function burgerVis(){document.querySelector('.burger').style.display=window.innerWidth<768?'flex':'none'}burgerVis();window.addEventListener('resize',burgerVis);
   </script>
 </body>
