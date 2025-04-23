@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betriebliches Management – Dein Assistent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern Variables */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+            --background: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+        /* Base Reset */
+        * {margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,Ubuntu,Cantarell,sans-serif;color:var(--text-color);background-color:var(--background);line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;flex-direction:column;min-height:100vh;}
+        /* Header */
+        .main-header{background-color:var(--card-bg);border-bottom:1px solid var(--border-color);padding:16px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:100;box-shadow:var(--shadow);} 
+        .main-header h1{font-size:1.25rem;font-weight:600;color:var(--primary-color);} 
+        .header-actions{display:flex;gap:12px;} 
+        .btn{padding:8px 16px;border-radius:var(--radius);font-weight:500;font-size:.875rem;cursor:pointer;border:none;transition:var(--transition);display:flex;align-items:center;gap:6px;} 
+        .btn-primary{background-color:var(--primary-color);color:#fff;} .btn-primary:hover{background-color:var(--primary-dark);} 
+        .btn-outline{background:transparent;border:1px solid var(--border-color);color:var(--text-color);} .btn-outline:hover{background-color:var(--secondary-color);} 
+        .btn-danger{background-color:#ef4444;color:#fff;} .btn-danger:hover{background-color:#dc2626;} 
+        /* Intro */
+        .intro-text{background-color:var(--card-bg);padding:20px;margin:16px auto;max-width:var(--max-width);width:calc(100% - 32px);border-radius:var(--radius);box-shadow:var(--shadow);text-align:center;font-size:.875rem;color:var(--light-text);line-height:1.5;}
+        /* Chat Wrapper */
+        .chat-container{flex:1;max-width:var(--max-width);width:calc(100% - 32px);margin:0 auto 80px;position:relative;}
+        .chat-box{background-color:var(--card-bg);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px;margin-bottom:16px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;min-height:60vh;max-height:calc(100vh - 300px);} 
+        .message-container{display:flex;gap:12px;align-items:flex-start;animation:fadeIn .3s ease;} @keyframes fadeIn{from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);}}
+        .message-container.user{flex-direction:row-reverse;} 
+        .avatar{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;} .user .avatar{background-color:var(--primary-color);color:#fff;} .bot .avatar{background-color:#9ca3af;color:#fff;} 
+        .message{padding:12px 16px;border-radius:18px;max-width:80%;font-size:.9375rem;box-shadow:0 1px 2px rgba(0,0,0,.05);word-wrap:break-word;position:relative;} 
+        .user-message{background-color:var(--primary-color);color:#fff;border-top-right-radius:4px;} .bot-message{background-color:var(--secondary-color);color:var(--text-color);border-top-left-radius:4px;} 
+        .bot-message a{color:var(--primary-color);text-decoration:none;} .bot-message a:hover{text-decoration:underline;} 
+        /* Input */
+        .input-container{position:fixed;bottom:0;left:0;right:0;padding:16px;background-color:var(--card-bg);border-top:1px solid var(--border-color);box-shadow:0 -4px 6px -1px rgba(0,0,0,.05);z-index:10;} 
+        .input-wrapper{max-width:var(--max-width);margin:0 auto;display:flex;align-items:flex-end;gap:12px;} 
+        .textarea-wrapper{flex:1;position:relative;border-radius:var(--radius);border:1px solid var(--border-color);background-color:var(--card-bg);transition:var(--transition);overflow:hidden;} .textarea-wrapper:focus-within{border-color:var(--primary-color);box-shadow:0 0 0 2px rgba(79,70,229,.2);} 
+        #userInput{width:100%;padding:12px 16px;border:none;background:transparent;font-size:.9375rem;color:var(--text-color);resize:none;font-family:inherit;max-height:120px;min-height:24px;line-height:1.5;} #userInput:focus{outline:none;} 
+        .send-button{background-color:var(--primary-color);color:#fff;border-radius:50%;width:48px;height:48px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;flex-shrink:0;transition:var(--transition);box-shadow:var(--shadow);} .send-button:hover{background-color:var(--primary-dark);transform:scale(1.05);} .send-button:disabled{background-color:#9ca3af;cursor:not-allowed;transform:none;} 
+        /* Media Queries */
+        @media(max-width:768px){.main-header h1{font-size:1rem;max-width:70%;}.message{max-width:85%;}.chat-box{padding:16px;min-height:50vh;}.input-container{padding:12px;}.btn{padding:6px 12px;font-size:.75rem;}.avatar{width:32px;height:32px;font-size:.875rem;}.send-button{width:42px;height:42px;}}
+        @media(min-width:1400px){.chat-box{max-height:calc(100vh - 320px);}}
+        @media print {.input-container,#print-button-container,.header-actions{display:none!important;}.chat-box{height:auto;overflow:visible;box-shadow:none;}.chat-container{margin-bottom:0;}.message{break-inside:avoid;page-break-inside:avoid;}}
+    </style>
+</head>
+<body>
+<header class="main-header">
+    <h1>Willkommen in Deinem Chat zur Erstausbildung</h1>
+    <div class="header-actions">
+        <button id="print-button" class="btn btn-outline" onclick="window.print()"><i class="fas fa-print"></i> Drucken</button>
+        <button id="reset-button" class="btn btn-danger" onclick="resetChat()"><i class="fas fa-redo-alt"></i> Reset</button>
+    </div>
+</header>
+<div class="intro-text">
+    Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um die <strong>Erstausbildung</strong>.<br>
+    Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.<br>
+    Beschreibe, wer Du bist, z.&nbsp;B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe eine Frage zur Erstausbildung. Meine Frage lautet konkret: […]"
+</div>
+<main class="chat-container">
+    <div class="chat-box" id="chatBox"></div>
+</main>
+<div class="input-container">
+    <div class="input-wrapper">
+        <div class="textarea-wrapper"><textarea id="userInput" placeholder="Deine Nachricht…" rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea></div>
+        <button class="send-button" id="sendButton" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+</div>
+<script>
+const webhookUrl="https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8";
+let userName="",userId="",askedForName=false,lastBotAnswer="",isWaitingForResponse=false,chatHistory=[];
+function autoResize(t){t.style.height='auto';t.style.height=t.scrollHeight+'px';}
+function initializeUser(){const s=localStorage.getItem("userId");userId=s?s:generateUserId();if(!s)localStorage.setItem("userId",userId);const n=localStorage.getItem("userName");if(n)userName=n;}
+function generateUserId(){return"user-"+Math.random().toString(36).substr(2,9);}function saveChatHistory(){localStorage.setItem("chatHistory",JSON.stringify(chatHistory));}
+function loadChatHistory(){const h=localStorage.getItem("chatHistory");if(h){try{chatHistory=JSON.parse(h);chatHistory.forEach(m=>{renderMessage(m.sender,m.text);});}catch(e){console.error("Fehler beim Laden des Chatverlaufs:",e);chatHistory=[];}}}
+function formatMessage(t){const p=t.split("\n\nQuellen:\n"),m=p[0],f=p[1]?p[1]:"",l=m.split("\n");let h="<div class='message-content'>",i=false;l.forEach(line=>{let r=line.trim();r=r.replace(/\*\*(.*?)\*\*/g,"<strong>$1</strong>").replace(/\*(.*?)\*/g,"<em>$1</em>").replace(/\[(.*?)\]\((.*?)\)/g,"<a href='$2' target='_blank'>$1</a>");if(r.startsWith("* ")){if(!i){i=true;h+="<ul>";}h+=`<li>${r.substring(2)}</li>`;}else{if(i){i=false;h+="</ul>";}h+=r!==""?`<p>${r}</p>`:"<br>";}});if(i)h+="</ul>";h+="</div>";if(f.trim()){const s=f.split("\n").filter(fn=>fn.trim()!=="");if(s.length>0){h+="<div class='footnotes'>";s.forEach((fn,idx)=>{h+=`<p>Quelle ${idx+1}: ${fn.trim()}</p>`;});h+="</div>";}}return h;}
+function renderMessage(s,t){const c=document.getElementById("chatBox"),mc=document.createElement("div");mc.classList.add("message-container",s==="user"?"user":"bot");const a=document.createElement("div");a.classList.add("avatar");a.innerHTML=s==="user"?'<i class="fas fa-user"></i>':'<i class="fas fa-robot"></i>';const m=document.createElement("div");m.classList.add("message",s==="user"?"user-message":"bot-message");if(s==="bot"){m.innerHTML=formatMessage(t);}else{m.textContent=t;}mc.appendChild(a);mc.appendChild(m);c.appendChild(mc);c.scrollTop=c.scrollHeight;}
+function addMessage(s,t){renderMessage(s,t);chatHistory.push({sender:s,text:t});saveChatHistory();}
+function showTypingIndicator(){const c=document.getElementById("chatBox"),ic=document.createElement("div");ic.classList.add("message-container","bot");ic.id="typingIndicator";const a=document.createElement("div");a.classList.add("avatar");a.innerHTML='<i class="fas fa-robot"></i>';const ind=document.createElement("div");ind.classList.add("typing-indicator");ind.innerHTML='<div class="dot"></div><div class="dot"></div><div class="dot"></div>';ic.appendChild(a);ic.appendChild(ind);c.appendChild(ic);c.scrollTop=c.scrollHeight;}
+function removeTypingIndicator(){const i=document.getElementById("typingIndicator");if(i)i.remove();}
+function handleKeyPress(e){if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();}}
+async function sendMessage(){if(isWaitingForResponse)return;const input=document.getElementById("userInput"),txt=input.value.trim();if(!txt)return;input.value="";input.style.height='auto';const sb=document.getElementById("sendButton");sb.disabled=true;sb.innerHTML='<i class="fas fa-spinner fa-spin"></i>';addMessage("user",txt);isWaitingForResponse=true;if(askedForName&&!userName){if(txt.toLowerCase()==="nein"){setTimeout(()=>{addMessage("bot","Wie kann ich behilflich sein?");isWaitingForResponse=false;sb.disabled=false;sb.innerHTML='<i class="fas fa-paper-plane"></i>';},800);}else{userName=txt;localStorage.setItem("userName",userName);setTimeout(()=>{addMessage("bot",`Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?`);isWaitingForResponse=false;sb.disabled=false;sb.innerHTML='<i class="fas fa-paper-plane"></i>';},800);}askedForName=false;return;}try{showTypingIndicator();const res=await fetch(webhookUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({user_id:userId,name:userName||"Unbekannt",question:txt,last_answer:lastBotAnswer})}),raw=await res.text();removeTypingIndicator();if(!res.ok)throw new Error(`HTTP-Fehler! Status: ${res.status}, Antwort: ${raw}`);let json;if(raw.trim().startsWith("{")&&raw.trim().endsWith("}")){try{json=JSON.parse(raw);}catch{json={answer:raw};}}else{json={answer:raw};}if(json.answer){lastBotAnswer=json.answer;addMessage("bot",json.answer);}else{addMessage("bot","Ich konnte keine Antwort vom Server erhalten.");}}catch(err){console.error("Fehler:",err);removeTypingIndicator();addMessage("bot","Es gab ein Problem mit der Server-Antwort. Bitte versuche es später noch einmal.");}finally{isWaitingForResponse=false;sb.disabled=false;sb.innerHTML='<i class="fas fa-paper-plane"></i>';}}
+function resetChat(){localStorage.removeItem("chatHistory");localStorage.removeItem("userName");chatHistory=[];userName="";askedForName=true;lastBotAnswer="";document.getElementById("chatBox").innerHTML="";setTimeout(()=>{const msg="Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen? Dann nenne mir diesen jetzt gerne.";addMessage("bot",msg);},500);} document.addEventListener("DOMContentLoaded",()=>{initializeUser();loadChatHistory();if(chatHistory.length===0){setTimeout(()=>{const welcome="Hallo, schön, dass Du diesen Bot nutzt. Wie heißt Du eigentlich? Viel Spaß beim Testen. Legen wir los. Formuliere Deine erste Frage, so ausführlicher, desto besser.";addMessage("bot",welcome);askedForName=true;},500);}const ta=document.getElementById("userInput");autoResize(ta);});
+</script>
+</body>
+</html>
