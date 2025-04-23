@@ -1,108 +1,825 @@
-<!--
-  Bitte lokal über einen HTTP-Server starten, z.B.:
-  python -m http.server 8000
-  sonst blockiert Chrome CORS bei file://-URLs
--->
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit v21</title>
-  <!-- Verhindert favicon.ico-Fehler -->
-  <link rel="icon" href="data:;base64,iVBORw0KGgo=">
-  <style>
-    /* … CSS unverändert … */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dein persönlicher Assistent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern Variables */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-dark: #4338ca;
+            --secondary-color: #f3f4f6;
+            --text-color: #1f2937;
+            --light-text: #6b7280;
+            --background: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --max-width: 1200px;
+        }
+
+        /* Base Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* Typography */
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-color);
+            background-color: var(--background);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Styles */
+        .main-header {
+            background-color: var(--card-bg);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow);
+        }
+
+        .main-header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* Intro Section */
+        .intro-text {
+            background-color: var(--card-bg);
+            padding: 20px;
+            margin: 16px auto;
+            max-width: var(--max-width);
+            width: calc(100% - 32px);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--light-text);
+            line-height: 1.5;
+        }
+
+        /* Chat Container */
+        .chat-container {
+            flex: 1;
+            max-width: var(--max-width);
+            width: calc(100% - 32px);
+            margin: 0 auto 80px;
+            position: relative;
+        }
+
+        /* Chat Messages */
+        .chat-box {
+            background-color: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+            margin-bottom: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 60vh;
+            max-height: calc(100vh - 300px);
+        }
+
+        .message-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message-container.user {
+            flex-direction: row-reverse;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .user .avatar {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .bot .avatar {
+            background-color: #9ca3af;
+            color: white;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            font-size: 0.9375rem;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            word-wrap: break-word;
+            position: relative;
+        }
+
+        .user-message {
+            background-color: var(--primary-color);
+            color: white;
+            border-top-right-radius: 4px;
+        }
+
+        .bot-message {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            border-top-left-radius: 4px;
+        }
+
+        .bot-message a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .bot-message a:hover {
+            text-decoration: underline;
+        }
+
+        /* Message Content Formatting */
+        .message-content p {
+            margin-bottom: 0.75rem;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-content ul, .message-content ol {
+            margin-top: 0.5rem;
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+        }
+
+        .message-content strong {
+            font-weight: 600;
+        }
+
+        .message-content em {
+            font-style: italic;
+        }
+
+        /* Footnotes / Sources */
+        .footnotes {
+            font-size: 0.75rem;
+            color: var(--light-text);
+            border-top: 1px solid var(--border-color);
+            margin-top: 12px;
+            padding-top: 8px;
+        }
+
+        .footnotes p {
+            margin: 4px 0;
+        }
+
+        /* Input Area */
+        .input-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background-color: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+        }
+
+        .input-wrapper {
+            max-width: var(--max-width);
+            margin: 0 auto;
+            display: flex;
+            align-items: flex-end;
+            gap: 12px;
+            position: relative;
+        }
+
+        .textarea-wrapper {
+            flex: 1;
+            position: relative;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg);
+            transition: var(--transition);
+            overflow: hidden;
+        }
+
+        .textarea-wrapper:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+        }
+
+        #userInput {
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-size: 0.9375rem;
+            color: var(--text-color);
+            resize: none;
+            font-family: inherit;
+            max-height: 120px;
+            min-height: 24px;
+            line-height: 1.5;
+        }
+
+        #userInput:focus {
+            outline: none;
+        }
+
+        .send-button {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border: none;
+            flex-shrink: 0;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .send-button:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.05);
+        }
+
+        .send-button:disabled {
+            background-color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Typing indicator */
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background-color: var(--secondary-color);
+            border-radius: 18px;
+            margin-bottom: 12px;
+            align-self: flex-start;
+            animation: pulse 1.5s infinite;
+        }
+
+        .typing-indicator.visible {
+            display: flex;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #9ca3af;
+            border-radius: 50%;
+            margin: 0 2px;
+            animation: bounce 1.5s infinite;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+
+        /* Print Button */
+        #print-button-container {
+            position: fixed;
+            top: 16px;
+            right: 16px;
+            z-index: 1000;
+        }
+
+        /* Media Queries */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 1rem;
+                max-width: 70%;
+            }
+
+            .message {
+                max-width: 85%;
+            }
+
+            .chat-box {
+                padding: 16px;
+                min-height: 50vh;
+            }
+
+            .input-container {
+                padding: 12px;
+            }
+
+            .btn {
+                padding: 6px 12px;
+                font-size: 0.75rem;
+            }
+
+            .avatar {
+                width: 32px;
+                height: 32px;
+                font-size: 0.875rem;
+            }
+
+            .send-button {
+                width: 42px;
+                height: 42px;
+            }
+        }
+
+        /* Für größere Screens */
+        @media (min-width: 1400px) {
+            .chat-box {
+                max-height: calc(100vh - 320px);
+            }
+        }
+
+        /* Print Styles */
+        @media print {
+            .input-container, 
+            #print-button-container,
+            .header-actions {
+                display: none !important;
+            }
+
+            .chat-box {
+                height: auto;
+                overflow: visible;
+                box-shadow: none;
+            }
+
+            .chat-container {
+                margin-bottom: 0;
+            }
+
+            .message {
+                break-inside: avoid;
+                page-break-inside: avoid;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>Dein Bot rund um Betriebliches Management und Führung und Zusammenarbeit</header>
-  <div class="chat-container" id="chat" aria-live="polite">
-    <div class="message bot">
-      Hallo, schön, dass Du den Bot nutzt. Teile mir kurz mit, was ich für Dich tun kann.<br>
-      Sei so genau wie möglich in Deiner Fragestellung. Stelle bei Rückfragen gezielt Deine Frage und nicht zu oberflächlich.
+    <!-- Header with title and controls -->
+    <header class="main-header">
+        <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
+        <div class="header-actions">
+            <button id="print-button" class="btn btn-outline" onclick="window.print()">
+                <i class="fas fa-print"></i> Drucken
+            </button>
+            <button id="reset-button" class="btn btn-danger" onclick="resetChat()">
+                <i class="fas fa-redo-alt"></i> Reset
+            </button>
+        </div>
+    </header>
+
+    <!-- Intro text with explanation -->
+    <div class="intro-text">
+        Herzlich willkommen bei Deinem Chatbot. Mit Hilfe von künstlicher Intelligenz unterstütze ich Dich bei Fragen rund um das Personalmanagement.<br>
+        Stelle Deine Frage so spezifisch wie möglich. Ich bin noch im Trainingsmodus, daher weiß ich noch nicht alles.
+        Frage einfach und nutze dazu das Textfeld unten. Beschreibe wer Du bist, z.B. "Ich bin Teilnehmer des Kurses Handelsfachwirt und habe ein Frage zur Ausbildung, meine Frage lautet konkret:[...]
     </div>
-  </div>
-  <div class="input-container">
-    <input type="text" id="input" placeholder="Stelle irgendeine Frage" autocomplete="off" autofocus />
-  </div>
-  <div class="hint">Bot im Trainingsmodus – Antworten können unvollständig oder fehlerhaft sein. Verlasse Dich nie blind auf die Ergebnisse, sondern prüfe diese.</div>
-  <script>
-    const webhookUrl = 'https://hook.us2.make.com/5jt5na1o9pd6sc9swnju03sw54f0ckw8';
-    const chat = document.getElementById('chat');
-    const input = document.getElementById('input');
-    let isFetching = false;
 
-    function scrollToBottom() {
-      const last = chat.lastElementChild;
-      if (last) last.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    <!-- Main chat container -->
+    <main class="chat-container">
+        <div class="chat-box" id="chatBox">
+            <!-- Chat messages will be added here -->
+        </div>
+    </main>
 
-    async function sendMessage(text) {
-      if (isFetching) return;
-      console.log('Sende Frage:', text);
+    <!-- Fixed input area at bottom -->
+    <div class="input-container">
+        <div class="input-wrapper">
+            <div class="textarea-wrapper">
+                <textarea id="userInput" placeholder="Deine Nachricht..." rows="1" onkeypress="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+            </div>
+            <button class="send-button" id="sendButton" onclick="sendMessage()">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
 
-      // User-Nachricht
-      const userMsg = document.createElement('div');
-      userMsg.className = 'message user';
-      userMsg.textContent = text;
-      chat.appendChild(userMsg);
-      scrollToBottom();
+    <script>
+        let userName = "";
+        let userId = "";
+        let askedForName = false;
+        let lastBotAnswer = ""; // Speichert letzte Bot-Antwort für Kontext
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // Dein Make-Webhook
+        let isWaitingForResponse = false;
 
-      // Loader
-      const loader = document.createElement('div');
-      loader.className = 'message bot loading';
-      loader.textContent = '...';
-      chat.appendChild(loader);
-      scrollToBottom();
+        // Chatverlauf als Array, das im LocalStorage gespeichert wird
+        let chatHistory = [];
 
-      isFetching = true;
-      input.disabled = true;
+        // Auto-resize textarea
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = (textarea.scrollHeight) + 'px';
+        }
 
-      try {
-        const response = await fetch(webhookUrl, {
-          method: 'POST',
-          mode: 'cors',              // CORS aktivieren
-          credentials: 'omit',       // keine Cookies
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
-          },
-          body: JSON.stringify({ question: text })
+        // Initialisiert den User, falls Daten im LocalStorage vorhanden sind
+        function initializeUser() {
+            const storedUserId = localStorage.getItem("userId");
+            if (storedUserId) {
+                userId = storedUserId;
+            } else {
+                userId = generateUserId();
+                localStorage.setItem("userId", userId);
+            }
+            
+            const storedUserName = localStorage.getItem("userName");
+            if (storedUserName) {
+                userName = storedUserName;
+            }
+        }
+
+        function generateUserId() {
+            return "user-" + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Speichert den Chatverlauf im LocalStorage
+        function saveChatHistory() {
+            localStorage.setItem("chatHistory", JSON.stringify(chatHistory));
+        }
+
+        // Lädt den Chatverlauf aus dem LocalStorage und rendert die Nachrichten
+        function loadChatHistory() {
+            const storedHistory = localStorage.getItem("chatHistory");
+            if (storedHistory) {
+                try {
+                    chatHistory = JSON.parse(storedHistory);
+                    chatHistory.forEach(msg => {
+                        renderMessage(msg.sender, msg.text);
+                    });
+                } catch (error) {
+                    console.error("Fehler beim Laden des Chatverlaufs:", error);
+                    chatHistory = [];
+                }
+            }
+        }
+
+        // Formatiert den Text: Wandelt Markdown in HTML um, erstellt Absätze und zeigt Quellen an.
+        function formatMessage(text) {
+            const parts = text.split("\n\nQuellen:\n");
+            const mainText = parts[0];
+            const footnoteText = parts[1] ? parts[1] : "";
+            const lines = mainText.split("\n");
+            let html = "<div class='message-content'>";
+            let inList = false;
+            
+            lines.forEach(line => {
+                let trimmedLine = line.trim();
+                // Markdown-Syntax in HTML umwandeln
+                trimmedLine = trimmedLine
+                    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+                    .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                    .replace(/\[(.*?)\]\((.*?)\)/g, "<a href='$2' target='_blank'>$1</a>");
+                
+                if (trimmedLine.startsWith("* ")) {
+                    if (!inList) {
+                        inList = true;
+                        html += "<ul>";
+                    }
+                    const bulletPoint = trimmedLine.substring(2);
+                    html += <li>${bulletPoint}</li>;
+                } else {
+                    if (inList) {
+                        inList = false;
+                        html += "</ul>";
+                    }
+                    if (trimmedLine !== "") {
+                        html += <p>${trimmedLine}</p>;
+                    } else {
+                        html += "<br>";
+                    }
+                }
+            });
+            
+            if (inList) {
+                html += "</ul>";
+            }
+            
+            html += "</div>";
+            
+            // Falls Quellen angegeben wurden, diese am Ende anzeigen
+            if (footnoteText.trim()) {
+                const footnotes = footnoteText.split("\n").filter(fn => fn.trim() !== "");
+                if (footnotes.length > 0) {
+                    html += "<div class='footnotes'>";
+                    footnotes.forEach((fn, index) => {
+                        html += <p>Quelle ${index + 1}: ${fn.trim()}</p>;
+                    });
+                    html += "</div>";
+                }
+            }
+            return html;
+        }
+
+        // Rendert eine Nachricht in der Chat-Box mit Avataren
+        function renderMessage(sender, text) {
+            const chatBox = document.getElementById("chatBox");
+            const messageContainer = document.createElement("div");
+            messageContainer.classList.add("message-container", sender === "user" ? "user" : "bot");
+            
+            // Avatar
+            const avatar = document.createElement("div");
+            avatar.classList.add("avatar");
+            avatar.innerHTML = sender === "user" ? 
+                '<i class="fas fa-user"></i>' : 
+                '<i class="fas fa-robot"></i>';
+            
+            // Message bubble
+            const message = document.createElement("div");
+            message.classList.add("message", sender === "user" ? "user-message" : "bot-message");
+            
+            if (sender === "bot") {
+                message.innerHTML = formatMessage(text);
+            } else {
+                message.textContent = text;
+            }
+            
+            messageContainer.appendChild(avatar);
+            messageContainer.appendChild(message);
+            chatBox.appendChild(messageContainer);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Zeigt Tippindikator an
+        function showTypingIndicator() {
+            const chatBox = document.getElementById("chatBox");
+            const indicatorContainer = document.createElement("div");
+            indicatorContainer.classList.add("message-container", "bot");
+            indicatorContainer.id = "typingIndicator";
+            
+            // Avatar
+            const avatar = document.createElement("div");
+            avatar.classList.add("avatar");
+            avatar.innerHTML = '<i class="fas fa-robot"></i>';
+            
+            // Typing indicator
+            const indicator = document.createElement("div");
+            indicator.classList.add("typing-indicator");
+            indicator.innerHTML = 
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            ;
+            
+            indicatorContainer.appendChild(avatar);
+            indicatorContainer.appendChild(indicator);
+            chatBox.appendChild(indicatorContainer);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        // Entfernt Tippindikator
+        function removeTypingIndicator() {
+            const indicator = document.getElementById("typingIndicator");
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        // Fügt eine Nachricht hinzu, rendert sie und speichert sie im Verlauf
+        function addMessage(sender, text) {
+            renderMessage(sender, text);
+            chatHistory.push({ sender, text });
+            saveChatHistory();
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {
+            initializeUser();
+            loadChatHistory();
+            
+            // Wenn kein Chatverlauf existiert, starte mit der Begrüßung
+            if (chatHistory.length === 0) {
+                setTimeout(() => {
+                    const welcomeMessage = "Hallo, schön, dass Du diesen Bot nutzt. Wie heißt Du eigentlich? Viel Spaß beim Testen. Legen wir los. Formuliere Deine erste Frage, so ausführlicher, desto besser.";
+                    addMessage("bot", welcomeMessage);
+                    askedForName = true;
+                }, 500);
+            }
+            
+            // Initial textarea height
+            const textarea = document.getElementById("userInput");
+            autoResize(textarea);
         });
-        console.log('HTTP-Status:', response.status);
-        if (!response.ok) throw new Error(`Status ${response.status}`);
 
-        const payload = await response.json();      // direkt JSON parsen
-        console.log('Antwort (json):', payload);
+        function handleKeyPress(event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
 
-        loader.remove();
-        const botMsg = document.createElement('div');
-        botMsg.className = 'message bot';
-        botMsg.innerHTML = (payload.answer || '').replace(/\n/g, '<br>');
-        chat.appendChild(botMsg);
-      } catch (err) {
-        console.error('Fetch-Fehler:', err);
-        loader.remove();
-        const errMsg = document.createElement('div');
-        errMsg.className = 'message bot';
-        errMsg.textContent = 'Entschuldige, es gab ein Problem beim Senden Deiner Anfrage.';
-        chat.appendChild(errMsg);
-      } finally {
-        isFetching = false;
-        input.disabled = false;
-        input.focus();
-        scrollToBottom();
-      }
-    }
+        async function sendMessage() {
+            if (isWaitingForResponse) return;
+            
+            const userInput = document.getElementById("userInput").value.trim();
+            if (!userInput) return;
 
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        const text = input.value.trim();
-        input.value = '';
-        sendMessage(text);
-      }
-    });
-  </script>
+            // Textarea zurücksetzen
+            const textarea = document.getElementById("userInput");
+            textarea.value = "";
+            textarea.style.height = 'auto';
+            
+            // UI-Updates
+            const sendButton = document.getElementById("sendButton");
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            addMessage("user", userInput);
+            isWaitingForResponse = true;
+
+            // Falls Name noch nicht erfasst wurde
+            if (askedForName && !userName) {
+                if (userInput.toLowerCase() === "nein") {
+                    setTimeout(() => {
+                        addMessage("bot", "Wie kann ich behilflich sein?");
+                        isWaitingForResponse = false;
+                        sendButton.disabled = false;
+                        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    }, 800);
+                } else {
+                    userName = userInput;
+                    localStorage.setItem("userName", userName);
+                    setTimeout(() => {
+                        addMessage("bot", Vielen Dank, ${userName}. Wie kann ich Dir weiterhelfen?);
+                        isWaitingForResponse = false;
+                        sendButton.disabled = false;
+                        sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+                    }, 800);
+                }
+                askedForName = false;
+                return;
+            }
+
+            try {
+                // Zeige Tippindikator an
+                showTypingIndicator();
+                
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        name: userName || "Unbekannt",
+                        question: userInput,
+                        last_answer: lastBotAnswer
+                    })
+                });
+
+                const textResponse = await response.text();
+                console.log("📩 Serverantwort (raw):", textResponse);
+
+                // Entferne Tippindikator
+                removeTypingIndicator();
+
+                if (!response.ok) {
+                    throw new Error(HTTP-Fehler! Status: ${response.status}, Antwort: ${textResponse});
+                }
+
+                let jsonResponse;
+                if (textResponse.trim().startsWith("{") && textResponse.trim().endsWith("}")) {
+                    try {
+                        jsonResponse = JSON.parse(textResponse);
+                    } catch (error) {
+                        console.warn("Fehler beim Parsen der JSON-Antwort, nutze Fallback auf Text.");
+                        jsonResponse = { answer: textResponse };
+                    }
+                } else {
+                    console.warn("Serverantwort ist kein JSON, nutze Text direkt.");
+                    jsonResponse = { answer: textResponse };
+                }
+
+                if (jsonResponse.answer) {
+                    lastBotAnswer = jsonResponse.answer;
+                    addMessage("bot", jsonResponse.answer);
+                } else {
+                    addMessage("bot", "Ich konnte keine Antwort vom Server erhalten.");
+                }
+            } catch (error) {
+                console.error("❌ Fehler:", error);
+                removeTypingIndicator();
+                addMessage("bot", "Es gab ein Problem mit der Server-Antwort. Bitte versuche es später noch einmal.");
+            } finally {
+                // UI wiederherstellen
+                isWaitingForResponse = false;
+                sendButton.disabled = false;
+                sendButton.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            }
+        }
+
+        // Reset-Funktion: Löscht Chatverlauf und gespeicherte Daten und startet den Chat neu
+        function resetChat() {
+            localStorage.removeItem("chatHistory");
+            localStorage.removeItem("userName");
+            // Optional: userId beibehalten oder entfernen
+            // localStorage.removeItem("userId");
+            chatHistory = [];
+            userName = "";
+            askedForName = true;
+            lastBotAnswer = "";
+            document.getElementById("chatBox").innerHTML = "";
+            setTimeout(() => {
+                const welcomeMessage = "Schön, dass Du Dich für diesen Bot interessierst. Darf ich Dich mit Vornamen ansprechen? Dann nenne mir diese jetzt gerne.";
+                addMessage("bot", welcomeMessage);
+            }, 500);
+        }
+
+        console.log("🚀 JavaScript erfolgreich geladen!");
+    </script>
 </body>
 </html>
