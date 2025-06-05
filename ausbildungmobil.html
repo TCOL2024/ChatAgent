@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mobile Ausbildung Chatbot</title>
-  <!-- Schriftart Inter laden -->
+  <!-- Schriftart "Inter" laden -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <!-- Font Awesome für Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -408,16 +408,16 @@
   </style>
 </head>
 <body>
-  <!-- Datenschutz/Haftungshinweis Modal -->
+  <!-- Datenschutz-/Haftungs-Modal (erscheint einmal alle 24h) -->
   <div class="modal-overlay" id="privacy-modal" style="display:none;">
     <div class="modal-card">
       <div class="modal-head"><i class="fa-solid fa-lock"></i> Datenschutzhinweis &amp; Haftung</div>
       <div class="modal-content">
         <ul>
-          <li>Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und die Automatisierungsplattform (Make, EU) übermittelt.</li>
+          <li>Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und Make (EU) übermittelt.</li>
           <li>Die Daten können auf Servern außerhalb der EU verarbeitet werden.</li>
           <li><strong>Bitte keine personenbezogenen oder sensiblen Daten eingeben!</strong></li>
-          <li>Antworten sind unverbindlich – keine Garantie auf Richtigkeit oder Vollständigkeit.</li>
+          <li>Antworten sind unverbindlich – keine Garantie auf Richtigkeit/ Vollständigkeit.</li>
         </ul>
         <p>Mit Nutzung stimmst du diesen Bedingungen zu.</p>
       </div>
@@ -446,10 +446,10 @@
       </div>
     </header>
 
-    <!-- Chat-Verlauf -->
+    <!-- Chat-Verlauf (scrollbar) -->
     <div class="chat-area" id="chatArea" role="log" aria-live="polite"></div>
 
-    <!-- Loader -->
+    <!-- Loader (wird eingeblendet, wenn Bot antwortet) -->
     <div class="loader" id="loader">
       <div class="typing-indicator">
         <div class="typing-dot"></div>
@@ -461,7 +461,7 @@
     <!-- Eingabebereich -->
     <div class="input-area">
       <div class="input-row">
-        <input 
+        <input
           type="text"
           id="userInput"
           placeholder="Schreibe hier deine Nachricht..."
@@ -482,7 +482,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
     /* ============================================================
-       Datenschutz-/Haftungs-Modal (Zustimmung 24 Stunden abspeichern)
+       Datenschutz-/Haftungs-Modal (Zustimmung 24 Stunden speichern)
     ============================================================== */
     const PRIVACY_KEY = "privacyAcceptedAt";
     function needsPrivacy() {
@@ -490,7 +490,7 @@
       if (!t) return true;
       const last = new Date(Number(t));
       const now = new Date();
-      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24 h
+      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24 Stunden
     }
     function acceptPrivacy() {
       localStorage.setItem(PRIVACY_KEY, Date.now().toString());
@@ -511,7 +511,7 @@
     const printButton    = document.getElementById("printButton");
     const clearButton    = document.getElementById("clearButton");
     const darkModeButton = document.getElementById("darkModeButton");
-    const webhookURL     = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n"; // anpassen
+    const webhookURL     = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n"; // Deine Webhook-URL
     let lastBotAnswer    = "";
     let isWaiting        = false;
     let retryCount       = 0;
@@ -538,13 +538,20 @@
        Chat initialisieren (Begrüßung)
     ============================================================== */
     function initializeChat() {
+      // Wenn kein Chat-Verlauf vorhanden ist, zeige Begrüßung
       if (chatArea.innerHTML.trim() === "") {
         appendMessage("bot",
-          "Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. " +
-          "Diese KI gibt euch erste **Informationen** und prüft unverbindlich, " +
-          "ob mobile Ausbildung für euch geeignet ist."
+          // Erste Willkommensnachricht
+          "👋 Hallo und herzlich willkommen beim Mobile Ausbildung Chatbot!<br><br>" +
+          "Ich unterstütze dich bei allen Fragen rund um die mobile Ausbildung: " +
+          "z. B. welche Voraussetzungen du brauchst, wie du startest, " +
+          "oder was du beachten musst."
         );
-        appendMessage("bot", "Wollen wir loslegen?");
+        appendMessage("bot",
+          // Aktive Frage an den Nutzer
+          "Womit kann ich dir heute weiterhelfen? " +
+          "Schreib einfach deine Frage in das Feld unten."
+        );
       }
     }
 
@@ -709,7 +716,6 @@
       document.body.classList.toggle("dark-mode");
       const isDark = document.body.classList.contains("dark-mode");
       localStorage.setItem("darkMode", isDark.toString());
-      // Dark-Mode-Farben umschalten
       if (isDark) {
         document.documentElement.classList.add("dark-mode");
       } else {
