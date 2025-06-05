@@ -27,7 +27,7 @@
             display: flex;
             flex-direction: column;
         }
-        /* Disclaimer Modal Neutral Style */
+        /* Disclaimer Modal */
         #disclaimer-modal {
             position: fixed;
             z-index: 2000;
@@ -102,6 +102,7 @@
             justify-content: flex-end;
             gap: 10px;
             padding: 0 24px 22px 24px;
+            flex-wrap: wrap;
         }
         .btn-disclaimer {
             font-size: 1.01rem;
@@ -129,11 +130,72 @@
             background: #eaf1fa;
             color: var(--primary-dark);
         }
+        .btn-disclaimer.privacy {
+            background: #fff;
+            color: var(--primary-blue);
+            border: 1px solid #c7d5ea;
+            box-shadow: none;
+            font-size: 0.99rem;
+            padding: 10px 16px;
+        }
+        .btn-disclaimer.privacy:hover {
+            background: #eaf1fa;
+            color: var(--primary-dark);
+        }
         @media (max-width: 520px) {
             #disclaimer-box { max-width: 98vw; padding: 0;}
             #disclaimer-head { padding: 14px 10px; font-size: 1rem;}
             #disclaimer-box .content { padding: 15px 10px 8px 10px;}
             #disclaimer-buttons { padding: 0 10px 12px 10px;}
+        }
+        /* Datenschutzinfo-Layer */
+        #privacy-modal {
+            display: none;
+            position: fixed;
+            z-index: 2100;
+            inset: 0;
+            background: rgba(0,0,0,0.52);
+            align-items: center;
+            justify-content: center;
+        }
+        #privacy-content {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 520px;
+            width: 96%;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.16);
+            padding: 32px 24px 24px 24px;
+            position: relative;
+            font-size: 1rem;
+            color: #222d3b;
+            animation: fadeInBG 0.25s;
+        }
+        #privacy-content h2 {
+            color: var(--primary-blue);
+            font-size: 1.24rem;
+            margin-top: 0;
+        }
+        #privacy-content .close-x {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #455;
+            font-size: 1.35rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity .2s;
+        }
+        #privacy-content .close-x:hover {
+            opacity: 1;
+        }
+        #privacy-content ul {
+            margin: 0 0 1em 1.1em;
+            padding: 0;
+        }
+        #privacy-content li {
+            margin-bottom: 0.6em;
         }
         /* Chatbot UI Beispiel */
         .main-header {
@@ -213,13 +275,13 @@
     </style>
 </head>
 <body>
-    <!-- Disclaimer Neutral Style -->
+    <!-- Disclaimer Modal -->
     <div id="disclaimer-modal">
         <div id="disclaimer-box">
             <div id="disclaimer-head">
                 <i class="fa-solid fa-shield-halved"></i>
                 Hinweis zu Datenschutz & KI
-                <button class="close-x" aria-label="Abbrechen" onclick="document.getElementById('disclaimer-modal').style.display='none'">
+                <button class="close-x" aria-label="Schließen" onclick="document.getElementById('disclaimer-modal').style.display='none'">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
             </div>
@@ -233,12 +295,34 @@
                 </p>
             </div>
             <div id="disclaimer-buttons">
+                <button class="btn-disclaimer privacy" onclick="openPrivacyModal()">Datenschutz</button>
                 <button class="btn-disclaimer cancel" onclick="document.getElementById('disclaimer-modal').style.display='none'">Abbrechen</button>
                 <button class="btn-disclaimer accept" onclick="document.getElementById('disclaimer-modal').style.display='none'">Akzeptieren</button>
             </div>
         </div>
     </div>
-    <!-- Beispiel-Chat-Layout -->
+    <!-- Datenschutzinfo-Overlay -->
+    <div id="privacy-modal">
+        <div id="privacy-content">
+            <button class="close-x" onclick="closePrivacyModal()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
+            <h2>Datenschutzhinweis für diesen Chatbot</h2>
+            <p>
+                Bei Nutzung dieses Chatbots werden deine Eingaben an folgende externe Dienstleister weitergeleitet:
+            </p>
+            <ul>
+                <li><b>OpenAI (USA)</b>: Die KI-gestützte Beantwortung erfolgt durch Server von OpenAI. Dabei können deine Texte den USA übermittelt werden. Es gelten die <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">Datenschutzrichtlinien von OpenAI</a>.</li>
+                <li><b>Make.com (Tschechien/EU)</b>: Für die technische Verarbeitung und Weiterleitung der Anfrage wird Make.com genutzt. Es gelten die <a href="https://www.make.com/en/privacy-policy" target="_blank" rel="noopener">Datenschutzbestimmungen von Make.com</a>.</li>
+            </ul>
+            <p>
+                Bitte gib keine persönlichen oder sensiblen Daten ein. Die Antworten dieses Bots sind KI-generiert und können fehlerhaft sein. Es wird keine Haftung übernommen.
+            </p>
+            <p>
+                Für Auskunft, Löschung oder Fragen wende dich bitte an den Betreiber dieser Seite.
+            </p>
+        </div>
+    </div>
+
+    <!-- Chatbot Oberfläche -->
     <header class="main-header">
         <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
     </header>
@@ -256,10 +340,19 @@
         </button>
     </div>
     <script>
-        // Demo-Logik für das Senden von Nachrichten
+        // Datenschutzinfo Modal Logik
+        function openPrivacyModal() {
+            document.getElementById('privacy-modal').style.display = 'flex';
+        }
+        function closePrivacyModal() {
+            document.getElementById('privacy-modal').style.display = 'none';
+        }
+
+        // Demo-Logik für das Senden von Nachrichten via Make
         const sendBtn = document.getElementById('sendButton');
         const userInput = document.getElementById('userInput');
         const chatBox = document.getElementById('chatBox');
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // <--- DEINE MAKE WEBHOOK URL
 
         sendBtn.addEventListener('click', sendMessage);
         userInput.addEventListener('keypress', function(e){
@@ -269,19 +362,44 @@
             }
         });
 
-        function sendMessage() {
-            const text = userInput.value.trim();
-            if (!text) return;
+        function addMessage(sender, text) {
             const msg = document.createElement('div');
-            msg.style.alignSelf = 'flex-end';
-            msg.style.background = '#eaf1fa';
+            msg.style.alignSelf = sender === 'user' ? 'flex-end' : 'flex-start';
+            msg.style.background = sender === 'user' ? '#eaf1fa' : '#f3f7fb';
             msg.style.padding = '10px 16px';
             msg.style.borderRadius = '14px';
             msg.style.marginTop = '6px';
+            msg.style.maxWidth = '85%';
             msg.textContent = text;
             chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            addMessage('user', text);
             userInput.value = '';
             chatBox.scrollTop = chatBox.scrollHeight;
+
+            // KI/Make-Integration:
+            addMessage('bot', '⏳ Anfrage wird verarbeitet ...');
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: text })
+                });
+                let reply = await response.text();
+                // Clean previous "wird verarbeitet ..."
+                const lastMsg = chatBox.querySelectorAll('div');
+                if(lastMsg.length > 0) lastMsg[lastMsg.length-1].remove();
+                addMessage('bot', reply);
+            } catch (err) {
+                const lastMsg = chatBox.querySelectorAll('div');
+                if(lastMsg.length > 0) lastMsg[lastMsg.length-1].remove();
+                addMessage('bot', "❌ Es ist ein Fehler aufgetreten.");
+            }
         }
     </script>
 </body>
