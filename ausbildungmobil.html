@@ -1,13 +1,19 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Mobile Ausbildung Chatbot</title>
   <!-- Schriftart "Inter" laden -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
   <!-- Font Awesome für Icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
   <style>
     /* ============================================================
        Basis-Reset & Variablen
@@ -25,7 +31,7 @@
       --chat-bg: #fff;
       --bot-bg: #f0f6fb;
       --user-bg: #004a99;
-      --shadow: 0 8px 40px rgba(0,0,0,0.08);
+      --shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
       --radius: 22px;
       --avatar-size: 52px;
       --bubble-radius: 18px;
@@ -34,9 +40,11 @@
       --text-color: #1a2332;
       --text-light: #92a4bb;
     }
-    html, body {
+    html,
+    body {
       height: 100%;
-      font-family: 'Inter', 'Segoe UI', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+      font-family: "Inter", "Segoe UI", Arial, "Helvetica Neue", Helvetica,
+        sans-serif;
       background: var(--bg);
       color: var(--text-color);
     }
@@ -84,7 +92,7 @@
       max-width: 480px;
       z-index: 10;
       border-radius: var(--radius) var(--radius) 0 0;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
     }
     .header-icon {
       position: absolute;
@@ -99,7 +107,7 @@
       justify-content: center;
       font-size: 2rem;
       color: #fff;
-      box-shadow: 0 3px 9px rgba(0,74,153,0.14);
+      box-shadow: 0 3px 9px rgba(0, 74, 153, 0.14);
     }
     header h1 {
       font-size: 1.19rem;
@@ -147,8 +155,14 @@
       animation: appear 0.15s;
     }
     @keyframes appear {
-      from { opacity: 0; transform: translateY(13px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(13px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
     .message.bot {
       justify-content: flex-start;
@@ -190,7 +204,7 @@
       background: var(--bot-bubble);
       font-size: 1.09rem;
       color: var(--text-color);
-      box-shadow: 0 1px 6px rgba(0,74,153,0.08);
+      box-shadow: 0 1px 6px rgba(0, 74, 153, 0.08);
     }
     .message.bot .message-content {
       background: var(--bot-bubble);
@@ -237,7 +251,7 @@
       background: #fff;
       color: var(--text-color);
       transition: border-color 0.21s, background 0.21s;
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
     }
     .input-area input:focus {
       border-color: var(--primary);
@@ -290,8 +304,14 @@
       animation-delay: 0.4s;
     }
     @keyframes typing {
-      0%,60%,100% { transform: translateY(0); }
-      30% { transform: translateY(-6px); }
+      0%,
+      60%,
+      100% {
+        transform: translateY(0);
+      }
+      30% {
+        transform: translateY(-6px);
+      }
     }
     .notification {
       position: fixed;
@@ -301,7 +321,7 @@
       background: #d4edda;
       color: #155724;
       border-radius: 7px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
       display: none;
       z-index: 100;
       animation: notificationSlide 0.3s forwards;
@@ -312,8 +332,14 @@
       color: #721c24;
     }
     @keyframes notificationSlide {
-      from { transform: translateX(100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
     }
     /* ============================================================
        Datenschutz/Disclaimer Modal
@@ -321,21 +347,21 @@
     .modal-overlay {
       position: fixed;
       inset: 0;
-      background: rgba(0,38,90,0.45);
+      background: rgba(0, 38, 90, 0.45);
       z-index: 5000;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: fadeInBG .26s;
+      animation: fadeInBG 0.26s;
     }
     .modal-card {
       background: #fff;
       border-radius: 16px;
       max-width: 430px;
       width: 93vw;
-      box-shadow: 0 8px 32px rgba(0,70,160,0.13);
+      box-shadow: 0 8px 32px rgba(0, 70, 160, 0.13);
       overflow: hidden;
-      animation: floatIn .19s;
+      animation: floatIn 0.19s;
       border: 1.5px solid var(--primary);
       position: relative;
     }
@@ -348,7 +374,8 @@
       font-size: 1.13rem;
       font-weight: 600;
     }
-    .modal-head .fa-lock, .modal-head .fa-shield-halved {
+    .modal-head .fa-lock,
+    .modal-head .fa-shield-halved {
       font-size: 1.2rem;
       margin-right: 11px;
     }
@@ -378,7 +405,7 @@
       font-size: 1.06rem;
       font-weight: 600;
       cursor: pointer;
-      box-shadow: 0 1px 5px rgba(0,89,179,0.06);
+      box-shadow: 0 1px 5px rgba(0, 89, 179, 0.06);
       transition: background 0.13s, color 0.11s;
     }
     .modal-btn.accept {
@@ -398,7 +425,8 @@
       color: var(--primary-dark);
     }
     @media (max-width: 600px) {
-      .chat-container, header {
+      .chat-container,
+      header {
         max-width: 99vw;
       }
       .modal-card {
@@ -408,22 +436,33 @@
   </style>
 </head>
 <body>
-  <!-- Datenschutz-/Haftungs-Modal (erscheint einmal alle 24h) -->
+  <!-- Datenschutz-/Haftungs-Modal (erscheint einmal alle 24 Stunden) -->
   <div class="modal-overlay" id="privacy-modal" style="display:none;">
     <div class="modal-card">
-      <div class="modal-head"><i class="fa-solid fa-lock"></i> Datenschutzhinweis &amp; Haftung</div>
+      <div class="modal-head">
+        <i class="fa-solid fa-lock"></i> Datenschutzhinweis &amp; Haftung
+      </div>
       <div class="modal-content">
         <ul>
-          <li>Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und Make (EU) übermittelt.</li>
+          <li>
+            Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und Make
+            (EU) übermittelt.
+          </li>
           <li>Die Daten können auf Servern außerhalb der EU verarbeitet werden.</li>
-          <li><strong>Bitte keine personenbezogenen oder sensiblen Daten eingeben!</strong></li>
-          <li>Antworten sind unverbindlich – keine Garantie auf Richtigkeit/ Vollständigkeit.</li>
+          <li><strong>Bitte keine personenbezogenen oder sensiblen Daten
+              eingeben!</strong></li>
+          <li>
+            Antworten sind unverbindlich – keine Garantie auf Richtigkeit oder
+            Vollständigkeit.
+          </li>
         </ul>
         <p>Mit Nutzung stimmst du diesen Bedingungen zu.</p>
       </div>
       <div class="modal-footer">
         <button class="modal-btn accept" onclick="acceptPrivacy()">Zustimmen</button>
-        <button class="modal-btn decline" onclick="window.location.reload()">Abbrechen</button>
+        <button class="modal-btn decline" onclick="window.location.reload()">
+          Abbrechen
+        </button>
       </div>
     </div>
   </div>
@@ -434,13 +473,21 @@
       <span class="header-icon"><i class="fa-solid fa-robot"></i></span>
       <h1>Mobile Ausbildung Chatbot</h1>
       <div class="header-buttons">
-        <button id="darkModeButton" class="header-btn" aria-label="Dunkelmodus umschalten">
+        <button
+          id="darkModeButton"
+          class="header-btn"
+          aria-label="Dunkelmodus umschalten"
+        >
           <i class="fa-solid fa-moon"></i>
         </button>
         <button id="printButton" class="header-btn" aria-label="Chat drucken">
           <i class="fa-solid fa-print"></i> Drucken
         </button>
-        <button id="clearButton" class="header-btn" aria-label="Chat-Verlauf löschen">
+        <button
+          id="clearButton"
+          class="header-btn"
+          aria-label="Chat-Verlauf löschen"
+        >
           <i class="fa-solid fa-trash"></i>
         </button>
       </div>
@@ -467,7 +514,7 @@
           placeholder="Schreibe hier deine Nachricht..."
           autocomplete="off"
           aria-label="Deine Nachricht eingeben"
-        >
+        />
         <button id="sendButton" aria-label="Nachricht senden">
           <i class="fa-solid fa-paper-plane"></i>
         </button>
@@ -490,46 +537,54 @@
       if (!t) return true;
       const last = new Date(Number(t));
       const now = new Date();
-      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24 Stunden
+      return now - last > 24 * 60 * 60 * 1000; // älter als 24 Stunden
     }
     function acceptPrivacy() {
       localStorage.setItem(PRIVACY_KEY, Date.now().toString());
-      document.getElementById('privacy-modal').style.display = 'none';
+      document.getElementById("privacy-modal").style.display = "none";
     }
     if (needsPrivacy()) {
-      document.getElementById('privacy-modal').style.display = 'flex';
+      document.getElementById("privacy-modal").style.display = "flex";
     }
 
     /* ============================================================
        DOM-Elemente & Konfiguration
     ============================================================== */
-    const chatArea       = document.getElementById("chatArea");
-    const userInput      = document.getElementById("userInput");
-    const sendButton     = document.getElementById("sendButton");
-    const loader         = document.getElementById("loader");
-    const notification   = document.getElementById("notification");
-    const printButton    = document.getElementById("printButton");
-    const clearButton    = document.getElementById("clearButton");
+    const chatArea = document.getElementById("chatArea");
+    const userInput = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+    const loader = document.getElementById("loader");
+    const notification = document.getElementById("notification");
+    const printButton = document.getElementById("printButton");
+    const clearButton = document.getElementById("clearButton");
     const darkModeButton = document.getElementById("darkModeButton");
-    const webhookURL     = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n"; // Deine Webhook-URL
-    let lastBotAnswer    = "";
-    let isWaiting        = false;
-    let retryCount       = 0;
-    const MAX_RETRIES    = 3;
-    const RETRY_DELAY    = 2000;
+    const webhookURL =
+      "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n"; // Deine Webhook-URL
+    let lastBotAnswer = "";
+    let isWaiting = false;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000;
 
     /* ============================================================
-       Chat-Verlauf speichern/laden
+       Chat-Verlauf speichern/laden (veraltetes JSON erkennen)
     ============================================================== */
     function loadChatHistory() {
       const saved = localStorage.getItem("chatHistory");
       if (saved) {
-        chatArea.innerHTML = saved;
-        chatArea.scrollTop = chatArea.scrollHeight;
-      } else {
-        initializeChat();
+        // Wenn der gespeicherte Verlauf mit '<' beginnt, handelt es sich um HTML:
+        if (saved.trim().startsWith("<")) {
+          chatArea.innerHTML = saved;
+          chatArea.scrollTop = chatArea.scrollHeight;
+          return;
+        } else {
+          // Veralteter JSON-String wurde gefunden → löschen und neu starten
+          localStorage.removeItem("chatHistory");
+        }
       }
+      initializeChat();
     }
+
     function saveChatHistory() {
       localStorage.setItem("chatHistory", chatArea.innerHTML);
     }
@@ -540,17 +595,16 @@
     function initializeChat() {
       // Wenn kein Chat-Verlauf vorhanden ist, zeige Begrüßung
       if (chatArea.innerHTML.trim() === "") {
-        appendMessage("bot",
-          // Erste Willkommensnachricht
-          "👋 Hallo und herzlich willkommen beim Mobile Ausbildung Chatbot!<br><br>" +
-          "Ich unterstütze dich bei allen Fragen rund um die mobile Ausbildung: " +
-          "z. B. welche Voraussetzungen du brauchst, wie du startest, " +
-          "oder was du beachten musst."
+        appendMessage(
+          "bot",
+          "👋 Hallo und herzlich willkommen beim Mobile Ausbildung Chatbot!\n\n" +
+            "Ich unterstütze dich bei allen Fragen rund um die mobile Ausbildung: " +
+            "z. B. welche Voraussetzungen du brauchst, wie du startest oder " +
+            "was du beachten musst."
         );
-        appendMessage("bot",
-          // Aktive Frage an den Nutzer
-          "Womit kann ich dir heute weiterhelfen? " +
-          "Schreib einfach deine Frage in das Feld unten."
+        appendMessage(
+          "bot",
+          "Womit kann ich dir heute weiterhelfen? Schreib einfach deine Frage in das Feld unten."
         );
       }
     }
@@ -559,13 +613,13 @@
        Nachricht formatieren (Markdown → HTML)
     ============================================================== */
     function formatMessage(text) {
-      const escapeHTML = str =>
-        str.replace(/[&<>'"]/g, tag => ({
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          "'": '&#39;',
-          '"': '&quot;'
+      const escapeHTML = (str) =>
+        str.replace(/[&<>'"]/g, (tag) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          "'": "&#39;",
+          '"': "&quot;",
         }[tag]));
       let safe = escapeHTML(text);
       safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
@@ -595,8 +649,13 @@
       const timestamp = document.createElement("div");
       timestamp.classList.add("timestamp");
       const now = new Date();
-      timestamp.textContent = `${now.getHours().toString().padStart(2, '0')}:${
-                              now.getMinutes().toString().padStart(2, '0')}`;
+      timestamp.textContent = `${now
+        .getHours()
+        .toString()
+        .padStart(2, "0")}:${now
+        .getMinutes()
+        .toString()
+        .padStart(2, "0")}`;
 
       wrapper.appendChild(content);
       wrapper.appendChild(timestamp);
@@ -638,12 +697,12 @@
       try {
         const payload = {
           message: text,
-          last_answer: lastBotAnswer
+          last_answer: lastBotAnswer,
         };
         const response = await fetch(webhookURL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
         if (!response.ok) {
           throw new Error(`Server antwortete mit Status: ${response.status}`);
@@ -665,12 +724,21 @@
         console.error("Fehler:", err);
         if (retryCount < MAX_RETRIES) {
           retryCount++;
-          showNotification(`Verbindungsfehler, versuche erneut (${retryCount}/${MAX_RETRIES})…`, true);
+          showNotification(
+            `Verbindungsfehler, versuche erneut (${retryCount}/${MAX_RETRIES})…`,
+            true
+          );
           setTimeout(() => sendTextMessage(text), RETRY_DELAY);
           return;
         } else {
-          appendMessage("bot", "Es gab einen Fehler bei der Kommunikation. Bitte versuche es später erneut.");
-          showNotification("Fehler bei der Kommunikation mit dem Server.", true);
+          appendMessage(
+            "bot",
+            "Es gab einen Fehler bei der Kommunikation. Bitte versuche es später erneut."
+          );
+          showNotification(
+            "Fehler bei der Kommunikation mit dem Server.",
+            true
+          );
           retryCount = 0;
         }
       } finally {
@@ -704,7 +772,9 @@
     });
     printButton.addEventListener("click", () => window.print());
     clearButton.addEventListener("click", () => {
-      if (confirm("Möchtest du wirklich den gesamten Chat-Verlauf löschen?")) {
+      if (
+        confirm("Möchtest du wirklich den gesamten Chat-Verlauf löschen?")
+      ) {
         localStorage.removeItem("chatHistory");
         chatArea.innerHTML = "";
         lastBotAnswer = "";
