@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mobile Ausbildung Chatbot</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {margin:0;padding:0;box-sizing:border-box;}
+    :root {
+      --primary: #004a99;
+      --primary-light: #2978c9;
+      --primary-dark: #003063;
+      --bg: #f7faff;
+      --chat-bg: #fff;
+      --bot-bg: #f0f6fb;
+      --user-bg: #004a99;
+      --bot-bubble: #fff;
+      --user-bubble: #2978c9;
+      --shadow: 0 8px 40px rgba(0,0,0,0.08);
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Inter', 'Segoe UI', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+      background: var(--bg);
+      color: #1a2332;
+    }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      background: linear-gradient(115deg, #f7faff 0%, #e3eefc 100%);
+    }
+    .chat-container {
+      background: var(--chat-bg);
+      width: 100%;
+      max-width: 480px;
+      min-width: 310px;
+      min-height: 620px;
+      height: 90vh;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      margin: 40px 0 32px 0;
+    }
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 28px 34px 20px 88px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 480px;
+      z-index: 10;
+      border-radius: 22px 22px 0 0;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+    }
+    .header-icon {
+      position: absolute;
+      left: 28px;
+      top: 19px;
+      background: linear-gradient(100deg, #004a99 0, #71b7fb 100%);
+      width: 44px; height: 44px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; color: #fff;
+      box-shadow: 0 3px 9px rgba(0,74,153,0.14);
+    }
+    header h1 {
+      font-size: 1.19rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin: 0;
+    }
+    .header-buttons {display: flex; gap: 8px;}
+    .header-btn {
+      background: var(--primary-light);
+      color: #fff;
+      border: none;
+      padding: 8px 12px;
+      font-size: 0.93em;
+      cursor: pointer;
+      border-radius: 7px;
+      transition: background 0.22s;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .header-btn:hover {background: var(--primary-dark);}
+    .chat-area {
+      flex: 1;
+      padding: 96px 20px 24px;
+      overflow-y: auto;
+      background: var(--bot-bg);
+      transition: background-color 0.3s;
+      scroll-behavior: smooth;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .message {
+      display: flex;
+      max-width: 90%;
+      margin-bottom: 10px;
+      animation: appear 0.15s;
+    }
+    @keyframes appear {from{opacity:0;transform:translateY(13px);} to{opacity:1;transform:translateY(0);}}
+    .message.bot {justify-content: flex-start;}
+    .message.user {justify-content: flex-end;}
+    .avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #dbeafe;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 700;
+      margin-right: 11px; flex-shrink: 0; color: var(--primary);
+    }
+    .message.user .avatar {
+      order: 1; margin-left: 11px; margin-right: 0;
+      background: var(--primary-light); color: #fff;
+    }
+    .message-wrapper {display: flex; flex-direction: column; max-width: calc(100% - 50px);}
+    .message-content {
+      padding: 15px 19px;
+      border-radius: 19px;
+      line-height: 1.63;
+      word-wrap: break-word;
+      background: var(--bot-bubble);
+      font-size: 1.09rem;
+      color: #233;
+      box-shadow: 0 1px 6px 0 rgba(0,74,153,0.08);
+    }
+    .message.bot .message-content {
+      background: var(--bot-bubble);
+      color: #233;
+      border-top-left-radius: 6px;
+      border-left: 4px solid var(--primary);
+    }
+    .message.user .message-content {
+      background: var(--user-bubble);
+      color: #fff;
+      border-top-right-radius: 6px;
+      border-right: 4px solid #ffe28b;
+    }
+    .timestamp {
+      font-size: 0.76em;
+      color: #92a4bb;
+      margin-top: 4px;
+      align-self: flex-end;
+    }
+    .message.bot .timestamp {align-self: flex-start;}
+    .input-area {
+      display: flex;
+      flex-direction: column;
+      border-top: 1.5px solid #e3eefa;
+      padding: 14px 16px 14px 14px;
+      background: #fff;
+      z-index: 2;
+    }
+    .input-row {
+      display: flex; width: 100%;
+    }
+    .input-area input {
+      flex: 1;
+      padding: 13px 17px;
+      font-size: 1.09em;
+      border: 1.5px solid #d1e3f9;
+      border-radius: 9px;
+      outline: none;
+      background: #fff;
+      color: #233;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      transition: border-color 0.21s, background 0.21s;
+    }
+    .input-area input:focus {border-color: var(--primary);}
+    .input-area button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 13px 20px;
+      font-size: 1.08em;
+      cursor: pointer;
+      border-radius: 9px;
+      margin-left: 10px;
+      transition: background 0.18s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .input-area button:hover {background: var(--primary-dark);}
+    .input-area button:disabled {background: #cccccc; cursor: not-allowed;}
+    .loader {
+      display: none;
+      margin: 14px auto;
+      text-align: center;
+    }
+    .typing-indicator {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .typing-dot {
+      width: 8px; height: 8px; background: #b5c7dd;
+      border-radius: 50%;
+      animation: typing 1.3s infinite;
+    }
+    .typing-dot:nth-child(2) {animation-delay: 0.2s;}
+    .typing-dot:nth-child(3) {animation-delay: 0.4s;}
+    @keyframes typing {
+      0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);}
+    }
+    .notification {
+      position: fixed; top: 20px; right: 20px;
+      padding: 14px 19px;
+      background: #d4edda; color: #155724;
+      border-radius: 7px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: none; z-index: 100;
+      animation: notificationSlide 0.3s forwards;
+      font-size: 1.05rem;
+    }
+    .notification.error {background: #f8d7da; color: #721c24;}
+    @keyframes notificationSlide {
+      from {transform: translateX(100%); opacity: 0;}
+      to {transform: translateX(0); opacity: 1;}
+    }
+    /* Datenschutz/Disclaimer Modal */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,38,90,0.45);
+      z-index: 5000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeInBG .26s;
+    }
+    .modal-card {
+      background: #fff;
+      border-radius: 16px;
+      max-width: 430px;
+      width: 93vw;
+      box-shadow: 0 8px 32px 0 rgba(0,70,160,0.13);
+      padding: 0;
+      overflow: hidden;
+      animation: floatIn .19s;
+      border: 1.5px solid var(--primary);
+      position: relative;
+    }
+    .modal-head {
+      background: var(--primary);
+      color: #fff;
+      padding: 19px 23px;
+      display: flex;
+      align-items: center;
+      font-size: 1.13rem;
+      font-weight: 600;
+    }
+    .modal-head .fa-lock, .modal-head .fa-shield-halved {
+      font-size: 1.2rem; margin-right: 11px;
+    }
+    .modal-content {
+      padding: 19px 20px 10px 20px;
+      color: #1c273a;
+      font-size: 1.04rem;
+    }
+    .modal-content ul {margin: 14px 0 0 17px;}
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 13px;
+      padding: 0 18px 17px 18px;
+    }
+    .modal-btn {
+      padding: 11px 24px;
+      border-radius: 19px;
+      border: none;
+      font-size: 1.06rem;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 1px 5px rgba(0,89,179,0.06);
+      transition: background .13s, color .11s;
+    }
+    .modal-btn.accept {background: var(--primary); color: #fff;}
+    .modal-btn.accept:hover {background: var(--primary-dark);}
+    .modal-btn.decline {
+      background: #f3f4f6; color: var(--primary);
+      border: 1px solid #c7d5ea;
+    }
+    .modal-btn.decline:hover {background: #eaf1fa; color: var(--primary-dark);}
+    @media (max-width:600px) {
+      .chat-container, header {max-width:99vw;}
+      .modal-card {max-width:99vw;}
+    }
+  </style>
+</head>
+<body>
+  <!-- Datenschutz/Haftung Modal -->
+  <div class="modal-overlay" id="privacy-modal" style="display:none;">
+    <div class="modal-card">
+      <div class="modal-head"><i class="fa-solid fa-lock"></i> Datenschutzhinweis & Haftung</div>
+      <div class="modal-content">
+        <ul>
+          <li>Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und die Automatisierungsplattform (Make, EU) übermittelt.</li>
+          <li>Die Daten können auf Servern außerhalb der EU verarbeitet werden.</li>
+          <li><b>Keine personenbezogenen oder sensiblen Daten eingeben!</b></li>
+          <li>Antworten sind unverbindlich, keine Garantie auf Richtigkeit oder Vollständigkeit.</li>
+        </ul>
+        <p style="font-size:.97em;color:#427;">Mit Nutzung stimmst du diesen Bedingungen zu.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn accept" onclick="acceptPrivacy()">Zustimmen</button>
+        <button class="modal-btn decline" onclick="window.location.reload()">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+  <div class="chat-container">
+    <header>
+      <span class="header-icon"><i class="fa-solid fa-robot"></i></span>
+      <h1>Mobile Ausbildung Chatbot</h1>
+      <div class="header-buttons">
+        <button id="darkModeButton" class="header-btn" aria-label="Dunkelmodus umschalten">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <button id="printButton" class="header-btn" aria-label="Chat drucken oder als PDF speichern">
+          <i class="fa-solid fa-print"></i> Drucken
+        </button>
+        <button id="clearButton" class="header-btn" aria-label="Chat-Verlauf löschen">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </header>
+    <div class="chat-area" id="chatArea" role="log" aria-live="polite"></div>
+    <div class="loader" id="loader">
+      <div class="typing-indicator">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    </div>
+    <div class="input-area">
+      <div class="input-row">
+        <input 
+          type="text" 
+          id="userInput" 
+          placeholder="Schreibe hier deine Nachricht..." 
+          autocomplete="off"
+          aria-label="Deine Nachricht eingeben"
+        >
+        <button id="sendButton" aria-label="Nachricht senden">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </div>
+    <div class="notification" id="notification"></div>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <script>
+    // Datenschutz-Zustimmung lokal speichern & prüfen (alle 24h abfragen)
+    const PRIVACY_KEY = "privacyAcceptedAt";
+    function needsPrivacy() {
+      const t = localStorage.getItem(PRIVACY_KEY);
+      if (!t) return true;
+      const last = new Date(Number(t));
+      const now = new Date();
+      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24h
+    }
+    function acceptPrivacy() {
+      localStorage.setItem(PRIVACY_KEY, Date.now().toString());
+      document.getElementById('privacy-modal').style.display = 'none';
+    }
+    if (needsPrivacy()) {
+      document.getElementById('privacy-modal').style.display = 'flex';
+    }
+
+    // DOM-Elemente 
+    const chatArea = document.getElementById("chatArea");
+    const userInput = document.getElementById("userInput");
+    const sendButton = document.getElementById("sendButton");
+    const loader = document.getElementById("loader");
+    const notification = document.getElementById("notification");
+    const printButton = document.getElementById("printButton");
+    const clearButton = document.getElementById("clearButton");
+    const darkModeButton = document.getElementById("darkModeButton");
+    const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
+    let lastBotAnswer = "";
+    let isWaitingForResponse = false;
+    let retryCount = 0;
+    const MAX_RETRIES = 3;
+    const RETRY_DELAY = 2000;
+
+    // Chat-Verlauf aus localStorage laden
+    function loadChatHistory() {
+      const savedChat = localStorage.getItem("chatHistory");
+      if (savedChat) {
+        chatArea.innerHTML = savedChat;
+        chatArea.scrollTop = chatArea.scrollHeight;
+      } else {
+        initializeChat();
+      }
+    }
+    // Chat initialisieren
+    function initializeChat() {
+      if (chatArea.innerHTML === "") {
+        appendMessage("bot", "Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI gibt euch erste **Informationen** und prüft unverbindlich, ob mobile Ausbildung für euch geeignet ist.");
+        appendMessage("bot", "Wollen wir loslegen?");
+      }
+    }
+    // Speichert aktuellen Chat-Verlauf
+    function saveChatHistory() {
+      localStorage.setItem("chatHistory", chatArea.innerHTML
