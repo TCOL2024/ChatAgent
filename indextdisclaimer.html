@@ -130,6 +130,34 @@
             border-top-right-radius: 6px;
             border-right: 4px solid #ffd47c;
         }
+        /* Bot-Answer: style for small font "sources" block */
+        .bubble .meta {
+            font-size: .97em;
+            margin-top: 12px;
+            color: #6b7280;
+            border-top: 1px solid #e5e9ef;
+            padding-top: 9px;
+        }
+        .bubble ul, .bubble ol {
+            margin: 9px 0 9px 1.5em;
+            padding: 0;
+        }
+        .bubble li {
+            margin-bottom: 0.3em;
+        }
+        .bubble a {
+            color: #0059b3;
+            text-decoration: underline;
+            word-break: break-all;
+        }
+        .bubble code {
+            font-family: 'Fira Mono', 'Consolas', monospace;
+            background: #f4f7fb;
+            border-radius: 5px;
+            padding: 1px 5px;
+            font-size: 0.97em;
+            color: #1976d2;
+        }
         .inputbar-area {
             background: #f7fafb;
             padding: 18px 16px;
@@ -312,7 +340,7 @@
         function acceptDisclaimer() {
             document.getElementById('disclaimer-modal').style.display = 'none';
         }
-        // Chatbot-Logik mit Make-Webhook
+        // Chatbot-Logik mit Make-Webhook & formatierten Bot-Antworten
         const messagesDiv = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
         const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // ggf. anpassen
@@ -322,14 +350,43 @@
             row.className = 'bubble-row ' + sender;
             const avatar = document.createElement('div');
             avatar.className = 'avatar';
-            avatar.innerHTML = sender === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+            avatar.innerHTML = sender === 'user'
+                ? '<i class="fa-solid fa-user"></i>'
+                : '<i class="fa-solid fa-robot"></i>';
+
+            // Bot-Antworten als Markdown/HTML rendern
             const bubble = document.createElement('div');
             bubble.className = 'bubble ' + sender;
-            bubble.innerHTML = text;
+
+            if(sender === 'bot') {
+                bubble.innerHTML = renderBotAnswer(text);
+            } else {
+                bubble.textContent = text;
+            }
             row.appendChild(avatar);
             row.appendChild(bubble);
             messagesDiv.appendChild(row);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Markdown-ähnliche Formatierung für bessere Bot-Antworten
+        function renderBotAnswer(text) {
+            // Fett, Kursiv, Links, Listen, Absätze, Code
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")                           // Fett
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")                             // Kursiv
+                .replace(/`([^`]+)`/g, "<code>$1</code>")                         // Code
+                .replace(/$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$([^$end:math:text$]+)\)/g, '<a href="$2" target="_blank">$1</a>') // Links
+                .replace(/\n{2,}/g, '<br>')                                       // Doppelte Absätze
+                .replace(/^- (.*)$/gm, '<li>$1</li>');                            // Einfache Liste
+
+            // Listen um <ul> setzen
+            html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+            // Quellen oder Hinweis Block am Ende kleiner
+            html = html.replace(/(Quellen?:|Hinweis:)([\s\S]*)$/i, function(_, start, rest) {
+                return `<div class="meta"><b>${start}</b>${rest}</div>`;
+            });
+            return html;
         }
 
         async function sendMessage() {
@@ -347,7 +404,7 @@
                 });
                 let reply = await response.text();
                 // Letztes Bot-Message (Ladekreis) ersetzen:
-                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = reply;
+                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = renderBotAnswer(reply);
             } catch (err) {
                 messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = "❌ Es ist ein Fehler aufgetreten.";
             }
