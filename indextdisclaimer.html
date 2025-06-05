@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>KI-Assistent für Personalmanagement</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #0059b3;
@@ -18,20 +19,20 @@
             --user-bubble: #eaf1fa;
             --bot-bubble: #fff;
             --bot-gradient: linear-gradient(100deg,#004fa2 0,#48a3ef 100%);
-            --footer-bg: #eaf1fa;
-            --footer-text: #466;
         }
         html, body {
             height: 100%;
             margin: 0;
-            background: linear-gradient(120deg,#f5f9fe 0,#eaf1fa 100%);
+            padding: 0;
         }
         body {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start;
+            font-family: 'Inter', 'Segoe UI', Arial, 'Helvetica Neue', Helvetica, sans-serif;
+            background: linear-gradient(120deg,#f5f9fe 0,#eaf1fa 100%);
+            color: #1d2736;
         }
         .center-area {
             min-height: 90vh;
@@ -45,9 +46,8 @@
             background: var(--chat-bg);
             border-radius: var(--radius);
             box-shadow: var(--chat-shadow);
-            padding: 0;
             width: 100%;
-            max-width: 430px;
+            max-width: 450px;
             min-width: 310px;
             min-height: 570px;
             display: flex;
@@ -96,6 +96,8 @@
             display: flex;
             flex-direction: column;
             gap: 18px;
+            min-height: 200px;
+            max-height: 62vh;
         }
         .bubble-row {
             display: flex;
@@ -130,6 +132,7 @@
             animation: appear 0.15s;
             margin-bottom: 2px;
             line-height: 1.6;
+            background: var(--bot-bubble);
         }
         @keyframes appear { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
         .bubble.bot {
@@ -168,7 +171,7 @@
         }
         .inputbar-area {
             background: #f7fafb;
-            padding: 18px 16px;
+            padding: 16px 14px;
             display: flex;
             gap: 10px;
             align-items: end;
@@ -200,7 +203,7 @@
             transition: background .18s;
         }
         .send-btn:hover { background: var(--primary-dark);}
-        /* Modals muster Look */
+        /* Modals Allianz.de Look */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -274,27 +277,9 @@
             background: #eaf1fa;
             color: var(--primary-dark);
         }
-        /* Footer Hinweis & Datenschutz */
-        .page-footer {
-            margin-top: auto;
-            background: var(--footer-bg);
-            color: var(--footer-text);
-            font-size: 0.97rem;
-            padding: 19px 12px 18px 12px;
-            border-radius: 18px 18px 0 0;
-            box-shadow: 0 -1px 8px rgba(0,70,160,0.03);
-            text-align: center;
-            width: 100vw;
-            max-width: 480px;
-        }
-        .page-footer a {
-            color: var(--primary-dark);
-            text-decoration: underline;
-        }
         /* Responsiveness */
         @media (max-width: 600px) {
             .chatbox-outer { max-width: 99vw; min-width:0; }
-            .page-footer { max-width: 99vw; }
         }
         @media (max-width: 410px) {
             .chat-header {padding-left: 65px;}
@@ -349,7 +334,6 @@
                 <div class="subtitle">Stelle deine Frage rund ums Personalmanagement</div>
             </div>
             <div class="messages-area" id="messages">
-                <!-- Chat-Verlauf erscheint hier -->
                 <div class="bubble-row bot">
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
                     <div class="bubble bot">
@@ -362,12 +346,6 @@
                 <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
         </div>
-    </div>
-    <div class="page-footer">
-        <span>
-            <b>Hinweis:</b> Dieser Chatbot erstellt KI-generierte Antworten, die keine Fachberatung ersetzen. Keine Haftung für Richtigkeit oder Vollständigkeit.<br>
-            <a href="https://openai.com/policies/privacy-policy" target="_blank">Datenschutz</a> &nbsp;|&nbsp; <a href="https://www.make.com/en/privacy-policy" target="_blank">Info zu Make</a>
-        </span>
     </div>
     <script>
         // MODAL FLOW: Erst Datenschutz, dann Disclaimer!
