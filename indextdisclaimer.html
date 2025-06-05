@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persönlicher KI-Assistent</title>
+    <title>KI-Assistent für Personalmanagement</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -11,50 +11,61 @@
             --primary-dark: #003974;
             --secondary: #f3f7fb;
             --chat-bg: #fff;
-            --chat-shadow: 0 12px 48px 0 rgba(0,0,0,0.09);
+            --chat-shadow: 0 12px 48px 0 rgba(0,0,0,0.13);
             --radius: 22px;
             --avatar-size: 52px;
             --bubble-radius: 18px;
             --user-bubble: #eaf1fa;
             --bot-bubble: #fff;
             --bot-gradient: linear-gradient(100deg,#004fa2 0,#48a3ef 100%);
+            --footer-bg: #eaf1fa;
+            --footer-text: #466;
+        }
+        html, body {
+            height: 100%;
+            margin: 0;
+            background: linear-gradient(120deg,#f5f9fe 0,#eaf1fa 100%);
         }
         body {
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #d1e8fa 0, #f4f7fb 90%);
             min-height: 100vh;
-            margin: 0;
-            color: #1d2736;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
         }
         .center-area {
-            min-height: 100vh;
+            min-height: 90vh;
+            width: 100vw;
             display: flex;
             align-items: center;
             justify-content: center;
+            flex: 1 1 auto;
         }
         .chatbox-outer {
             background: var(--chat-bg);
             border-radius: var(--radius);
             box-shadow: var(--chat-shadow);
             padding: 0;
-            width: 390px;
-            max-width: 96vw;
+            width: 100%;
+            max-width: 430px;
+            min-width: 310px;
             min-height: 570px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            border: 1px solid #e3eefa;
+            border: 1.5px solid #e3eefa;
+            margin: 48px 0 24px 0;
         }
         .chat-header {
             background: var(--primary);
             color: #fff;
-            padding: 22px 28px 16px 90px;
+            padding: 24px 32px 18px 92px;
             position: relative;
         }
         .chat-header .bot-avatar {
             position: absolute;
-            left: 24px;
-            top: 12px;
+            left: 30px;
+            top: 18px;
             width: var(--avatar-size);
             height: var(--avatar-size);
             background: var(--bot-gradient);
@@ -70,9 +81,10 @@
             font-size: 1.22rem;
             font-weight: 700;
             margin: 0 0 5px 0;
+            letter-spacing: 0.02em;
         }
         .chat-header .subtitle {
-            font-size: .98rem;
+            font-size: .97rem;
             font-weight: 400;
             color: #d8e8f8;
         }
@@ -110,27 +122,28 @@
         }
         .bubble {
             border-radius: var(--bubble-radius);
-            font-size: 1.02rem;
-            padding: 12px 18px;
-            max-width: 72%;
+            font-size: 1.08rem;
+            padding: 14px 19px;
+            max-width: 82%;
             word-break: break-word;
-            box-shadow: 0 2px 10px 0 rgba(0,70,160,0.03);
-            animation: appear 0.17s;
+            box-shadow: 0 2px 10px 0 rgba(0,70,160,0.05);
+            animation: appear 0.15s;
+            margin-bottom: 2px;
+            line-height: 1.6;
         }
         @keyframes appear { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
         .bubble.bot {
             background: var(--bot-bubble);
             color: #1d2736;
-            border-top-left-radius: 6px;
+            border-top-left-radius: 7px;
             border-left: 4px solid var(--primary);
         }
         .bubble.user {
             background: var(--user-bubble);
             color: #22324c;
-            border-top-right-radius: 6px;
+            border-top-right-radius: 7px;
             border-right: 4px solid #ffd47c;
         }
-        /* Bot-Answer: style for small font "sources" block */
         .bubble .meta {
             font-size: .97em;
             margin-top: 12px;
@@ -138,13 +151,8 @@
             border-top: 1px solid #e5e9ef;
             padding-top: 9px;
         }
-        .bubble ul, .bubble ol {
-            margin: 9px 0 9px 1.5em;
-            padding: 0;
-        }
-        .bubble li {
-            margin-bottom: 0.3em;
-        }
+        .bubble ul, .bubble ol { margin: 10px 0 10px 1.5em; padding: 0;}
+        .bubble li { margin-bottom: 0.3em;}
         .bubble a {
             color: #0059b3;
             text-decoration: underline;
@@ -183,16 +191,16 @@
             background: var(--primary);
             color: #fff;
             border: none;
-            width: 44px;
-            height: 44px;
+            width: 46px;
+            height: 46px;
             border-radius: 50%;
-            font-size: 1.3rem;
+            font-size: 1.34rem;
             cursor: pointer;
-            box-shadow: 0 3px 10px 0 rgba(0,70,160,0.07);
+            box-shadow: 0 3px 10px 0 rgba(0,70,160,0.09);
             transition: background .18s;
         }
         .send-btn:hover { background: var(--primary-dark);}
-        /* --- Disclaimer + Datenschutzlayer Allianz.de Style --- */
+        /* Modals muster Look */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -201,38 +209,37 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            animation: fadeInBG .34s;
+            animation: fadeInBG .32s;
         }
         .modal-card {
             background: #fff;
             border-radius: 16px;
-            max-width: 450px;
+            max-width: 440px;
             width: 95vw;
             box-shadow: 0 8px 32px 0 rgba(0,70,160,0.13);
             padding: 0;
             overflow: hidden;
-            animation: floatIn .27s;
+            animation: floatIn .21s;
             border: 1.5px solid var(--primary);
             position: relative;
         }
         .modal-head {
             background: var(--primary);
             color: #fff;
-            padding: 22px 28px;
+            padding: 20px 26px;
             display: flex;
             align-items: center;
-            font-size: 1.13rem;
+            font-size: 1.12rem;
             font-weight: 600;
-            letter-spacing: 0.01em;
         }
         .modal-head .fa-lock, .modal-head .fa-shield-halved {
-            font-size: 1.3rem;
-            margin-right: 13px;
+            font-size: 1.2rem;
+            margin-right: 12px;
         }
         .modal-content {
-            padding: 26px 24px 14px 24px;
+            padding: 22px 22px 10px 22px;
             color: #1c273a;
-            font-size: 1.04rem;
+            font-size: 1.03rem;
         }
         .modal-content ul {
             margin: 14px 0 0 18px;
@@ -241,17 +248,17 @@
             display: flex;
             justify-content: flex-end;
             gap: 14px;
-            padding: 0 24px 22px 24px;
+            padding: 0 22px 18px 22px;
         }
         .modal-btn {
             padding: 11px 28px;
             border-radius: 20px;
             border: none;
-            font-size: 1.09rem;
+            font-size: 1.06rem;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 1px 5px rgba(0,89,179,0.06);
-            transition: background .17s, color .14s;
+            transition: background .14s, color .12s;
         }
         .modal-btn.accept {
             background: var(--primary);
@@ -267,9 +274,32 @@
             background: #eaf1fa;
             color: var(--primary-dark);
         }
-        @media (max-width:600px) {
-            .chatbox-outer { min-width: 0; width:98vw;}
-            .modal-card {max-width:99vw;}
+        /* Footer Hinweis & Datenschutz */
+        .page-footer {
+            margin-top: auto;
+            background: var(--footer-bg);
+            color: var(--footer-text);
+            font-size: 0.97rem;
+            padding: 19px 12px 18px 12px;
+            border-radius: 18px 18px 0 0;
+            box-shadow: 0 -1px 8px rgba(0,70,160,0.03);
+            text-align: center;
+            width: 100vw;
+            max-width: 480px;
+        }
+        .page-footer a {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+        /* Responsiveness */
+        @media (max-width: 600px) {
+            .chatbox-outer { max-width: 99vw; min-width:0; }
+            .page-footer { max-width: 99vw; }
+        }
+        @media (max-width: 410px) {
+            .chat-header {padding-left: 65px;}
+            .chat-header .bot-avatar {left:10px;}
+            .chatbox-outer {margin: 9vw 0 10vw 0;}
         }
     </style>
 </head>
@@ -279,12 +309,12 @@
         <div class="modal-card">
             <div class="modal-head"><i class="fa-solid fa-lock"></i>Datenschutzhinweis</div>
             <div class="modal-content">
-                <p>Um diesen Chatbot nutzen zu können, ist deine Zustimmung zur folgenden Datenschutzerklärung erforderlich:</p>
+                <p>Um diesen Chatbot nutzen zu können, ist deine Zustimmung zur Datenschutzerklärung erforderlich:</p>
                 <ul>
                     <li>Deine Eingaben werden an externe KI-Dienstleister (OpenAI, USA) und die Automatisierungsplattform (Make, EU) übermittelt.</li>
-                    <li>Die übermittelten Daten werden für die Generierung von Antworten verarbeitet, können aber auf Servern außerhalb der EU gespeichert werden.</li>
+                    <li>Die übermittelten Daten werden für die Generierung von Antworten verarbeitet und können auf Servern außerhalb der EU gespeichert werden.</li>
                     <li>Bitte gib <b>keine personenbezogenen oder sensiblen Daten</b> ein!</li>
-                    <li>Weitere Informationen: <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">Datenschutzrichtlinie OpenAI</a>, <a href="https://www.make.com/en/privacy-policy" target="_blank" rel="noopener">Make.com</a>.</li>
+                    <li>Weitere Informationen: <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">OpenAI</a>, <a href="https://www.make.com/en/privacy-policy" target="_blank" rel="noopener">Make.com</a>.</li>
                 </ul>
             </div>
             <div class="modal-footer">
@@ -322,7 +352,9 @@
                 <!-- Chat-Verlauf erscheint hier -->
                 <div class="bubble-row bot">
                     <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bubble bot">Hallo! Ich bin dein KI-Assistent. Stelle mir deine Frage zu Personal, Ausbildung oder Prüfungsvorbereitung.</div>
+                    <div class="bubble bot">
+                        Hallo! Ich bin dein KI-Assistent. Stelle mir deine Frage zu Personal, Ausbildung oder Prüfungsvorbereitung.
+                    </div>
                 </div>
             </div>
             <form class="inputbar-area" onsubmit="event.preventDefault();sendMessage();">
@@ -330,6 +362,12 @@
                 <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
             </form>
         </div>
+    </div>
+    <div class="page-footer">
+        <span>
+            <b>Hinweis:</b> Dieser Chatbot erstellt KI-generierte Antworten, die keine Fachberatung ersetzen. Keine Haftung für Richtigkeit oder Vollständigkeit.<br>
+            <a href="https://openai.com/policies/privacy-policy" target="_blank">Datenschutz</a> &nbsp;|&nbsp; <a href="https://www.make.com/en/privacy-policy" target="_blank">Info zu Make</a>
+        </span>
     </div>
     <script>
         // MODAL FLOW: Erst Datenschutz, dann Disclaimer!
@@ -343,7 +381,7 @@
         // Chatbot-Logik mit Make-Webhook & formatierten Bot-Antworten
         const messagesDiv = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
-        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // ggf. anpassen
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // anpassen!
 
         function addMessage(sender, text) {
             const row = document.createElement('div');
@@ -371,18 +409,14 @@
 
         // Markdown-ähnliche Formatierung für bessere Bot-Antworten
         function renderBotAnswer(text) {
-            // Fett, Kursiv, Links, Listen, Absätze, Code
             let html = text
-                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")                           // Fett
-                .replace(/\*(.*?)\*/g, "<em>$1</em>")                             // Kursiv
-                .replace(/`([^`]+)`/g, "<code>$1</code>")                         // Code
-                .replace(/$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$([^$end:math:text$]+)\)/g, '<a href="$2" target="_blank">$1</a>') // Links
-                .replace(/\n{2,}/g, '<br>')                                       // Doppelte Absätze
-                .replace(/^- (.*)$/gm, '<li>$1</li>');                            // Einfache Liste
-
-            // Listen um <ul> setzen
+                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")                           
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")                             
+                .replace(/`([^`]+)`/g, "<code>$1</code>")                         
+                .replace(/$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$([^$end:math:text$]+)\)/g, '<a href="$2" target="_blank">$1</a>') 
+                .replace(/\n{2,}/g, '<br>')                                       
+                .replace(/^- (.*)$/gm, '<li>$1</li>');                            
             html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-            // Quellen oder Hinweis Block am Ende kleiner
             html = html.replace(/(Quellen?:|Hinweis:)([\s\S]*)$/i, function(_, start, rest) {
                 return `<div class="meta"><b>${start}</b>${rest}</div>`;
             });
@@ -403,7 +437,6 @@
                     body: JSON.stringify({ question: text })
                 });
                 let reply = await response.text();
-                // Letztes Bot-Message (Ladekreis) ersetzen:
                 messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = renderBotAnswer(reply);
             } catch (err) {
                 messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = "❌ Es ist ein Fehler aufgetreten.";
@@ -421,7 +454,7 @@
                 sendMessage();
             }
         });
-        // Modal beim Laden anzeigen
+        // Modals beim Laden anzeigen
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('privacy-modal').style.display = 'flex';
         });
