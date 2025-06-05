@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbot Übersicht</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header {
+            background-color: white;
+            border-bottom: 1px solid #e5e5e5;
+            padding: 40px 0;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 300;
+            color: #003781;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .main-content {
+            padding-bottom: 80px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 400;
+            color: #003781;
+            margin-bottom: 40px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #003781;
+            display: inline-block;
+        }
+
+        .chatbots-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .chatbot-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 4px;
+            padding: 32px;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .chatbot-card:hover {
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            border-color: #003781;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #003781;
+            margin-bottom: 8px;
+        }
+
+        .card-subtitle {
+            font-size: 0.9rem;
+            color: #666666;
+            font-weight: 400;
+        }
+
+        .card-description {
+            color: #555555;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .card-badges {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background-color: #f0f4f8;
+            color: #003781;
+            padding: 6px 12px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border: 1px solid #d0d7de;
+        }
+
+        .badge.beta {
+            background-color: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .badge.experiment {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        .launch-button {
+            background-color: #003781;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 3px;
+            font-weight: 500;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .launch-button:hover {
+            background-color: #004a94;
+            color: white;
+            text-decoration: none;
+        }
+
+        .launch-button:active {
+            background-color: #002c5a;
+        }
+
+        .footer {
+            background-color: white;
+            border-top: 1px solid #e5e5e5;
+            padding: 40px 0;
+            margin-top: 60px;
+            text-align: center;
+        }
+
+        .footer p {
+            color: #666666;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 30px 0;
+                margin-bottom: 40px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 6px;
+            }
+
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .chatbots-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .chatbot-card {
+                padding: 20px;
+                margin: 0 4px;
+            }
+
+            .container {
+                padding: 0 16px;
+            }
+
+            .section-title {
+                font-size: 1.3rem;
+                margin-bottom: 30px;
+            }
+
+            .card-title {
+                font-size: 1.2rem;
+            }
+
+            .card-description {
+                font-size: 0.95rem;
+            }
+
+            .launch-button {
+                width: 100%;
+                padding: 14px 24px;
+                font-size: 1rem;
+            }
+
+            .card-badges {
+                margin-bottom: 20px;
+            }
+
+            .badge {
+                font-size: 0.75rem;
+                padding: 5px 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .chatbot-card {
+                padding: 16px;
+                margin: 0 2px;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+        }
+
+        /* Clean, minimal animations */
+        .chatbot-card {
+            transform: translateY(0);
+        }
+
+        .chatbot-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Typography hierarchy */
+        h1, h2, h3 {
+            font-weight: 400;
+        }
+
+        .card-title {
+            font-weight: 600;
+        }
+
+        /* Consistent spacing */
+        .header, .main-content, .footer {
+            padding-left: 0;
+            padding-right: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <h1>Chatbot Übersicht</h1>
+            <p>Intelligente Assistenten für verschiedene Anwendungsbereiche</p>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h2 class="section-title">Verfügbare Chatbots</h2>
+            
+            <div class="chatbots-grid">
+                <div class="chatbot-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Mobile Ausbildung</h3>
+                        <p class="card-subtitle">Spezialisierter Ausbildungsassistent</p>
+                    </div>
+                    <p class="card-description">
+                        Ein auf mobile Ausbildungsthemen spezialisierter Chatbot, der Auszubildende und Berufseinsteiger bei ihrer beruflichen Entwicklung unterstützt.
+                    </p>
+                    <div class="card-badges">
+                        <span class="badge beta">Beta</span>
+                        <span class="badge">Mobile</span>
+                    </div>
+                    <a href="https://tcol2024.github.io/ChatAgent/mobileausb3005.html" class="launch-button" target="_blank">
+                        Öffnen
+                    </a>
+                </div>
+
+                <div class="chatbot-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Persönlicher Assistant</h3>
+                        <p class="card-subtitle">Mit Nutzungshinweisen</p>
+                    </div>
+                    <p class="card-description">
+                        Ihr zuverlässiger AI-Begleiter mit transparenten Nutzungshinweisen und Disclaimer für eine vertrauensvolle Kommunikation.
+                    </p>
+                    <div class="card-badges">
+                        <span class="badge beta">Beta</span>
+                        <span class="badge">Disclaimer</span>
+                    </div>
+                    <a href="https://tcol2024.github.io/ChatAgent/indextdisclaimer.html" class="launch-button" target="_blank">
+                        Öffnen
+                    </a>
+                </div>
+
+                <div class="chatbot-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Design-Test Version</h3>
+                        <p class="card-subtitle">Mit PDF-Export Funktion</p>
+                    </div>
+                    <p class="card-description">
+                        Experimentelle Version des persönlichen Assistenten mit erweiterten Design-Features und praktischer PDF-Druckfunktion.
+                    </p>
+                    <div class="card-badges">
+                        <span class="badge experiment">Experiment</span>
+                        <span class="badge">PDF-Export</span>
+                    </div>
+                    <a href="https://tcol2024.github.io/ChatAgent/indext_designtest.html" class="launch-button" target="_blank">
+                        Öffnen
+                    </a>
+                </div>
+
+                <div class="chatbot-card">
+                    <div class="card-header">
+                        <h3 class="card-title">Gemini Assistant</h3>
+                        <p class="card-subtitle">Google Gemini Integration</p>
+                    </div>
+                    <p class="card-description">
+                        Erweiterte Version mit Google Gemini AI-Technologie für noch intelligentere und vielseitigere Unterhaltungen und Aufgaben.
+                    </p>
+                    <div class="card-badges">
+                        <span class="badge">Gemini</span>
+                        <span class="badge">Multi-Modal</span>
+                    </div>
+                    <a href="https://tcol2024.github.io/ChatAgent/IndexMulti.html" class="launch-button" target="_blank">
+                        Öffnen
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <div class="container">
+            <p>Wählen Sie den passenden Chatbot für Ihre Anforderungen</p>
+        </div>
+    </div>
+</body>
+</htm
