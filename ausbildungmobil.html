@@ -4,10 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mobile Ausbildung Chatbot</title>
+  <!-- Schriftart Inter laden -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Font Awesome für Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    * {margin:0;padding:0;box-sizing:border-box;}
+    /* ============================================================
+       Basis-Reset & Variablen
+    ============================================================== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
     :root {
       --primary: #004a99;
       --primary-light: #2978c9;
@@ -16,15 +25,20 @@
       --chat-bg: #fff;
       --bot-bg: #f0f6fb;
       --user-bg: #004a99;
+      --shadow: 0 8px 40px rgba(0,0,0,0.08);
+      --radius: 22px;
+      --avatar-size: 52px;
+      --bubble-radius: 18px;
       --bot-bubble: #fff;
       --user-bubble: #2978c9;
-      --shadow: 0 8px 40px rgba(0,0,0,0.08);
+      --text-color: #1a2332;
+      --text-light: #92a4bb;
     }
     html, body {
       height: 100%;
       font-family: 'Inter', 'Segoe UI', Arial, 'Helvetica Neue', Helvetica, sans-serif;
       background: var(--bg);
-      color: #1a2332;
+      color: var(--text-color);
     }
     body {
       min-height: 100vh;
@@ -34,21 +48,27 @@
       justify-content: flex-start;
       background: linear-gradient(115deg, #f7faff 0%, #e3eefc 100%);
     }
+    /* ============================================================
+       Chat-Container
+    ============================================================== */
     .chat-container {
       background: var(--chat-bg);
       width: 100%;
       max-width: 480px;
       min-width: 310px;
-      min-height: 620px;
       height: 90vh;
-      border-radius: 22px;
+      min-height: 620px;
+      border-radius: var(--radius);
       box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
-      position: relative;
       overflow: hidden;
       margin: 40px 0 32px 0;
+      position: relative;
     }
+    /* ============================================================
+       Header
+    ============================================================== */
     header {
       background: var(--primary);
       color: #fff;
@@ -63,7 +83,7 @@
       width: 100%;
       max-width: 480px;
       z-index: 10;
-      border-radius: 22px 22px 0 0;
+      border-radius: var(--radius) var(--radius) 0 0;
       box-shadow: 0 2px 8px rgba(0,0,0,0.07);
     }
     .header-icon {
@@ -71,9 +91,14 @@
       left: 28px;
       top: 19px;
       background: linear-gradient(100deg, #004a99 0, #71b7fb 100%);
-      width: 44px; height: 44px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2rem; color: #fff;
+      width: var(--avatar-size);
+      height: var(--avatar-size);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      color: #fff;
       box-shadow: 0 3px 9px rgba(0,74,153,0.14);
     }
     header h1 {
@@ -82,7 +107,10 @@
       letter-spacing: 0.02em;
       margin: 0;
     }
-    .header-buttons {display: flex; gap: 8px;}
+    .header-buttons {
+      display: flex;
+      gap: 8px;
+    }
     .header-btn {
       background: var(--primary-light);
       color: #fff;
@@ -92,15 +120,21 @@
       cursor: pointer;
       border-radius: 7px;
       transition: background 0.22s;
-      display: flex; align-items: center; gap: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
     }
-    .header-btn:hover {background: var(--primary-dark);}
+    .header-btn:hover {
+      background: var(--primary-dark);
+    }
+    /* ============================================================
+       Chat-Bereich
+    ============================================================== */
     .chat-area {
       flex: 1;
       padding: 96px 20px 24px;
       overflow-y: auto;
       background: var(--bot-bg);
-      transition: background-color 0.3s;
       scroll-behavior: smooth;
       display: flex;
       flex-direction: column;
@@ -112,34 +146,54 @@
       margin-bottom: 10px;
       animation: appear 0.15s;
     }
-    @keyframes appear {from{opacity:0;transform:translateY(13px);} to{opacity:1;transform:translateY(0);}}
-    .message.bot {justify-content: flex-start;}
-    .message.user {justify-content: flex-end;}
+    @keyframes appear {
+      from { opacity: 0; transform: translateY(13px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .message.bot {
+      justify-content: flex-start;
+    }
+    .message.user {
+      justify-content: flex-end;
+    }
     .avatar {
-      width: 38px; height: 38px; border-radius: 50%;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       background: #dbeafe;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; font-weight: 700;
-      margin-right: 11px; flex-shrink: 0; color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-right: 11px;
+      flex-shrink: 0;
+      color: var(--primary);
     }
     .message.user .avatar {
-      order: 1; margin-left: 11px; margin-right: 0;
-      background: var(--primary-light); color: #fff;
+      order: 1;
+      margin-left: 11px;
+      margin-right: 0;
+      background: var(--primary-light);
+      color: #fff;
     }
-    .message-wrapper {display: flex; flex-direction: column; max-width: calc(100% - 50px);}
+    .message-wrapper {
+      display: flex;
+      flex-direction: column;
+      max-width: calc(100% - 50px);
+    }
     .message-content {
       padding: 15px 19px;
-      border-radius: 19px;
+      border-radius: var(--bubble-radius);
       line-height: 1.63;
       word-wrap: break-word;
       background: var(--bot-bubble);
       font-size: 1.09rem;
-      color: #233;
-      box-shadow: 0 1px 6px 0 rgba(0,74,153,0.08);
+      color: var(--text-color);
+      box-shadow: 0 1px 6px rgba(0,74,153,0.08);
     }
     .message.bot .message-content {
       background: var(--bot-bubble);
-      color: #233;
       border-top-left-radius: 6px;
       border-left: 4px solid var(--primary);
     }
@@ -151,21 +205,27 @@
     }
     .timestamp {
       font-size: 0.76em;
-      color: #92a4bb;
+      color: var(--text-light);
       margin-top: 4px;
       align-self: flex-end;
     }
-    .message.bot .timestamp {align-self: flex-start;}
+    .message.bot .timestamp {
+      align-self: flex-start;
+    }
+    /* ============================================================
+       Eingabebereich
+    ============================================================== */
     .input-area {
       display: flex;
       flex-direction: column;
       border-top: 1.5px solid #e3eefa;
       padding: 14px 16px 14px 14px;
-      background: #fff;
+      background: var(--chat-bg);
       z-index: 2;
     }
     .input-row {
-      display: flex; width: 100%;
+      display: flex;
+      width: 100%;
     }
     .input-area input {
       flex: 1;
@@ -175,11 +235,13 @@
       border-radius: 9px;
       outline: none;
       background: #fff;
-      color: #233;
-      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+      color: var(--text-color);
       transition: border-color 0.21s, background 0.21s;
+      font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
     }
-    .input-area input:focus {border-color: var(--primary);}
+    .input-area input:focus {
+      border-color: var(--primary);
+    }
     .input-area button {
       background: var(--primary);
       color: #fff;
@@ -190,45 +252,75 @@
       border-radius: 9px;
       margin-left: 10px;
       transition: background 0.18s;
-      display: flex; align-items: center; justify-content: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
-    .input-area button:hover {background: var(--primary-dark);}
-    .input-area button:disabled {background: #cccccc; cursor: not-allowed;}
+    .input-area button:hover {
+      background: var(--primary-dark);
+    }
+    .input-area button:disabled {
+      background: #cccccc;
+      cursor: not-allowed;
+    }
+    /* ============================================================
+       Loader & Notifications
+    ============================================================== */
     .loader {
       display: none;
       margin: 14px auto;
       text-align: center;
     }
     .typing-indicator {
-      display: flex; align-items: center; gap: 4px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
     .typing-dot {
-      width: 8px; height: 8px; background: #b5c7dd;
+      width: 8px;
+      height: 8px;
+      background: #b5c7dd;
       border-radius: 50%;
       animation: typing 1.3s infinite;
     }
-    .typing-dot:nth-child(2) {animation-delay: 0.2s;}
-    .typing-dot:nth-child(3) {animation-delay: 0.4s;}
+    .typing-dot:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    .typing-dot:nth-child(3) {
+      animation-delay: 0.4s;
+    }
     @keyframes typing {
-      0%,60%,100%{transform:translateY(0);} 30%{transform:translateY(-6px);}
+      0%,60%,100% { transform: translateY(0); }
+      30% { transform: translateY(-6px); }
     }
     .notification {
-      position: fixed; top: 20px; right: 20px;
+      position: fixed;
+      top: 20px;
+      right: 20px;
       padding: 14px 19px;
-      background: #d4edda; color: #155724;
-      border-radius: 7px; box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      display: none; z-index: 100;
+      background: #d4edda;
+      color: #155724;
+      border-radius: 7px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      display: none;
+      z-index: 100;
       animation: notificationSlide 0.3s forwards;
       font-size: 1.05rem;
     }
-    .notification.error {background: #f8d7da; color: #721c24;}
-    @keyframes notificationSlide {
-      from {transform: translateX(100%); opacity: 0;}
-      to {transform: translateX(0); opacity: 1;}
+    .notification.error {
+      background: #f8d7da;
+      color: #721c24;
     }
-    /* Datenschutz/Disclaimer Modal */
+    @keyframes notificationSlide {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+    /* ============================================================
+       Datenschutz/Disclaimer Modal
+    ============================================================== */
     .modal-overlay {
-      position: fixed; inset: 0;
+      position: fixed;
+      inset: 0;
       background: rgba(0,38,90,0.45);
       z-index: 5000;
       display: flex;
@@ -241,8 +333,7 @@
       border-radius: 16px;
       max-width: 430px;
       width: 93vw;
-      box-shadow: 0 8px 32px 0 rgba(0,70,160,0.13);
-      padding: 0;
+      box-shadow: 0 8px 32px rgba(0,70,160,0.13);
       overflow: hidden;
       animation: floatIn .19s;
       border: 1.5px solid var(--primary);
@@ -258,14 +349,22 @@
       font-weight: 600;
     }
     .modal-head .fa-lock, .modal-head .fa-shield-halved {
-      font-size: 1.2rem; margin-right: 11px;
+      font-size: 1.2rem;
+      margin-right: 11px;
     }
     .modal-content {
       padding: 19px 20px 10px 20px;
       color: #1c273a;
       font-size: 1.04rem;
     }
-    .modal-content ul {margin: 14px 0 0 17px;}
+    .modal-content ul {
+      margin: 14px 0 0 17px;
+    }
+    .modal-content p {
+      margin-top: 12px;
+      font-size: 0.97rem;
+      color: #427;
+    }
     .modal-footer {
       display: flex;
       justify-content: flex-end;
@@ -280,34 +379,47 @@
       font-weight: 600;
       cursor: pointer;
       box-shadow: 0 1px 5px rgba(0,89,179,0.06);
-      transition: background .13s, color .11s;
+      transition: background 0.13s, color 0.11s;
     }
-    .modal-btn.accept {background: var(--primary); color: #fff;}
-    .modal-btn.accept:hover {background: var(--primary-dark);}
+    .modal-btn.accept {
+      background: var(--primary);
+      color: #fff;
+    }
+    .modal-btn.accept:hover {
+      background: var(--primary-dark);
+    }
     .modal-btn.decline {
-      background: #f3f4f6; color: var(--primary);
+      background: #f3f4f6;
+      color: var(--primary);
       border: 1px solid #c7d5ea;
     }
-    .modal-btn.decline:hover {background: #eaf1fa; color: var(--primary-dark);}
-    @media (max-width:600px) {
-      .chat-container, header {max-width:99vw;}
-      .modal-card {max-width:99vw;}
+    .modal-btn.decline:hover {
+      background: #eaf1fa;
+      color: var(--primary-dark);
+    }
+    @media (max-width: 600px) {
+      .chat-container, header {
+        max-width: 99vw;
+      }
+      .modal-card {
+        max-width: 99vw;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Datenschutz/Haftung Modal -->
+  <!-- Datenschutz/Haftungshinweis Modal -->
   <div class="modal-overlay" id="privacy-modal" style="display:none;">
     <div class="modal-card">
-      <div class="modal-head"><i class="fa-solid fa-lock"></i> Datenschutzhinweis & Haftung</div>
+      <div class="modal-head"><i class="fa-solid fa-lock"></i> Datenschutzhinweis &amp; Haftung</div>
       <div class="modal-content">
         <ul>
           <li>Deine Eingaben werden an KI-Dienstleister (OpenAI, USA) und die Automatisierungsplattform (Make, EU) übermittelt.</li>
           <li>Die Daten können auf Servern außerhalb der EU verarbeitet werden.</li>
-          <li><b>Keine personenbezogenen oder sensiblen Daten eingeben!</b></li>
-          <li>Antworten sind unverbindlich, keine Garantie auf Richtigkeit oder Vollständigkeit.</li>
+          <li><strong>Bitte keine personenbezogenen oder sensiblen Daten eingeben!</strong></li>
+          <li>Antworten sind unverbindlich – keine Garantie auf Richtigkeit oder Vollständigkeit.</li>
         </ul>
-        <p style="font-size:.97em;color:#427;">Mit Nutzung stimmst du diesen Bedingungen zu.</p>
+        <p>Mit Nutzung stimmst du diesen Bedingungen zu.</p>
       </div>
       <div class="modal-footer">
         <button class="modal-btn accept" onclick="acceptPrivacy()">Zustimmen</button>
@@ -315,6 +427,8 @@
       </div>
     </div>
   </div>
+
+  <!-- Haupt-Chat-Container -->
   <div class="chat-container">
     <header>
       <span class="header-icon"><i class="fa-solid fa-robot"></i></span>
@@ -323,7 +437,7 @@
         <button id="darkModeButton" class="header-btn" aria-label="Dunkelmodus umschalten">
           <i class="fa-solid fa-moon"></i>
         </button>
-        <button id="printButton" class="header-btn" aria-label="Chat drucken oder als PDF speichern">
+        <button id="printButton" class="header-btn" aria-label="Chat drucken">
           <i class="fa-solid fa-print"></i> Drucken
         </button>
         <button id="clearButton" class="header-btn" aria-label="Chat-Verlauf löschen">
@@ -331,7 +445,11 @@
         </button>
       </div>
     </header>
+
+    <!-- Chat-Verlauf -->
     <div class="chat-area" id="chatArea" role="log" aria-live="polite"></div>
+
+    <!-- Loader -->
     <div class="loader" id="loader">
       <div class="typing-indicator">
         <div class="typing-dot"></div>
@@ -339,12 +457,14 @@
         <div class="typing-dot"></div>
       </div>
     </div>
+
+    <!-- Eingabebereich -->
     <div class="input-area">
       <div class="input-row">
         <input 
-          type="text" 
-          id="userInput" 
-          placeholder="Schreibe hier deine Nachricht..." 
+          type="text"
+          id="userInput"
+          placeholder="Schreibe hier deine Nachricht..."
           autocomplete="off"
           aria-label="Deine Nachricht eingeben"
         >
@@ -353,18 +473,24 @@
         </button>
       </div>
     </div>
+
+    <!-- Benachrichtigung -->
     <div class="notification" id="notification"></div>
   </div>
+
+  <!-- Font Awesome JS (für Icons) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
   <script>
-    // Datenschutz-Zustimmung lokal speichern & prüfen (alle 24h abfragen)
+    /* ============================================================
+       Datenschutz-/Haftungs-Modal (Zustimmung 24 Stunden abspeichern)
+    ============================================================== */
     const PRIVACY_KEY = "privacyAcceptedAt";
     function needsPrivacy() {
       const t = localStorage.getItem(PRIVACY_KEY);
       if (!t) return true;
       const last = new Date(Number(t));
       const now = new Date();
-      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24h
+      return ((now - last) > 24 * 60 * 60 * 1000); // älter als 24 h
     }
     function acceptPrivacy() {
       localStorage.setItem(PRIVACY_KEY, Date.now().toString());
@@ -374,39 +500,235 @@
       document.getElementById('privacy-modal').style.display = 'flex';
     }
 
-    // DOM-Elemente 
-    const chatArea = document.getElementById("chatArea");
-    const userInput = document.getElementById("userInput");
-    const sendButton = document.getElementById("sendButton");
-    const loader = document.getElementById("loader");
-    const notification = document.getElementById("notification");
-    const printButton = document.getElementById("printButton");
-    const clearButton = document.getElementById("clearButton");
+    /* ============================================================
+       DOM-Elemente & Konfiguration
+    ============================================================== */
+    const chatArea       = document.getElementById("chatArea");
+    const userInput      = document.getElementById("userInput");
+    const sendButton     = document.getElementById("sendButton");
+    const loader         = document.getElementById("loader");
+    const notification   = document.getElementById("notification");
+    const printButton    = document.getElementById("printButton");
+    const clearButton    = document.getElementById("clearButton");
     const darkModeButton = document.getElementById("darkModeButton");
-    const webhookURL = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n";
-    let lastBotAnswer = "";
-    let isWaitingForResponse = false;
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-    const RETRY_DELAY = 2000;
+    const webhookURL     = "https://hook.us2.make.com/qa8g1cw25ec5lbydckaga3y4vqj9lx1n"; // anpassen
+    let lastBotAnswer    = "";
+    let isWaiting        = false;
+    let retryCount       = 0;
+    const MAX_RETRIES    = 3;
+    const RETRY_DELAY    = 2000;
 
-    // Chat-Verlauf aus localStorage laden
+    /* ============================================================
+       Chat-Verlauf speichern/laden
+    ============================================================== */
     function loadChatHistory() {
-      const savedChat = localStorage.getItem("chatHistory");
-      if (savedChat) {
-        chatArea.innerHTML = savedChat;
+      const saved = localStorage.getItem("chatHistory");
+      if (saved) {
+        chatArea.innerHTML = saved;
         chatArea.scrollTop = chatArea.scrollHeight;
       } else {
         initializeChat();
       }
     }
-    // Chat initialisieren
+    function saveChatHistory() {
+      localStorage.setItem("chatHistory", chatArea.innerHTML);
+    }
+
+    /* ============================================================
+       Chat initialisieren (Begrüßung)
+    ============================================================== */
     function initializeChat() {
-      if (chatArea.innerHTML === "") {
-        appendMessage("bot", "Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. Diese KI gibt euch erste **Informationen** und prüft unverbindlich, ob mobile Ausbildung für euch geeignet ist.");
+      if (chatArea.innerHTML.trim() === "") {
+        appendMessage("bot",
+          "Liebe Auszubildende, schön, dass ihr euch für mobile Ausbildung interessiert. " +
+          "Diese KI gibt euch erste **Informationen** und prüft unverbindlich, " +
+          "ob mobile Ausbildung für euch geeignet ist."
+        );
         appendMessage("bot", "Wollen wir loslegen?");
       }
     }
-    // Speichert aktuellen Chat-Verlauf
-    function saveChatHistory() {
-      localStorage.setItem("chatHistory", chatArea.innerHTML
+
+    /* ============================================================
+       Nachricht formatieren (Markdown → HTML)
+    ============================================================== */
+    function formatMessage(text) {
+      const escapeHTML = str =>
+        str.replace(/[&<>'"]/g, tag => ({
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          "'": '&#39;',
+          '"': '&quot;'
+        }[tag]));
+      let safe = escapeHTML(text);
+      safe = safe.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      safe = safe.replace(/\n/g, "<br>");
+      return safe;
+    }
+
+    /* ============================================================
+       Nachricht ins Chat-Fenster anhängen
+    ============================================================== */
+    function appendMessage(sender, text) {
+      const messageDiv = document.createElement("div");
+      messageDiv.classList.add("message", sender);
+      messageDiv.setAttribute("role", sender === "bot" ? "status" : "none");
+
+      const avatar = document.createElement("div");
+      avatar.classList.add("avatar");
+      avatar.innerHTML = sender === "bot" ? "B" : "Du";
+
+      const wrapper = document.createElement("div");
+      wrapper.classList.add("message-wrapper");
+
+      const content = document.createElement("div");
+      content.classList.add("message-content");
+      content.innerHTML = formatMessage(text);
+
+      const timestamp = document.createElement("div");
+      timestamp.classList.add("timestamp");
+      const now = new Date();
+      timestamp.textContent = `${now.getHours().toString().padStart(2, '0')}:${
+                              now.getMinutes().toString().padStart(2, '0')}`;
+
+      wrapper.appendChild(content);
+      wrapper.appendChild(timestamp);
+
+      if (sender === "user") {
+        messageDiv.appendChild(wrapper);
+        messageDiv.appendChild(avatar);
+      } else {
+        messageDiv.appendChild(avatar);
+        messageDiv.appendChild(wrapper);
+      }
+
+      chatArea.appendChild(messageDiv);
+      chatArea.scrollTop = chatArea.scrollHeight;
+      saveChatHistory();
+    }
+
+    /* ============================================================
+       Benachrichtigung anzeigen
+    ============================================================== */
+    function showNotification(message, isError = false) {
+      notification.textContent = message;
+      notification.className = "notification" + (isError ? " error" : "");
+      notification.style.display = "block";
+      setTimeout(() => {
+        notification.style.display = "none";
+      }, 3000);
+    }
+
+    /* ============================================================
+       Nachricht an Webhook senden (mit Retry-Logik)
+    ============================================================== */
+    async function sendTextMessage(text) {
+      if (isWaiting) return;
+      isWaiting = true;
+      loader.style.display = "block";
+      sendButton.disabled = true;
+
+      try {
+        const payload = {
+          message: text,
+          last_answer: lastBotAnswer
+        };
+        const response = await fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+          throw new Error(`Server antwortete mit Status: ${response.status}`);
+        }
+        const respText = await response.text();
+
+        let reply = "";
+        try {
+          const data = JSON.parse(respText);
+          reply = data.answer || respText;
+        } catch {
+          reply = respText;
+        }
+
+        lastBotAnswer = reply;
+        appendMessage("bot", reply);
+        retryCount = 0;
+      } catch (err) {
+        console.error("Fehler:", err);
+        if (retryCount < MAX_RETRIES) {
+          retryCount++;
+          showNotification(`Verbindungsfehler, versuche erneut (${retryCount}/${MAX_RETRIES})…`, true);
+          setTimeout(() => sendTextMessage(text), RETRY_DELAY);
+          return;
+        } else {
+          appendMessage("bot", "Es gab einen Fehler bei der Kommunikation. Bitte versuche es später erneut.");
+          showNotification("Fehler bei der Kommunikation mit dem Server.", true);
+          retryCount = 0;
+        }
+      } finally {
+        isWaiting = false;
+        loader.style.display = "none";
+        sendButton.disabled = false;
+        userInput.focus();
+      }
+    }
+
+    /* ============================================================
+       Schickt Nutzereingabe ab
+    ============================================================== */
+    function handleSendMessage() {
+      const text = userInput.value.trim();
+      if (text === "" || isWaiting) return;
+      appendMessage("user", text);
+      userInput.value = "";
+      sendTextMessage(text);
+    }
+
+    /* ============================================================
+       Event-Listener setzen
+    ============================================================== */
+    sendButton.addEventListener("click", handleSendMessage);
+    userInput.addEventListener("keypress", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        handleSendMessage();
+      }
+    });
+    printButton.addEventListener("click", () => window.print());
+    clearButton.addEventListener("click", () => {
+      if (confirm("Möchtest du wirklich den gesamten Chat-Verlauf löschen?")) {
+        localStorage.removeItem("chatHistory");
+        chatArea.innerHTML = "";
+        lastBotAnswer = "";
+        initializeChat();
+        showNotification("Chat-Verlauf wurde gelöscht.");
+      }
+    });
+    darkModeButton.addEventListener("click", () => {
+      document.body.classList.toggle("dark-mode");
+      const isDark = document.body.classList.contains("dark-mode");
+      localStorage.setItem("darkMode", isDark.toString());
+      // Dark-Mode-Farben umschalten
+      if (isDark) {
+        document.documentElement.classList.add("dark-mode");
+      } else {
+        document.documentElement.classList.remove("dark-mode");
+      }
+    });
+
+    /* ============================================================
+       Initialisierung bei Laden
+    ============================================================== */
+    window.addEventListener("DOMContentLoaded", () => {
+      // Chatverlauf laden oder Begrüßung
+      loadChatHistory();
+      // Dark-Mode-Status wiederherstellen
+      const darkModeEnabled = localStorage.getItem("darkMode");
+      if (darkModeEnabled === "true") {
+        document.documentElement.classList.add("dark-mode");
+      }
+    });
+  </script>
+</body>
+</html>
