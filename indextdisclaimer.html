@@ -3,376 +3,333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dein persönlicher Assistent</title>
+    <title>Persönlicher KI-Assistent</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-blue: #0059b3;
+            --primary: #0059b3;
             --primary-dark: #003974;
-            --disclaimer-bg: rgba(0,0,0,0.45);
-            --btn-radius: 8px;
-            --shadow: 0 4px 20px 2px rgba(0,0,0,0.12);
-            --max-width: 700px;
+            --secondary: #f3f7fb;
             --chat-bg: #fff;
-            --header-bg: #f9fafb;
-            --border: #e1e7ef;
+            --chat-shadow: 0 12px 48px 0 rgba(0,0,0,0.09);
+            --radius: 22px;
+            --avatar-size: 52px;
+            --bubble-radius: 18px;
+            --user-bubble: #eaf1fa;
+            --bot-bubble: #fff;
+            --bot-gradient: linear-gradient(100deg,#004fa2 0,#48a3ef 100%);
         }
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            background: #f4f7fb;
+            background: linear-gradient(135deg, #d1e8fa 0, #f4f7fb 90%);
+            min-height: 100vh;
             margin: 0;
-            padding: 0;
-            color: #22324c;
+            color: #1d2736;
+        }
+        .center-area {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-        }
-        /* Disclaimer Modal */
-        #disclaimer-modal {
-            position: fixed;
-            z-index: 2000;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--disclaimer-bg);
-            animation: fadeInBG 0.4s;
-        }
-        @keyframes fadeInBG {
-            from { background: rgba(0,0,0,0);}
-            to   { background: var(--disclaimer-bg);}
-        }
-        #disclaimer-box {
-            background: #fff;
-            border-radius: 18px;
-            max-width: 430px;
-            width: 90%;
-            box-shadow: var(--shadow);
-            overflow: hidden;
-            animation: floatIn 0.45s;
-            position: relative;
-        }
-        @keyframes floatIn {
-            from { opacity:0; transform: translateY(30px);}
-            to { opacity:1; transform: translateY(0);}
-        }
-        #disclaimer-head {
-            background: var(--primary-blue);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            padding: 20px 24px;
-            position: relative;
-        }
-        #disclaimer-head .fa-shield-halved {
-            font-size: 1.3rem;
-            margin-right: 14px;
-        }
-        #disclaimer-head .close-x {
-            position: absolute;
-            top: 18px;
-            right: 20px;
-            background: transparent;
-            border: none;
-            color: #fff;
-            font-size: 1.3rem;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity .2s;
-        }
-        #disclaimer-head .close-x:hover {
-            opacity: 1;
-        }
-        #disclaimer-box .content {
-            padding: 24px 24px 14px 24px;
-            color: #22324c;
-            font-size: 1.01rem;
-        }
-        #disclaimer-box .content p {
-            margin: 0 0 12px 0;
-            line-height: 1.45;
-        }
-        #disclaimer-box .content .warn {
-            color: var(--primary-blue);
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-        #disclaimer-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 0 24px 22px 24px;
-            flex-wrap: wrap;
-        }
-        .btn-disclaimer {
-            font-size: 1.01rem;
-            padding: 10px 22px;
-            border-radius: var(--btn-radius);
-            border: none;
-            cursor: pointer;
-            transition: background 0.15s, color 0.12s;
-            font-weight: 600;
-            box-shadow: 0 2px 8px rgba(0,89,179,0.05);
-        }
-        .btn-disclaimer.accept {
-            background: var(--primary-blue);
-            color: #fff;
-        }
-        .btn-disclaimer.accept:hover {
-            background: var(--primary-dark);
-        }
-        .btn-disclaimer.cancel {
-            background: #f3f4f6;
-            color: var(--primary-blue);
-            border: 1px solid #c7d5ea;
-        }
-        .btn-disclaimer.cancel:hover {
-            background: #eaf1fa;
-            color: var(--primary-dark);
-        }
-        .btn-disclaimer.privacy {
-            background: #fff;
-            color: var(--primary-blue);
-            border: 1px solid #c7d5ea;
-            box-shadow: none;
-            font-size: 0.99rem;
-            padding: 10px 16px;
-        }
-        .btn-disclaimer.privacy:hover {
-            background: #eaf1fa;
-            color: var(--primary-dark);
-        }
-        @media (max-width: 520px) {
-            #disclaimer-box { max-width: 98vw; padding: 0;}
-            #disclaimer-head { padding: 14px 10px; font-size: 1rem;}
-            #disclaimer-box .content { padding: 15px 10px 8px 10px;}
-            #disclaimer-buttons { padding: 0 10px 12px 10px;}
-        }
-        /* Datenschutzinfo-Layer */
-        #privacy-modal {
-            display: none;
-            position: fixed;
-            z-index: 2100;
-            inset: 0;
-            background: rgba(0,0,0,0.52);
             align-items: center;
             justify-content: center;
         }
-        #privacy-content {
-            background: #fff;
-            border-radius: 16px;
-            max-width: 520px;
-            width: 96%;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.16);
-            padding: 32px 24px 24px 24px;
-            position: relative;
-            font-size: 1rem;
-            color: #222d3b;
-            animation: fadeInBG 0.25s;
-        }
-        #privacy-content h2 {
-            color: var(--primary-blue);
-            font-size: 1.24rem;
-            margin-top: 0;
-        }
-        #privacy-content .close-x {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            background: transparent;
-            border: none;
-            color: #455;
-            font-size: 1.35rem;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: opacity .2s;
-        }
-        #privacy-content .close-x:hover {
-            opacity: 1;
-        }
-        #privacy-content ul {
-            margin: 0 0 1em 1.1em;
-            padding: 0;
-        }
-        #privacy-content li {
-            margin-bottom: 0.6em;
-        }
-        /* Chatbot UI Beispiel */
-        .main-header {
-            background: var(--header-bg);
-            border-bottom: 1.5px solid var(--border);
-            padding: 18px 0 12px 0;
-            text-align: center;
-        }
-        .main-header h1 {
-            margin: 0;
-            font-size: 1.35rem;
-            color: var(--primary-blue);
-        }
-        .chat-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin: 0 auto;
-            max-width: var(--max-width);
-            width: 100%;
-        }
-        .chat-box {
-            width: 100%;
-            max-width: 600px;
+        .chatbox-outer {
             background: var(--chat-bg);
-            border-radius: 14px;
-            box-shadow: var(--shadow);
-            margin: 32px 0 0 0;
-            padding: 20px 18px;
-            min-height: 300px;
-            min-width: 240px;
+            border-radius: var(--radius);
+            box-shadow: var(--chat-shadow);
+            padding: 0;
+            width: 390px;
+            max-width: 96vw;
+            min-height: 570px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            overflow: hidden;
+            border: 1px solid #e3eefa;
         }
-        .input-container {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto 32px auto;
+        .chat-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 22px 28px 16px 90px;
+            position: relative;
+        }
+        .chat-header .bot-avatar {
+            position: absolute;
+            left: 24px;
+            top: 12px;
+            width: var(--avatar-size);
+            height: var(--avatar-size);
+            background: var(--bot-gradient);
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 12px;
+            justify-content: center;
+            font-size: 2.1rem;
+            box-shadow: 0 6px 18px 0 rgba(0,70,160,0.15);
+            color: #fff;
         }
-        .textarea-wrapper {
+        .chat-header h1 {
+            font-size: 1.22rem;
+            font-weight: 700;
+            margin: 0 0 5px 0;
+        }
+        .chat-header .subtitle {
+            font-size: .98rem;
+            font-weight: 400;
+            color: #d8e8f8;
+        }
+        .messages-area {
             flex: 1;
+            background: #f8fafc;
+            padding: 22px 16px 16px 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .bubble-row {
+            display: flex;
+            gap: 8px;
+        }
+        .bubble-row.user {
+            flex-direction: row-reverse;
+        }
+        .bubble-row .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #cbe4f8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            color: #1976d2;
+            flex-shrink: 0;
+        }
+        .bubble-row.user .avatar {
+            background: #fdeacc;
+            color: #e89c23;
+        }
+        .bubble {
+            border-radius: var(--bubble-radius);
+            font-size: 1.02rem;
+            padding: 12px 18px;
+            max-width: 72%;
+            word-break: break-word;
+            box-shadow: 0 2px 10px 0 rgba(0,70,160,0.03);
+            animation: appear 0.17s;
+        }
+        @keyframes appear { from{opacity:0;transform:translateY(10px);} to{opacity:1;transform:translateY(0);} }
+        .bubble.bot {
+            background: var(--bot-bubble);
+            color: #1d2736;
+            border-top-left-radius: 6px;
+            border-left: 4px solid var(--primary);
+        }
+        .bubble.user {
+            background: var(--user-bubble);
+            color: #22324c;
+            border-top-right-radius: 6px;
+            border-right: 4px solid #ffd47c;
+        }
+        .inputbar-area {
+            background: #f7fafb;
+            padding: 18px 16px;
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            border-top: 1.5px solid #e3eefa;
         }
         #userInput {
-            width: 100%;
-            border-radius: 8px;
-            border: 1.5px solid #cfd8e6;
-            padding: 12px 14px;
-            font-size: 1.05rem;
-            font-family: inherit;
-            resize: none;
+            flex: 1;
+            border: none;
             background: #fff;
+            border-radius: 10px;
+            font-size: 1.08rem;
+            padding: 12px 16px;
+            resize: none;
+            box-shadow: 0 2px 5px 0 rgba(0,0,0,0.05);
+            border: 1px solid #dbe8f8;
+            transition: border .13s;
         }
-        #userInput:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-        }
-        .send-button {
-            background: var(--primary-blue);
+        #userInput:focus { outline: none; border: 1.5px solid var(--primary);}
+        .send-btn {
+            background: var(--primary);
             color: #fff;
             border: none;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            width: 48px;
-            height: 48px;
             font-size: 1.3rem;
+            cursor: pointer;
+            box-shadow: 0 3px 10px 0 rgba(0,70,160,0.07);
+            transition: background .18s;
+        }
+        .send-btn:hover { background: var(--primary-dark);}
+        /* --- Disclaimer + Datenschutzlayer Allianz.de Style --- */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,38,90,0.45);
+            z-index: 3000;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: background 0.15s;
+            animation: fadeInBG .34s;
         }
-        .send-button:hover { background: var(--primary-dark);}
+        .modal-card {
+            background: #fff;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 95vw;
+            box-shadow: 0 8px 32px 0 rgba(0,70,160,0.13);
+            padding: 0;
+            overflow: hidden;
+            animation: floatIn .27s;
+            border: 1.5px solid var(--primary);
+            position: relative;
+        }
+        .modal-head {
+            background: var(--primary);
+            color: #fff;
+            padding: 22px 28px;
+            display: flex;
+            align-items: center;
+            font-size: 1.13rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+        .modal-head .fa-lock, .modal-head .fa-shield-halved {
+            font-size: 1.3rem;
+            margin-right: 13px;
+        }
+        .modal-content {
+            padding: 26px 24px 14px 24px;
+            color: #1c273a;
+            font-size: 1.04rem;
+        }
+        .modal-content ul {
+            margin: 14px 0 0 18px;
+        }
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 14px;
+            padding: 0 24px 22px 24px;
+        }
+        .modal-btn {
+            padding: 11px 28px;
+            border-radius: 20px;
+            border: none;
+            font-size: 1.09rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 1px 5px rgba(0,89,179,0.06);
+            transition: background .17s, color .14s;
+        }
+        .modal-btn.accept {
+            background: var(--primary);
+            color: #fff;
+        }
+        .modal-btn.accept:hover { background: var(--primary-dark);}
+        .modal-btn.decline {
+            background: #f3f4f6;
+            color: var(--primary);
+            border: 1px solid #c7d5ea;
+        }
+        .modal-btn.decline:hover {
+            background: #eaf1fa;
+            color: var(--primary-dark);
+        }
+        @media (max-width:600px) {
+            .chatbox-outer { min-width: 0; width:98vw;}
+            .modal-card {max-width:99vw;}
+        }
     </style>
 </head>
 <body>
+    <!-- Datenschutz Modal -->
+    <div class="modal-overlay" id="privacy-modal">
+        <div class="modal-card">
+            <div class="modal-head"><i class="fa-solid fa-lock"></i>Datenschutzhinweis</div>
+            <div class="modal-content">
+                <p>Um diesen Chatbot nutzen zu können, ist deine Zustimmung zur folgenden Datenschutzerklärung erforderlich:</p>
+                <ul>
+                    <li>Deine Eingaben werden an externe KI-Dienstleister (OpenAI, USA) und die Automatisierungsplattform (Make, EU) übermittelt.</li>
+                    <li>Die übermittelten Daten werden für die Generierung von Antworten verarbeitet, können aber auf Servern außerhalb der EU gespeichert werden.</li>
+                    <li>Bitte gib <b>keine personenbezogenen oder sensiblen Daten</b> ein!</li>
+                    <li>Weitere Informationen: <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">Datenschutzrichtlinie OpenAI</a>, <a href="https://www.make.com/en/privacy-policy" target="_blank" rel="noopener">Make.com</a>.</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-btn accept" onclick="acceptPrivacy()">Zustimmen</button>
+                <button class="modal-btn decline" onclick="window.location.reload()">Ablehnen</button>
+            </div>
+        </div>
+    </div>
     <!-- Disclaimer Modal -->
-    <div id="disclaimer-modal">
-        <div id="disclaimer-box">
-            <div id="disclaimer-head">
-                <i class="fa-solid fa-shield-halved"></i>
-                Hinweis zu Datenschutz & KI
-                <button class="close-x" aria-label="Schließen" onclick="document.getElementById('disclaimer-modal').style.display='none'">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+    <div class="modal-overlay" id="disclaimer-modal" style="display:none;">
+        <div class="modal-card">
+            <div class="modal-head"><i class="fa-solid fa-shield-halved"></i>Haftungsausschluss</div>
+            <div class="modal-content">
+                <ul>
+                    <li>Die Antworten dieses Chatbots werden durch künstliche Intelligenz (KI) erzeugt.</li>
+                    <li>Es besteht <b>keine Garantie auf Richtigkeit, Vollständigkeit oder Aktualität</b> der bereitgestellten Informationen.</li>
+                    <li>Die Nutzung des Chatbots ersetzt keine Rechts-, Steuer- oder Fachberatung.</li>
+                </ul>
             </div>
-            <div class="content">
-                <div class="warn">KI-generierte Antworten sind niemals verbindlich.</div>
-                <p>
-                    Dieser Chatbot basiert auf künstlicher Intelligenz. Die bereitgestellten Informationen dienen ausschließlich allgemeinen Zwecken und ersetzen keine Fachberatung. Für die Richtigkeit und Vollständigkeit wird keine Haftung übernommen.
-                </p>
-                <p>
-                    Bitte gib <b>keine persönlichen oder personenbezogenen Daten</b> ein. Deine Eingaben werden an externe Dienste übermittelt.
-                </p>
-            </div>
-            <div id="disclaimer-buttons">
-                <button class="btn-disclaimer privacy" onclick="openPrivacyModal()">Datenschutz</button>
-                <button class="btn-disclaimer cancel" onclick="document.getElementById('disclaimer-modal').style.display='none'">Abbrechen</button>
-                <button class="btn-disclaimer accept" onclick="document.getElementById('disclaimer-modal').style.display='none'">Akzeptieren</button>
+            <div class="modal-footer">
+                <button class="modal-btn accept" onclick="acceptDisclaimer()">Einverstanden</button>
+                <button class="modal-btn decline" onclick="window.location.reload()">Ablehnen</button>
             </div>
         </div>
     </div>
-    <!-- Datenschutzinfo-Overlay -->
-    <div id="privacy-modal">
-        <div id="privacy-content">
-            <button class="close-x" onclick="closePrivacyModal()" aria-label="Schließen"><i class="fa-solid fa-xmark"></i></button>
-            <h2>Datenschutzhinweis für diesen Chatbot</h2>
-            <p>
-                Bei Nutzung dieses Chatbots werden deine Eingaben an folgende externe Dienstleister weitergeleitet:
-            </p>
-            <ul>
-                <li><b>OpenAI (USA)</b>: Die KI-gestützte Beantwortung erfolgt durch Server von OpenAI. Dabei können deine Texte den USA übermittelt werden. Es gelten die <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener">Datenschutzrichtlinien von OpenAI</a>.</li>
-                <li><b>Make.com (Tschechien/EU)</b>: Für die technische Verarbeitung und Weiterleitung der Anfrage wird Make.com genutzt. Es gelten die <a href="https://www.make.com/en/privacy-policy" target="_blank" rel="noopener">Datenschutzbestimmungen von Make.com</a>.</li>
-            </ul>
-            <p>
-                Bitte gib keine persönlichen oder sensiblen Daten ein. Die Antworten dieses Bots sind KI-generiert und können fehlerhaft sein. Es wird keine Haftung übernommen.
-            </p>
-            <p>
-                Für Auskunft, Löschung oder Fragen wende dich bitte an den Betreiber dieser Seite.
-            </p>
-        </div>
-    </div>
-
     <!-- Chatbot Oberfläche -->
-    <header class="main-header">
-        <h1>Willkommen in Deinem Chat zu Personalmanagement</h1>
-    </header>
-    <main class="chat-container">
-        <div class="chat-box" id="chatBox">
-            <div style="color:#6b7280;">Herzlich willkommen! Dieser Chatbot hilft Dir rund um das Thema Personalmanagement.<br>Stelle Deine Frage unten im Textfeld.</div>
+    <div class="center-area">
+        <div class="chatbox-outer">
+            <div class="chat-header">
+                <div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>
+                <h1>Dein KI-Assistent</h1>
+                <div class="subtitle">Stelle deine Frage rund ums Personalmanagement</div>
+            </div>
+            <div class="messages-area" id="messages">
+                <!-- Chat-Verlauf erscheint hier -->
+                <div class="bubble-row bot">
+                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
+                    <div class="bubble bot">Hallo! Ich bin dein KI-Assistent. Stelle mir deine Frage zu Personal, Ausbildung oder Prüfungsvorbereitung.</div>
+                </div>
+            </div>
+            <form class="inputbar-area" onsubmit="event.preventDefault();sendMessage();">
+                <textarea id="userInput" placeholder="Nachricht eingeben..." rows="1" autocomplete="off"></textarea>
+                <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
         </div>
-    </main>
-    <div class="input-container">
-        <div class="textarea-wrapper">
-            <textarea id="userInput" placeholder="Deine Nachricht..." rows="1"></textarea>
-        </div>
-        <button class="send-button" id="sendButton">
-            <i class="fas fa-paper-plane"></i>
-        </button>
     </div>
     <script>
-        // Datenschutzinfo Modal Logik
-        function openPrivacyModal() {
-            document.getElementById('privacy-modal').style.display = 'flex';
-        }
-        function closePrivacyModal() {
+        // MODAL FLOW: Erst Datenschutz, dann Disclaimer!
+        function acceptPrivacy() {
             document.getElementById('privacy-modal').style.display = 'none';
+            document.getElementById('disclaimer-modal').style.display = 'flex';
         }
-
-        // Demo-Logik für das Senden von Nachrichten via Make
-        const sendBtn = document.getElementById('sendButton');
+        function acceptDisclaimer() {
+            document.getElementById('disclaimer-modal').style.display = 'none';
+        }
+        // Chatbot-Logik mit Make-Webhook
+        const messagesDiv = document.getElementById('messages');
         const userInput = document.getElementById('userInput');
-        const chatBox = document.getElementById('chatBox');
-        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // <--- DEINE MAKE WEBHOOK URL
-
-        sendBtn.addEventListener('click', sendMessage);
-        userInput.addEventListener('keypress', function(e){
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
+        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // ggf. anpassen
 
         function addMessage(sender, text) {
-            const msg = document.createElement('div');
-            msg.style.alignSelf = sender === 'user' ? 'flex-end' : 'flex-start';
-            msg.style.background = sender === 'user' ? '#eaf1fa' : '#f3f7fb';
-            msg.style.padding = '10px 16px';
-            msg.style.borderRadius = '14px';
-            msg.style.marginTop = '6px';
-            msg.style.maxWidth = '85%';
-            msg.textContent = text;
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            const row = document.createElement('div');
+            row.className = 'bubble-row ' + sender;
+            const avatar = document.createElement('div');
+            avatar.className = 'avatar';
+            avatar.innerHTML = sender === 'user' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-robot"></i>';
+            const bubble = document.createElement('div');
+            bubble.className = 'bubble ' + sender;
+            bubble.innerHTML = text;
+            row.appendChild(avatar);
+            row.appendChild(bubble);
+            messagesDiv.appendChild(row);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
         async function sendMessage() {
@@ -380,10 +337,8 @@
             if (!text) return;
             addMessage('user', text);
             userInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
-
-            // KI/Make-Integration:
-            addMessage('bot', '⏳ Anfrage wird verarbeitet ...');
+            userInput.focus();
+            addMessage('bot', '⏳ Einen Moment bitte ...');
             try {
                 const response = await fetch(webhookUrl, {
                     method: "POST",
@@ -391,16 +346,28 @@
                     body: JSON.stringify({ question: text })
                 });
                 let reply = await response.text();
-                // Clean previous "wird verarbeitet ..."
-                const lastMsg = chatBox.querySelectorAll('div');
-                if(lastMsg.length > 0) lastMsg[lastMsg.length-1].remove();
-                addMessage('bot', reply);
+                // Letztes Bot-Message (Ladekreis) ersetzen:
+                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = reply;
             } catch (err) {
-                const lastMsg = chatBox.querySelectorAll('div');
-                if(lastMsg.length > 0) lastMsg[lastMsg.length-1].remove();
-                addMessage('bot', "❌ Es ist ein Fehler aufgetreten.");
+                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = "❌ Es ist ein Fehler aufgetreten.";
             }
         }
+        // Textarea wächst mit:
+        userInput.addEventListener('input', function(){
+            this.style.height = "auto";
+            this.style.height = (this.scrollHeight+2) + "px";
+        });
+        // Enter sendet ab, Shift+Enter für neue Zeile:
+        userInput.addEventListener('keydown', function(e){
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        // Modal beim Laden anzeigen
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('privacy-modal').style.display = 'flex';
+        });
     </script>
 </body>
 </html>
