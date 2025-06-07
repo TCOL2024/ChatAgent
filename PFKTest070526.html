@@ -2,33 +2,138 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
-  <title>WBT: Sozialrecht & Pflege – Quiz mit Erklärungen</title>
+  <title>WBT: Sozialrecht & Pflege – Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body {background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0;}
-    .container {max-width: 650px; margin: 40px auto; background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 30px 25px 20px 25px;}
-    h1 {text-align: center; color: #003366; margin-bottom: 14px;}
-    .intro {text-align: center; color: #444; margin-bottom: 20px; font-size: 1.1em;}
-    .question {margin: 22px 0 10px 0; font-weight: bold; color: #223c60;}
-    .answers label {display: block; margin: 10px 0; cursor: pointer; border-radius: 6px; padding: 8px 14px; background: #f0f4f9; transition: background 0.2s;}
-    .answers input[type="radio"] {margin-right: 12px;}
-    .answers label.selected {background: #dde8f7; border: 1px solid #81a1d4;}
-    .feedback {margin: 8px 0 4px 0; font-size: 1em;}
-    .explanation {font-size: 0.97em; color: #555; margin-bottom: 8px;}
-    .correct {color: #238c1c; font-weight: bold;}
-    .incorrect {color: #c0392b; font-weight: bold;}
-    .btn {background: #0071c2; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; cursor: pointer; font-size: 1em; margin-top: 16px; transition: background 0.2s;}
-    .btn:hover {background: #005a97;}
-    .results {text-align: center; margin: 30px 0 0 0;}
-    @media (max-width: 640px) {.container {padding: 10px 4px;}}
+    body {
+      background: #f7fafd;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+    }
+    .container {
+      max-width: 680px;
+      margin: 38px auto;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px rgba(0,45,90,0.13);
+      padding: 38px 30px 20px 30px;
+      position: relative;
+    }
+    h1 {
+      text-align: center;
+      color: #002855;
+      margin-bottom: 16px;
+      font-size: 2.1em;
+      letter-spacing: -1px;
+      font-weight: 700;
+    }
+    .intro {
+      text-align: center;
+      color: #444b54;
+      margin-bottom: 24px;
+      font-size: 1.13em;
+      line-height: 1.5;
+    }
+    .progressbar {
+      width: 100%;
+      background: #e5eefd;
+      border-radius: 9px;
+      overflow: hidden;
+      height: 18px;
+      margin-bottom: 22px;
+    }
+    .progress {
+      height: 18px;
+      background: linear-gradient(90deg,#0058a3,#0083c5);
+      transition: width 0.3s;
+      border-radius: 9px 0 0 9px;
+    }
+    .question {
+      font-weight: bold;
+      color: #002855;
+      font-size: 1.12em;
+      margin-bottom: 10px;
+      margin-top: 22px;
+    }
+    .answers label {
+      display: block;
+      margin: 12px 0;
+      cursor: pointer;
+      border-radius: 9px;
+      padding: 12px 18px;
+      background: #f3f6fb;
+      transition: background 0.19s, border 0.19s;
+      font-size: 1.04em;
+      border: 1.5px solid transparent;
+    }
+    .answers label.selected {
+      background: #e5eefd;
+      border: 1.5px solid #0083c5;
+      font-weight: 600;
+    }
+    .btn {
+      background: linear-gradient(90deg,#0058a3,#0083c5);
+      color: #fff;
+      border: none;
+      padding: 13px 30px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 1.08em;
+      font-weight: 600;
+      margin-top: 18px;
+      transition: background 0.2s;
+      box-shadow: 0 2px 6px rgba(0,56,130,0.08);
+      display: block;
+      width: 100%;
+      letter-spacing: .5px;
+    }
+    .btn:hover {
+      background: linear-gradient(90deg,#003b73,#006ea1);
+    }
+    .results {
+      text-align: center;
+      margin: 34px 0 0 0;
+    }
+    .feedback {
+      font-size: 1.07em;
+      margin: 18px 0 10px 0;
+      color: #002855;
+    }
+    .explanation {
+      font-size: 0.97em;
+      color: #555;
+      margin-bottom: 8px;
+      margin-top: 3px;
+    }
+    .retry-btn {
+      background: #f9b233;
+      color: #002855;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 7px;
+      cursor: pointer;
+      margin: 14px auto 0 auto;
+      display: block;
+      font-size: 1em;
+      font-weight: 600;
+    }
+    .retry-btn:hover {
+      background: #f5a623;
+    }
+    @media (max-width: 700px) {
+      .container {padding: 10px 3vw;}
+      .btn {font-size: 1em;}
+    }
   </style>
 </head>
 <body>
 <div class="container">
-  <h1>Wissensquiz: Sozialrecht & Pflege</h1>
+  <h1>Quiz Sozialrecht & Pflegeversicherung</h1>
   <div class="intro">
-    Teste dein Wissen rund um die Pflegeversicherung, Arbeitslosenversicherung und Sozialgerichtsbarkeit.<br>Nach jeder Antwort bekommst du direkt eine Erklärung.
+    Teste dein Wissen rund um Pflegeversicherung, Arbeitslosenversicherung und Sozialgerichtsbarkeit.<br>
+    Du erhältst dein Feedback erst am Ende. Bei falscher Antwort kannst du es nochmal probieren!
   </div>
+  <div class="progressbar"><div class="progress" id="progress" style="width:0%"></div></div>
   <form id="quizForm"></form>
   <div class="results" id="results"></div>
 </div>
@@ -85,15 +190,15 @@ const questions = [
     e: "Bis zu 4.180 € zahlt die Pflegekasse pro Umbaumaßnahme zur Verbesserung des Wohnumfelds."
   },
   {
-    q: "6. Welche Pflegeleistungen übernimmt die Pflegeversicherung für technische Pflegehilfsmittel?",
+    q: "6. Was bedeutet Pflegebedürftigkeit im Sinne der Pflegeversicherung?",
     a: [
-      "100 % der Kosten ohne Eigenanteil",
-      "Zehn Prozent, maximal 25 € pro Gegenstand als Eigenanteil",
-      "Nur bis 42 € monatlich",
-      "Keine Leistungen"
+      "Man benötigt Unterstützung bei mind. zwei Aktivitäten im Haushalt.",
+      "Es besteht ein körperlicher, geistiger oder seelischer Hilfebedarf bei der Bewältigung des Alltags über längere Zeit.",
+      "Nur Menschen im Pflegeheim gelten als pflegebedürftig.",
+      "Pflegebedürftigkeit gibt es erst ab Pflegegrad 2."
     ],
     c: 1,
-    e: "Für technische Pflegehilfsmittel ist ein Eigenanteil von 10 %, maximal 25 € pro Gegenstand zu zahlen."
+    e: "Pflegebedürftigkeit liegt vor, wenn aufgrund von gesundheitlichen Beeinträchtigungen der Selbstständigkeit oder Fähigkeiten über längere Zeit (mindestens 6 Monate) Hilfe im Alltag benötigt wird."
   },
   {
     q: "7. Was ist der erste Schritt, bevor ein Sozialgericht angerufen werden kann?",
@@ -141,80 +246,101 @@ const questions = [
   }
 ];
 
+let current = 0;
 let userAnswers = Array(questions.length).fill(null);
+let attempts = Array(questions.length).fill(0);
 
 function renderQuiz() {
+  showProgress();
   const form = document.getElementById('quizForm');
   form.innerHTML = '';
-  questions.forEach((q, i) => {
-    let block = document.createElement('div');
-    block.className = "question-block";
-    block.innerHTML = `
-      <div class="question">${q.q}</div>
-      <div class="answers" id="answers${i}">
-        ${q.a.map((ans, idx) => `
-          <label>
-            <input type="radio" name="q${i}" value="${idx}" onclick="giveFeedback(${i}, ${idx})">
-            ${ans}
-          </label>
-        `).join('')}
-      </div>
-      <div class="feedback" id="feedback${i}"></div>
-      <div class="explanation" id="explanation${i}"></div>
-    `;
-    form.appendChild(block);
-  });
+  const q = questions[current];
+  let block = document.createElement('div');
+  block.className = "question-block";
+  block.innerHTML = `
+    <div class="question">${q.q}</div>
+    <div class="answers" id="answers${current}">
+      ${q.a.map((ans, idx) => `
+        <label id="label${current}_${idx}">
+          <input type="radio" name="q${current}" value="${idx}">
+          ${ans}
+        </label>
+      `).join('')}
+    </div>
+    <div id="error" style="color:#c0392b;margin:8px 0 0 2px;"></div>
+  `;
+  form.appendChild(block);
+
   let btn = document.createElement('button');
   btn.className = 'btn';
   btn.type = 'button';
-  btn.textContent = 'Quiz auswerten';
-  btn.onclick = checkQuiz;
+  btn.textContent = (current === questions.length - 1) ? 'Quiz auswerten' : 'Weiter';
+  btn.onclick = checkAnswer;
   form.appendChild(btn);
 }
 
-window.giveFeedback = function(i, idx) {
-  userAnswers[i] = idx;
-  const feedback = document.getElementById('feedback' + i);
-  const explanation = document.getElementById('explanation' + i);
-  // Reset selection visual
-  let labels = document.querySelectorAll(`#answers${i} label`);
-  labels.forEach((lbl, n) => {
-    lbl.classList.toggle('selected', n === idx);
-  });
-  if (idx === questions[i].c) {
-    feedback.textContent = "Richtig!";
-    feedback.className = "feedback correct";
-  } else {
-    feedback.textContent = "Leider falsch!";
-    feedback.className = "feedback incorrect";
+function checkAnswer(e) {
+  e.preventDefault();
+  const radios = document.getElementsByName('q'+current);
+  let answer = null;
+  let selectedIdx = null;
+  radios.forEach((r, idx) => { if (r.checked) { answer = parseInt(r.value); selectedIdx = idx; } });
+  const err = document.getElementById('error');
+  if (answer === null) {
+    err.textContent = 'Bitte wähle eine Antwort aus.';
+    return;
   }
-  explanation.textContent = questions[i].e;
-};
-
-function checkQuiz() {
-  let score = 0;
-  let allAnswered = true;
-  questions.forEach((q, i) => {
-    if (userAnswers[i] === null) {
-      document.getElementById('feedback'+i).textContent = 'Bitte wähle eine Antwort aus.';
-      document.getElementById('feedback'+i).className = 'feedback incorrect';
-      allAnswered = false;
-    } else if (userAnswers[i] === q.c) {
-      score++;
+  err.textContent = '';
+  attempts[current]++;
+  if (answer === questions[current].c) {
+    userAnswers[current] = answer;
+    current++;
+    if (current < questions.length) {
+      renderQuiz();
+    } else {
+      showResults();
     }
-  });
-  const results = document.getElementById('results');
-  if (allAnswered) {
-    results.innerHTML = `<h2>Ergebnis</h2>
-      <p>Du hast <b>${score} von ${questions.length}</b> Fragen richtig beantwortet.</p>
-      ${score === questions.length ? "<p>Stark, alles richtig! 🎉</p>" : ""}
-      ${score < 7 ? "<p>Schau gerne nochmal in die Unterlagen – viele Lösungen findest du dort kompakt erklärt.</p>" : ""}
-      <p>Möchtest du einzelne Erklärungen noch einmal ansehen, klicke einfach erneut auf die jeweilige Frage.</p>
-      `;
-    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
   } else {
-    results.innerHTML = '';
+    // Highlight falsche Auswahl
+    radios.forEach((r, idx) => {
+      let lbl = document.getElementById(`label${current}_${idx}`);
+      if (idx === selectedIdx) lbl.classList.add('selected');
+      else lbl.classList.remove('selected');
+    });
+    err.textContent = 'Leider falsch, bitte versuche es erneut!';
   }
+  showProgress();
+}
+
+function showResults() {
+  document.getElementById('quizForm').innerHTML = '';
+  let score = userAnswers.filter((a,i)=>a===questions[i].c).length;
+  let resHtml = `<h2>Auswertung</h2>
+    <div class="feedback">Du hast <b>${score} von ${questions.length}</b> Fragen korrekt beantwortet.</div>`;
+  if(score===questions.length){
+    resHtml += `<div class="feedback" style="color:#238c1c;">Top! Alles richtig beantwortet. 🎉</div>`;
+  }else if(score<7){
+    resHtml += `<div class="feedback" style="color:#c0392b;">Tipp: Schau die Inhalte nochmal an und versuche es gerne erneut.</div>`;
+  }
+  // Erklärungen je Frage
+  resHtml += `<div style="text-align:left;margin-top:26px;"><b>Erklärungen zu den Lösungen:</b><ol>`;
+  questions.forEach((q,i)=>{
+    resHtml += `<li style="margin-bottom:16px;">
+      <b>${q.q}</b><br>
+      <span style="color:#0058a3">Richtige Antwort: ${q.a[q.c]}</span><br>
+      <span class="explanation">${q.e}</span>
+    </li>`;
+  });
+  resHtml += `</ol></div>`;
+  document.getElementById('results').innerHTML = resHtml;
+  showProgress(100);
+}
+
+function showProgress(forcePercent){
+  let percent = forcePercent!==undefined
+    ? forcePercent
+    : Math.round((current/questions.length)*100);
+  document.getElementById('progress').style.width = percent+'%';
 }
 
 renderQuiz();
