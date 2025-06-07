@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>WBT: Sozialrecht & Pflege – Quiz mit Erklärungen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {background: #f5f7fa; font-family: 'Segoe UI', Arial, sans-serif; margin: 0;}
+    .container {max-width: 650px; margin: 40px auto; background: #fff; border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); padding: 30px 25px 20px 25px;}
+    h1 {text-align: center; color: #003366; margin-bottom: 14px;}
+    .intro {text-align: center; color: #444; margin-bottom: 20px; font-size: 1.1em;}
+    .question {margin: 22px 0 10px 0; font-weight: bold; color: #223c60;}
+    .answers label {display: block; margin: 10px 0; cursor: pointer; border-radius: 6px; padding: 8px 14px; background: #f0f4f9; transition: background 0.2s;}
+    .answers input[type="radio"] {margin-right: 12px;}
+    .answers label.selected {background: #dde8f7; border: 1px solid #81a1d4;}
+    .feedback {margin: 8px 0 4px 0; font-size: 1em;}
+    .explanation {font-size: 0.97em; color: #555; margin-bottom: 8px;}
+    .correct {color: #238c1c; font-weight: bold;}
+    .incorrect {color: #c0392b; font-weight: bold;}
+    .btn {background: #0071c2; color: #fff; border: none; padding: 10px 26px; border-radius: 6px; cursor: pointer; font-size: 1em; margin-top: 16px; transition: background 0.2s;}
+    .btn:hover {background: #005a97;}
+    .results {text-align: center; margin: 30px 0 0 0;}
+    @media (max-width: 640px) {.container {padding: 10px 4px;}}
+  </style>
+</head>
+<body>
+<div class="container">
+  <h1>Wissensquiz: Sozialrecht & Pflege</h1>
+  <div class="intro">
+    Teste dein Wissen rund um die Pflegeversicherung, Arbeitslosenversicherung und Sozialgerichtsbarkeit.<br>Nach jeder Antwort bekommst du direkt eine Erklärung.
+  </div>
+  <form id="quizForm"></form>
+  <div class="results" id="results"></div>
+</div>
+<script>
+const questions = [
+  {
+    q: "1. In welchem Gesetzbuch ist die soziale Pflegeversicherung geregelt?",
+    a: ["SGB V", "SGB VI", "SGB XI", "SGB III"],
+    c: 2,
+    e: "Die soziale Pflegeversicherung ist im Elften Buch Sozialgesetzbuch (SGB XI) geregelt."
+  },
+  {
+    q: "2. Wer ist in Deutschland verpflichtet, eine Pflegeversicherung abzuschließen?",
+    a: [
+      "Nur gesetzlich Krankenversicherte",
+      "Nur privat Krankenversicherte",
+      "Alle, die gesetzlich oder privat krankenversichert sind",
+      "Nur Rentner"
+    ],
+    c: 2,
+    e: "Jede Person, die krankenversichert ist – egal ob gesetzlich oder privat –, ist verpflichtet, auch eine Pflegeversicherung abzuschließen."
+  },
+  {
+    q: "3. Wie hoch ist das monatliche Pflegegeld 2025 für Pflegegrad 3 (ambulant)?",
+    a: [
+      "347 €",
+      "599 €",
+      "800 €",
+      "1.497 €"
+    ],
+    c: 1,
+    e: "Pflegegrad 3: Das Pflegegeld beträgt 599 € monatlich (ambulant, Stand 2025)."
+  },
+  {
+    q: "4. Wie viel beträgt der Entlastungsbetrag monatlich, den Pflegebedürftige zu Hause unabhängig vom Pflegegrad bekommen?",
+    a: [
+      "25,50 €",
+      "131 €",
+      "347 €",
+      "42 €"
+    ],
+    c: 1,
+    e: "Der Entlastungsbetrag beträgt monatlich 131 € für alle Pflegegrade bei ambulanter Pflege."
+  },
+  {
+    q: "5. Was ist der maximale Zuschuss der Pflegekasse für eine Umbaumaßnahme (pro Maßnahme)?",
+    a: [
+      "2.000 €",
+      "4.180 €",
+      "7.000 €",
+      "16.720 €"
+    ],
+    c: 1,
+    e: "Bis zu 4.180 € zahlt die Pflegekasse pro Umbaumaßnahme zur Verbesserung des Wohnumfelds."
+  },
+  {
+    q: "6. Welche Pflegeleistungen übernimmt die Pflegeversicherung für technische Pflegehilfsmittel?",
+    a: [
+      "100 % der Kosten ohne Eigenanteil",
+      "Zehn Prozent, maximal 25 € pro Gegenstand als Eigenanteil",
+      "Nur bis 42 € monatlich",
+      "Keine Leistungen"
+    ],
+    c: 1,
+    e: "Für technische Pflegehilfsmittel ist ein Eigenanteil von 10 %, maximal 25 € pro Gegenstand zu zahlen."
+  },
+  {
+    q: "7. Was ist der erste Schritt, bevor ein Sozialgericht angerufen werden kann?",
+    a: [
+      "Direkte Klage beim Gericht",
+      "Mediation durch einen Anwalt",
+      "Außergerichtliches Vorverfahren (Widerspruch)",
+      "Schlichtung durch die Krankenkasse"
+    ],
+    c: 2,
+    e: "Vor einer Klage beim Sozialgericht muss ein außergerichtliches Vorverfahren (Widerspruch) durchgeführt werden."
+  },
+  {
+    q: "8. Wer entscheidet in der ersten Instanz (Sozialgericht) über einen Fall?",
+    a: [
+      "Ein Berufsrichter allein",
+      "Eine Kammer mit einem Berufsrichter und zwei ehrenamtlichen Richtern",
+      "Drei Berufsrichter ohne Ehrenamt",
+      "Fünf Richter, davon alle Ehrenamtliche"
+    ],
+    c: 1,
+    e: "In der 1. Instanz entscheidet eine Kammer: ein Berufsrichter (Vorsitz) und zwei ehrenamtliche Richter."
+  },
+  {
+    q: "9. Die Beiträge zur Arbeitslosenversicherung werden 2025 wie zwischen Arbeitgeber und Arbeitnehmer aufgeteilt?",
+    a: [
+      "Nur Arbeitnehmer zahlt",
+      "Nur Arbeitgeber zahlt",
+      "Jeweils 1,3 % vom Brutto (insgesamt 2,6 %)",
+      "Jeweils 2,6 % (insgesamt 5,2 %)"
+    ],
+    c: 2,
+    e: "Arbeitgeber und Arbeitnehmer zahlen je 1,3 % vom Bruttoeinkommen (gesamt: 2,6 %)."
+  },
+  {
+    q: "10. In welchem Fall wird das Bundessozialgericht tätig?",
+    a: [
+      "Als erste Instanz bei allen Sozialfällen",
+      "Als Berufungsinstanz bei Streitigkeiten unter Richtern",
+      "Als Revisionsinstanz – prüft nur Rechtsfragen",
+      "Nur bei Angelegenheiten der Bundesagentur für Arbeit"
+    ],
+    c: 2,
+    e: "Das Bundessozialgericht ist Revisionsinstanz und entscheidet nur über Rechtsfragen, nicht über Tatsachen."
+  }
+];
+
+let userAnswers = Array(questions.length).fill(null);
+
+function renderQuiz() {
+  const form = document.getElementById('quizForm');
+  form.innerHTML = '';
+  questions.forEach((q, i) => {
+    let block = document.createElement('div');
+    block.className = "question-block";
+    block.innerHTML = `
+      <div class="question">${q.q}</div>
+      <div class="answers" id="answers${i}">
+        ${q.a.map((ans, idx) => `
+          <label>
+            <input type="radio" name="q${i}" value="${idx}" onclick="giveFeedback(${i}, ${idx})">
+            ${ans}
+          </label>
+        `).join('')}
+      </div>
+      <div class="feedback" id="feedback${i}"></div>
+      <div class="explanation" id="explanation${i}"></div>
+    `;
+    form.appendChild(block);
+  });
+  let btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.type = 'button';
+  btn.textContent = 'Quiz auswerten';
+  btn.onclick = checkQuiz;
+  form.appendChild(btn);
+}
+
+window.giveFeedback = function(i, idx) {
+  userAnswers[i] = idx;
+  const feedback = document.getElementById('feedback' + i);
+  const explanation = document.getElementById('explanation' + i);
+  // Reset selection visual
+  let labels = document.querySelectorAll(`#answers${i} label`);
+  labels.forEach((lbl, n) => {
+    lbl.classList.toggle('selected', n === idx);
+  });
+  if (idx === questions[i].c) {
+    feedback.textContent = "Richtig!";
+    feedback.className = "feedback correct";
+  } else {
+    feedback.textContent = "Leider falsch!";
+    feedback.className = "feedback incorrect";
+  }
+  explanation.textContent = questions[i].e;
+};
+
+function checkQuiz() {
+  let score = 0;
+  let allAnswered = true;
+  questions.forEach((q, i) => {
+    if (userAnswers[i] === null) {
+      document.getElementById('feedback'+i).textContent = 'Bitte wähle eine Antwort aus.';
+      document.getElementById('feedback'+i).className = 'feedback incorrect';
+      allAnswered = false;
+    } else if (userAnswers[i] === q.c) {
+      score++;
+    }
+  });
+  const results = document.getElementById('results');
+  if (allAnswered) {
+    results.innerHTML = `<h2>Ergebnis</h2>
+      <p>Du hast <b>${score} von ${questions.length}</b> Fragen richtig beantwortet.</p>
+      ${score === questions.length ? "<p>Stark, alles richtig! 🎉</p>" : ""}
+      ${score < 7 ? "<p>Schau gerne nochmal in die Unterlagen – viele Lösungen findest du dort kompakt erklärt.</p>" : ""}
+      <p>Möchtest du einzelne Erklärungen noch einmal ansehen, klicke einfach erneut auf die jeweilige Frage.</p>
+      `;
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  } else {
+    results.innerHTML = '';
+  }
+}
+
+renderQuiz();
+</script>
+</body>
+</html>
