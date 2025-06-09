@@ -77,3 +77,83 @@
     }
 
     .objektinfo {
+      background: #fff;
+      padding: 20px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Formular zur Wohnungsbewerbung</h1>
+
+    <div class="objektinfo">
+      <h2>Objektinformationen</h2>
+      <p><strong>Objekt:</strong> Zwei Zimmer, Küche, Bad, Gäste-WC, eigener Parkplatz direkt vor der Tür. Kleine Terrasse.</p>
+      <p><strong>Kaltmiete:</strong> 480 €</p>
+      <p><strong>Nebenkosten:</strong> 250 € inkl. Gas, Strom, Versicherung, Steuer, Wasser, Abwasser</p>
+      <p><strong>Lage:</strong> zentral in Rhauderfehn, B438</p>
+      <p><strong>Verfügbar:</strong> spätestens ab 01.09.2025</p>
+      <p><strong>Kaution:</strong> 960 €</p>
+      <p><strong>Hinweis:</strong> Dieses Formular dient ausschließlich der Organisation von Besichtigungsterminen. Kein Mietverhältnis entsteht. Besichtigungen ab Ende Juni. Termine per SMS, WhatsApp oder E-Mail. Bitte reichen Sie aktuell <strong>keine Unterlagen</strong> ein.</p>
+    </div>
+
+    <form id="bewerbungForm">
+      <label for="name">Name*</label>
+      <input type="text" id="name" required>
+
+      <label for="email">E-Mail-Adresse</label>
+      <input type="email" id="email">
+
+      <label for="telefon">Telefonnummer</label>
+      <input type="text" id="telefon">
+
+      <label for="personen">Anzahl einziehender Personen*</label>
+      <input type="number" id="personen" required>
+
+      <label for="einkommen">Monatl. Haushaltsnettoeinkommen (freiwillig)</label>
+      <input type="text" id="einkommen">
+
+      <label for="bemerkung">Bemerkungen</label>
+      <textarea id="bemerkung" rows="4"></textarea>
+
+      <label><input type="checkbox" id="einwilligung" required> Ich willige in die untenstehenden Datenschutzbestimmungen ein.</label>
+
+      <div class="datenschutz">
+        <p><strong>Datenschutzhinweis:</strong><br>
+        Mit dem Absenden dieses Formulars willigen Sie ein, dass Ihre übermittelten Angaben (z. B. Name, E-Mail-Adresse, Telefonnummer, Haushaltsangaben) zum Zweck der Wohnungsbewerbung verarbeitet und gespeichert werden.</p>
+        <p>Ihre Einwilligung ist freiwillig und kann jederzeit – auch vor der Wohnungsbesichtigung – widerrufen werden. Die Daten werden spätestens drei Monate nach Abschluss gelöscht, sofern keine Vermietung zustande kommt. Keine Weitergabe an Dritte.</p>
+      </div>
+
+      <button type="submit">E-Mail vorbereiten</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("bewerbungForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const telefon = document.getElementById("telefon").value;
+      const personen = document.getElementById("personen").value;
+      const einkommen = document.getElementById("einkommen").value;
+      const bemerkung = document.getElementById("bemerkung").value;
+
+      const body =
+        `Name: ${name}%0D%0A` +
+        `E-Mail: ${email}%0D%0A` +
+        `Telefon: ${telefon}%0D%0A` +
+        `Einziehende Personen: ${personen}%0D%0A` +
+        `Nettoeinkommen: ${einkommen}%0D%0A` +
+        `Bemerkungen: ${bemerkung}%0D%0A%0D%0A` +
+        `Ich habe die Datenschutzhinweise zur Kenntnis genommen und willige in die Verarbeitung meiner Angaben ein.`;
+
+      const mailtoLink = `mailto:vermietung.rhfehn@icloud.com?subject=Wohnungsbewerbung&body=${body}`;
+      window.location.href = mailtoLink;
+    });
+  </script>
+</body>
+</html>
