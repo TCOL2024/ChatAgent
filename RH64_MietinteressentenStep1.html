@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Wohnungsbewerbung</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 1em; font-weight: bold; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 4px; box-sizing: border-box; }
+    button { margin-top: 1.5em; padding: 10px 20px; font-size: 1em; }
+    .info { font-size: 0.9em; color: #555; margin-top: 1em; }
+  </style>
+</head>
+<body>
+
+  <h1>Formular zur Wohnungsbewerbung</h1>
+
+  <form id="bewerbungForm">
+    <label for="name">Name*</label>
+    <input type="text" id="name" required>
+
+    <label for="email">E-Mail-Adresse</label>
+    <input type="email" id="email">
+
+    <label for="telefon">Telefonnummer</label>
+    <input type="tel" id="telefon">
+
+    <label for="personen">Anzahl einziehender Personen*</label>
+    <input type="number" id="personen" required>
+
+    <label for="einkommen">Monatl. Haushaltsnettoeinkommen (freiwillig)</label>
+    <input type="text" id="einkommen">
+
+    <label for="bemerkung">Bemerkungen / Bitte hängen Sie Nachweise separat an:</label>
+    <textarea id="bemerkung" rows="5"></textarea>
+
+    <label><input type="checkbox" id="einwilligung" required> Ich willige in die Datenverarbeitung ein.</label>
+
+    <button type="submit">E-Mail vorbereiten</button>
+  </form>
+
+  <p class="info">
+    Nach dem Klick öffnet sich dein E-Mail-Programm mit den Daten im Textfeld.<br>
+    Du kannst dann Gehaltsnachweise o. Ä. manuell anhängen.
+  </p>
+
+  <script>
+    document.getElementById("bewerbungForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+      const telefon = document.getElementById("telefon").value;
+      const personen = document.getElementById("personen").value;
+      const einkommen = document.getElementById("einkommen").value;
+      const bemerkung = document.getElementById("bemerkung").value;
+
+      const body =
+        `Name: ${name}%0D%0A` +
+        `E-Mail: ${email}%0D%0A` +
+        `Telefon: ${telefon}%0D%0A` +
+        `Einziehende Personen: ${personen}%0D%0A` +
+        `Nettoeinkommen: ${einkommen}%0D%0A` +
+        `Bemerkungen: ${bemerkung}%0D%0A`;
+
+      const mailtoLink = `mailto:deine@emailadresse.de?subject=Wohnungsbewerbung&body=${body}`;
+      window.location.href = mailtoLink;
+    });
+  </script>
+
+</body>
+</html>
