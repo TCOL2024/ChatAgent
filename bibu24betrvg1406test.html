@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BetrVG Quiz – Bachelor Professional Bilanzbuchhaltung</title>
+  <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f72ff;
+      --secondary: #f8fafc;
+      --success: #23b26d;
+      --error: #e94d3c;
+      --accent: #fffbe6;
+      --gray: #6b7280;
+      --radius: 22px;
+      --shadow: 0 4px 32px rgba(79,114,255,0.08);
+    }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--secondary);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .quiz-container {
+      max-width: 560px;
+      background: #fff;
+      margin: 50px auto 0 auto;
+      box-shadow: var(--shadow);
+      border-radius: var(--radius);
+      padding: 36px 28px 28px 28px;
+      position: relative;
+    }
+    .progress-container {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      width: 180px;
+      text-align: right;
+    }
+    .progress-bar-bg {
+      width: 100%;
+      height: 9px;
+      background: #e8eefd;
+      border-radius: 9px;
+      margin-bottom: 5px;
+      overflow: hidden;
+      margin-top: 2px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 60%, #57c8fa 100%);
+      border-radius: 9px;
+      transition: width 0.4s;
+    }
+    h1 {
+      font-size: 2rem;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 10px;
+      margin-top: 0;
+      letter-spacing: 0.01em;
+    }
+    .question {
+      font-size: 1.15rem;
+      margin-bottom: 24px;
+      font-weight: 600;
+      color: #1d2436;
+      min-height: 60px;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .answer-btn {
+      background: var(--secondary);
+      border: 2px solid #e8eefd;
+      border-radius: var(--radius);
+      padding: 18px 22px;
+      font-size: 1.06rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+      outline: none;
+      color: #252d45;
+      box-shadow: none;
+    }
+    .answer-btn:hover, .answer-btn.selected {
+      border-color: var(--primary);
+      background: var(--accent);
+    }
+    .next-btn {
+      margin-top: 28px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 15px 35px;
+      font-size: 1.05rem;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 3px 16px rgba(79,114,255,0.07);
+      letter-spacing: 0.01em;
+      transition: background 0.2s;
+    }
+    .next-btn:active {
+      background: #3958b6;
+    }
+    .result-overview {
+      margin-top: 20px;
+      background: #f7fafd;
+      border-radius: var(--radius);
+      padding: 20px 10px;
+    }
+    .result-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid #f1f3fa;
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-icon {
+      font-size: 1.5rem;
+    }
+    .correct {
+      color: var(--success);
+      font-weight: 600;
+    }
+    .incorrect {
+      color: var(--error);
+      font-weight: 600;
+    }
+    .explanation {
+      margin-left: 36px;
+      color: var(--gray);
+      font-size: 0.97rem;
+      margin-top: 2px;
+    }
+    .score {
+      font-size: 1.4rem;
+      color: var(--primary);
+      margin-top: 10px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .restart-btn {
+      margin-top: 16px;
+      background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 1.02rem;
+      padding: 11px 25px;
+      border-radius: var(--radius);
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .restart-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    @media (max-width: 620px) {
+      .quiz-container {padding: 18px 5vw;}
+      .progress-container {right: 5vw;}
+    }
+    @media (max-width: 400px) {
+      h1 {font-size: 1.1rem;}
+      .question {font-size: 0.97rem;}
+      .answer-btn, .next-btn, .restart-btn {font-size: 0.92rem;}
+    }
+  </style>
+</head>
+<body>
+  <div class="quiz-container">
+    <div class="progress-container">
+      <div id="progress-text">Frage 1 von 10</div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+      </div>
+    </div>
+    <h1>Betriebsverfassungsrecht-Quiz</h1>
+    <div id="quiz">
+      <!-- Quiz-Frage wird hier eingefügt -->
+    </div>
+  </div>
+<script>
+const quizData = [
+  {
+    question: "Wofür steht der Begriff 'Betriebsrat' gemäß § 1 BetrVG?",
+    answers: [
+      "Ein von der Geschäftsleitung gewähltes Gremium",
+      "Die Interessenvertretung der Arbeitnehmer im Betrieb",
+      "Eine staatliche Kontrollstelle im Unternehmen",
+      "Ein Aufsichtsorgan für Arbeitgeber"
+    ],
+    correct: 1,
+    explanation: "Der Betriebsrat ist laut § 1 BetrVG die gewählte Interessenvertretung der Arbeitnehmer eines Betriebs."
+  },
+  {
+    question: "Wie viele Arbeitnehmer müssen mindestens im Betrieb beschäftigt sein, damit ein Betriebsrat gewählt werden kann (§ 1 BetrVG)?",
+    answers: [
+      "mindestens 5 wahlberechtigte Arbeitnehmer, davon 3 wählbar",
+      "mindestens 20 Arbeitnehmer",
+      "mindestens 10 wahlberechtigte Arbeitnehmer",
+      "mindestens 3 Arbeitnehmer"
+    ],
+    correct: 0,
+    explanation: "Laut § 1 Abs. 1 BetrVG müssen mindestens 5 wahlberechtigte Arbeitnehmer im Betrieb beschäftigt sein, von denen 3 wählbar sind."
+  },
+  {
+    question: "Worum geht es schwerpunktmäßig in § 87 BetrVG?",
+    answers: [
+      "Mitbestimmung bei personellen Einzelmaßnahmen",
+      "Mitbestimmung in sozialen Angelegenheiten",
+      "Mitbestimmung bei wirtschaftlichen Angelegenheiten",
+      "Mitbestimmung bei Kündigungen"
+    ],
+    correct: 1,
+    explanation: "§ 87 BetrVG regelt die Mitbestimmung des Betriebsrats in sozialen Angelegenheiten (z.B. Arbeitszeit, Urlaub, Ordnung im Betrieb)."
+  },
+  {
+    question: "Welches Mitbestimmungsrecht hat der Betriebsrat laut § 87 Abs. 1 Nr. 6 BetrVG?",
+    answers: [
+      "Mitbestimmung bei der Gestaltung von Arbeitsplatz, Arbeitsablauf und Arbeitsumgebung",
+      "Mitbestimmung bei der Einführung technischer Einrichtungen zur Überwachung",
+      "Mitbestimmung bei Einstellungen",
+      "Mitbestimmung bei Entgeltgestaltung"
+    ],
+    correct: 1,
+    explanation: "§ 87 Abs. 1 Nr. 6 BetrVG: Der Betriebsrat hat bei der Einführung und Anwendung technischer Einrichtungen, die das Verhalten oder die Leistung der Arbeitnehmer überwachen können, ein zwingendes Mitbestimmungsrecht."
+  },
+  {
+    question: "Was ist gemäß § 99 BetrVG Voraussetzung für eine personelle Einzelmaßnahme (z.B. Einstellung)?",
+    answers: [
+      "Der Betriebsrat muss informiert werden, hat aber kein Mitbestimmungsrecht",
+      "Der Arbeitgeber muss den Betriebsrat anhören",
+      "Der Betriebsrat muss zustimmen (Zustimmungsverfahren)",
+      "Die Einigungsstelle muss immer entscheiden"
+    ],
+    correct: 2,
+    explanation: "Nach § 99 BetrVG muss der Arbeitgeber die Zustimmung des Betriebsrats zu personellen Einzelmaßnahmen (z.B. Einstellungen, Versetzungen) einholen."
+  },
+  {
+    question: "Wie kann der Betriebsrat bei einer verweigerten Zustimmung nach § 99 BetrVG vorgehen?",
+    answers: [
+      "Er kann die Maßnahme stoppen",
+      "Er kann die Einigungsstelle anrufen",
+      "Er kann eine Beschwerde beim Arbeitgeber einlegen",
+      "Er kann sofort ein Gericht anrufen"
+    ],
+    correct: 1,
+    explanation: "Wird die Zustimmung verweigert, kann der Arbeitgeber die Einigungsstelle anrufen. Diese entscheidet über die Durchführung der Maßnahme."
+  },
+  {
+    question: "Welche Bedeutung hat § 95 BetrVG für die Arbeitnehmer?",
+    answers: [
+      "Regelungen zu Personalfragebögen",
+      "Regelungen zur Betriebsvereinbarung",
+      "Regelungen zur Auswahlrichtlinie",
+      "Regelungen zur Kündigung"
+    ],
+    correct: 2,
+    explanation: "§ 95 BetrVG regelt die Auswahlrichtlinien, die der Arbeitgeber mit dem Betriebsrat bei Einstellungen, Versetzungen, Kündigungen vereinbaren kann."
+  },
+  {
+    question: "Welche Aufgabe hat der Betriebsrat laut § 80 BetrVG NICHT?",
+    answers: [
+      "Überwachung der Einhaltung von Gesetzen, Unfallverhütungsvorschriften etc.",
+      "Förderung der Gleichstellung von Frauen und Männern",
+      "Regelung der Arbeitszeit im Alleingang",
+      "Förderung der Integration ausländischer Arbeitnehmer"
+    ],
+    correct: 2,
+    explanation: "Der Betriebsrat kann die Arbeitszeit nicht alleine regeln, sondern hat nur Mitbestimmungs- und Mitwirkungsrechte."
+  },
+  {
+    question: "Was ist nach § 94 BetrVG bei Personalfragebögen erforderlich?",
+    answers: [
+      "Zustimmung des Betriebsrats zur Einführung",
+      "Betriebsratsanhörung",
+      "Zustimmung der Belegschaft",
+      "Nur Information des Betriebsrats"
+    ],
+    correct: 0,
+    explanation: "Nach § 94 BetrVG dürfen Personalfragebögen nur mit Zustimmung des Betriebsrats eingeführt werden."
+  },
+  {
+    question: "Welche Mitwirkungspflicht hat der Arbeitgeber laut BetrVG grundsätzlich?",
+    answers: [
+      "Er kann allein entscheiden",
+      "Er muss den Betriebsrat nur informieren",
+      "Er muss den Betriebsrat beteiligen, wo das Gesetz dies vorschreibt",
+      "Er muss den Betriebsrat immer an allen Entscheidungen beteiligen"
+    ],
+    correct: 2,
+    explanation: "Der Arbeitgeber muss den Betriebsrat nur bei gesetzlich geregelten Mitwirkungs- und Mitbestimmungsrechten beteiligen."
+  }
+];
+
+let currentQ = 0;
+let userAnswers = [];
+const quizDiv = document.getElementById("quiz");
+const progressText = document.getElementById("progress-text");
+const progressBar = document.getElementById("progress-bar");
+
+function renderQuestion(idx) {
+  const data = quizData[idx];
+  progressText.textContent = `Frage ${idx+1} von ${quizData.length}`;
+  progressBar.style.width = `${((idx+1)/quizData.length)*100}%`;
+  quizDiv.innerHTML = `
+    <div class="question">${data.question}</div>
+    <div class="answers">
+      ${data.answers.map((a,i)=>`
+        <button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>
+      `).join("")}
+    </div>
+  `;
+}
+window.selectAnswer = function(i) {
+  userAnswers[currentQ] = i;
+  Array.from(document.querySelectorAll(".answer-btn")).forEach((btn, idx)=>{
+    btn.classList.toggle('selected', idx===i);
+    btn.disabled = true;
+  });
+  setTimeout(()=>{
+    if(currentQ < quizData.length - 1){
+      currentQ++;
+      renderQuestion(currentQ);
+    } else {
+      showResults();
+    }
+  }, 500);
+}
+function showResults() {
+  progressText.textContent = "Ergebnis";
+  progressBar.style.width = "100%";
+  let score = 0;
+  quizDiv.innerHTML = `
+    <div class="score">Dein Ergebnis: ${
+      quizData.filter((q,idx)=>userAnswers[idx]===q.correct).length
+    } / ${quizData.length} richtig</div>
+    <div class="result-overview">
+      ${quizData.map((q,idx)=>{
+        const right = userAnswers[idx] === q.correct;
+        return `
+          <div class="result-row">
+            <span class="result-icon">${right ? "✅" : "❌"}</span>
+            <span class="${right?"correct":"incorrect"}">Frage ${idx+1}</span>
+            <span>${q.question}</span>
+          </div>
+          ${!right ? `<div class="explanation">
+            Richtige Antwort: <strong>${q.answers[q.correct]}</strong><br>${q.explanation}
+          </div>` : ""}
+        `;
+      }).join("")}
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
+  `;
+}
+window.restartQuiz = function() {
+  currentQ = 0;
+  userAnswers = [];
+  renderQuestion(currentQ);
+}
+renderQuestion(currentQ);
+</script>
+</body>
+</html>
