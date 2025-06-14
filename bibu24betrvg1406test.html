@@ -498,109 +498,106 @@ window.submitName = function() {
     return;
   }
   document.getElementById('overlay').style.display = 'none';
-  openCertificate(name);
+  // Zertifikat anzeigen
+  showCertificate(name, scoreGlobal, quizData.length);
 }
-function openCertificate(name) {
-  const date = new Date();
-  const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  const result = `${scoreGlobal} von ${quizData.length} Punkten`;
-  const certHtml = `
-  <!DOCTYPE html>
-  <html lang="de">
-  <head>
-    <meta charset="UTF-8">
-    <title>Zertifikat Betriebsrat-Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        background: #eef3fe;
-        font-family: 'Inter', Arial, sans-serif;
-        min-height: 100vh;
-        color: #2346e4;
-        margin: 0;
-        padding: 0;
-      }
-      .cert-outer {
-        max-width: 540px;
-        margin: 64px auto 0 auto;
-        background: #fff;
-        border-radius: 24px;
-        box-shadow: 0 8px 40px rgba(35,70,228,0.16);
-        padding: 50px 34px 44px 34px;
-        text-align: center;
-        border: 3px solid #2346e4;
-      }
-      h1 {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #2346e4;
-        margin-bottom: 12px;
-        margin-top: 0;
-      }
-      .cert-divider {
-        height: 2px;
-        width: 60px;
-        background: #28b779;
-        margin: 16px auto 24px auto;
-        border-radius: 3px;
-      }
-      .cert-name {
-        font-size: 1.35rem;
-        color: #243060;
-        font-weight: 700;
-        margin-bottom: 18px;
-      }
-      .cert-text {
-        color: #25345b;
-        font-size: 1.09rem;
-        margin-bottom: 17px;
-      }
-      .cert-date {
-        color: #7d8597;
-        margin-bottom: 4px;
-        font-size: 1rem;
-        margin-top: 28px;
-      }
-      .cert-result {
-        color: #2346e4;
-        font-size: 1.22rem;
-        font-weight: 600;
-        margin-bottom: 28px;
-      }
-      .cert-footer {
-        color: #b8c3ea;
-        font-size: 0.92rem;
-        margin-top: 24px;
-      }
-      @media print {
-        body { background: #fff; }
-        .cert-outer { box-shadow: none; border: none;}
-      }
-    </style>
-  </head>
-  <body>
-    <div class="cert-outer">
-      <h1>Zertifikat</h1>
-      <div class="cert-divider"></div>
-      <div class="cert-name">${name}</div>
-      <div class="cert-text">
-        hat am <b>${dateStr}</b> erfolgreich am <br>
-        <b>Wissensquiz „Betriebsrat/Betriebsverfassungsrecht“</b> <br>
-        (Schwerpunkt §§ 1, 87-99 BetrVG) teilgenommen.
+
+function showCertificate(name, score, total) {
+  // Neues Fenster für das Zertifikat öffnen
+  const certWindow = window.open('', '_blank', 'width=700,height=900');
+  const dateStr = new Date().toLocaleDateString('de-DE');
+  certWindow.document.write(`
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <title>Zertifikat Betriebsverfassungsrecht</title>
+      <style>
+        body {
+          font-family: 'Inter', Arial, sans-serif;
+          background: #f7faff;
+          color: #222;
+          margin: 0; padding: 0;
+        }
+        .cert-container {
+          max-width: 520px;
+          margin: 48px auto 0 auto;
+          background: #fff;
+          border-radius: 26px;
+          box-shadow: 0 8px 32px rgba(35,70,228,0.13);
+          padding: 44px 30px 40px 30px;
+          text-align: center;
+          position: relative;
+        }
+        .cert-title {
+          font-size: 2.1rem;
+          color: #2346e4;
+          font-weight: 700;
+          margin-bottom: 16px;
+        }
+        .cert-line {
+          width: 60px;
+          height: 4px;
+          background: #2346e4;
+          border-radius: 3px;
+          margin: 0 auto 22px auto;
+        }
+        .cert-name {
+          font-size: 1.28rem;
+          color: #212b4a;
+          margin: 24px 0 12px 0;
+          font-weight: 600;
+        }
+        .cert-score {
+          font-size: 1.12rem;
+          color: #2346e4;
+          font-weight: 600;
+          margin-bottom: 18px;
+        }
+        .cert-date {
+          color: #7d8597;
+          font-size: 1.01rem;
+          margin-top: 22px;
+        }
+        .cert-footer {
+          margin-top: 38px;
+          font-size: 0.98rem;
+          color: #7d8597;
+        }
+        .cert-print-btn {
+          margin-top: 30px;
+          background: #2346e4;
+          color: #fff;
+          border: none;
+          padding: 13px 38px;
+          font-size: 1.11rem;
+          border-radius: 12px;
+          cursor: pointer;
+          font-weight: 600;
+          box-shadow: 0 3px 18px rgba(35,70,228,0.10);
+          letter-spacing: 0.01em;
+        }
+        @media print {
+          .cert-print-btn { display: none !important; }
+          body { background: #fff; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="cert-container">
+        <div class="cert-title">Zertifikat</div>
+        <div class="cert-line"></div>
+        <div>Hiermit wird bestätigt, dass</div>
+        <div class="cert-name">${name}</div>
+        <div>das Quiz <b>"Betriebsverfassungsrecht"</b> erfolgreich absolviert hat.</div>
+        <div class="cert-score">Ergebnis: <b>${score} von ${total} Punkten</b></div>
+        <div class="cert-date">Datum: ${dateStr}</div>
+        <button class="cert-print-btn" onclick="window.print()">Zertifikat drucken</button>
+        <div class="cert-footer">Bachelor Professional Bilanzbuchhaltung – Online-Quiz</div>
       </div>
-      <div class="cert-result">Ergebnis: <b>${result}</b></div>
-      <div class="cert-date">Oldenburg, den ${dateStr}</div>
-      <div class="cert-footer">Dieses Zertifikat wurde automatisch erstellt und ist nicht rechtsverbindlich.</div>
-    </div>
-    <script>
-      window.onload = function() { window.print(); }
-    </script>
-  </body>
-  </html>
-  `;
-  const win = window.open('', '_blank');
-  win.document.write(certHtml);
-  win.document.close();
+    </body>
+    </html>
+  `);
 }
 
 renderQuestion(currentQ);
