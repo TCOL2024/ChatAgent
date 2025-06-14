@@ -447,3 +447,163 @@ window.selectAnswer = function(i) {
   setTimeout(()=>{
     if(currentQ < quizData.length - 1){
       currentQ++;
+      renderQuestion(currentQ);
+    } else {
+      showResults();
+    }
+  }, 450);
+}
+function showResults() {
+  progressLabel.textContent = "Ergebnis";
+  progressBar.style.width = "100%";
+  scoreGlobal = quizData.filter((q,idx)=>userAnswers[idx]===q.correct).length;
+  quizDiv.innerHTML = `
+    <div class="score">Dein Ergebnis: ${scoreGlobal} / ${quizData.length} richtig</div>
+    <div class="result-overview">
+      ${quizData.map((q,idx)=>{
+        const right = userAnswers[idx] === q.correct;
+        return `
+          <div class="result-row">
+            <span class="result-icon">${right ? "✅" : "❌"}</span>
+            <span class="${right?"correct":"incorrect"}">Frage ${idx+1}</span>
+            <span>${q.question}</span>
+          </div>
+          ${!right ? `<div class="explanation">
+            Richtige Antwort: <strong>${q.answers[q.correct]}</strong><br>${q.explanation}
+          </div>` : ""}
+        `;
+      }).join("")}
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
+    <button class="certificate-btn" onclick="showNameDialog()">Zertifikat drucken</button>
+  `;
+}
+window.restartQuiz = function() {
+  currentQ = 0;
+  userAnswers = [];
+  renderQuestion(currentQ);
+}
+
+// Zertifikat-Dialog und Zertifikatsausgabe
+window.showNameDialog = function() {
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('username').focus();
+  document.getElementById('name-error').style.display = 'none';
+}
+window.submitName = function() {
+  const name = document.getElementById('username').value.trim();
+  if (!name || name.length < 2) {
+    document.getElementById('name-error').textContent = "Bitte gib deinen vollständigen Namen ein.";
+    document.getElementById('name-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('overlay').style.display = 'none';
+  openCertificate(name);
+}
+function openCertificate(name) {
+  const date = new Date();
+  const dateStr = date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  const result = `${scoreGlobal} von ${quizData.length} Punkten`;
+  const certHtml = `
+  <!DOCTYPE html>
+  <html lang="de">
+  <head>
+    <meta charset="UTF-8">
+    <title>Zertifikat Betriebsrat-Quiz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        background: #eef3fe;
+        font-family: 'Inter', Arial, sans-serif;
+        min-height: 100vh;
+        color: #2346e4;
+        margin: 0;
+        padding: 0;
+      }
+      .cert-outer {
+        max-width: 540px;
+        margin: 64px auto 0 auto;
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 8px 40px rgba(35,70,228,0.16);
+        padding: 50px 34px 44px 34px;
+        text-align: center;
+        border: 3px solid #2346e4;
+      }
+      h1 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: #2346e4;
+        margin-bottom: 12px;
+        margin-top: 0;
+      }
+      .cert-divider {
+        height: 2px;
+        width: 60px;
+        background: #28b779;
+        margin: 16px auto 24px auto;
+        border-radius: 3px;
+      }
+      .cert-name {
+        font-size: 1.35rem;
+        color: #243060;
+        font-weight: 700;
+        margin-bottom: 18px;
+      }
+      .cert-text {
+        color: #25345b;
+        font-size: 1.09rem;
+        margin-bottom: 17px;
+      }
+      .cert-date {
+        color: #7d8597;
+        margin-bottom: 4px;
+        font-size: 1rem;
+        margin-top: 28px;
+      }
+      .cert-result {
+        color: #2346e4;
+        font-size: 1.22rem;
+        font-weight: 600;
+        margin-bottom: 28px;
+      }
+      .cert-footer {
+        color: #b8c3ea;
+        font-size: 0.92rem;
+        margin-top: 24px;
+      }
+      @media print {
+        body { background: #fff; }
+        .cert-outer { box-shadow: none; border: none;}
+      }
+    </style>
+  </head>
+  <body>
+    <div class="cert-outer">
+      <h1>Zertifikat</h1>
+      <div class="cert-divider"></div>
+      <div class="cert-name">${name}</div>
+      <div class="cert-text">
+        hat am <b>${dateStr}</b> erfolgreich am <br>
+        <b>Wissensquiz „Betriebsrat/Betriebsverfassungsrecht“</b> <br>
+        (Schwerpunkt §§ 1, 87-99 BetrVG) teilgenommen.
+      </div>
+      <div class="cert-result">Ergebnis: <b>${result}</b></div>
+      <div class="cert-date">Oldenburg, den ${dateStr}</div>
+      <div class="cert-footer">Dieses Zertifikat wurde automatisch erstellt und ist nicht rechtsverbindlich.</div>
+    </div>
+    <script>
+      window.onload = function() { window.print(); }
+    </script>
+  </body>
+  </html>
+  `;
+  const win = window.open('', '_blank');
+  win.document.write(certHtml);
+  win.document.close();
+}
+
+renderQuestion(currentQ);
+</script>
+</body>
+</html>
