@@ -4,128 +4,170 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BetrVG Quiz – Bachelor Professional Bilanzbuchhaltung</title>
-  <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #4f72ff;
-      --secondary: #f8fafc;
-      --success: #23b26d;
-      --error: #e94d3c;
-      --accent: #fffbe6;
-      --gray: #6b7280;
-      --radius: 22px;
-      --shadow: 0 4px 32px rgba(79,114,255,0.08);
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 30px;
+      --radius-sm: 14px;
     }
-    body {
-      font-family: 'Inter', Arial, sans-serif;
-      background: var(--secondary);
+    html, body {
+      background: var(--primary-light);
       margin: 0;
       padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
       min-height: 100vh;
+      color: #222;
+    }
+    .main-outer {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 42px 0;
     }
     .quiz-container {
-      max-width: 560px;
-      background: #fff;
-      margin: 50px auto 0 auto;
-      box-shadow: var(--shadow);
+      background: var(--secondary);
+      max-width: 600px;
+      width: 95vw;
       border-radius: var(--radius);
-      padding: 36px 28px 28px 28px;
+      box-shadow: var(--shadow);
+      padding: 44px 36px 36px 36px;
       position: relative;
-    }
-    .progress-container {
-      position: absolute;
-      top: 22px;
-      right: 28px;
-      width: 180px;
-      text-align: right;
-    }
-    .progress-bar-bg {
-      width: 100%;
-      height: 9px;
-      background: #e8eefd;
-      border-radius: 9px;
-      margin-bottom: 5px;
-      overflow: hidden;
-      margin-top: 2px;
-    }
-    .progress-bar-fill {
-      height: 100%;
-      background: linear-gradient(90deg, var(--primary) 60%, #57c8fa 100%);
-      border-radius: 9px;
-      transition: width 0.4s;
-    }
-    h1 {
-      font-size: 2rem;
-      color: var(--primary);
-      font-weight: 600;
-      margin-bottom: 10px;
-      margin-top: 0;
-      letter-spacing: 0.01em;
-    }
-    .question {
-      font-size: 1.15rem;
-      margin-bottom: 24px;
-      font-weight: 600;
-      color: #1d2436;
-      min-height: 60px;
-    }
-    .answers {
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
-    .answer-btn {
-      background: var(--secondary);
-      border: 2px solid #e8eefd;
-      border-radius: var(--radius);
-      padding: 18px 22px;
-      font-size: 1.06rem;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.18s;
-      outline: none;
-      color: #252d45;
-      box-shadow: none;
+    .progress-bar-outer {
+      position: absolute;
+      top: 28px;
+      right: 36px;
+      min-width: 170px;
+      background: rgba(255,255,255,0.82);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 8px rgba(35,70,228,0.07);
+      padding: 11px 20px 8px 20px;
+      z-index: 2;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
     }
-    .answer-btn:hover, .answer-btn.selected {
-      border-color: var(--primary);
-      background: var(--accent);
+    .progress-label {
+      font-size: 0.97rem;
+      color: var(--gray);
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+    .progress-bar-bg {
+      width: 130px;
+      height: 9px;
+      background: #e3eafc;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 70%, #57c8fa 100%);
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(.59,.13,.29,1.12);
+    }
+    h1 {
+      font-size: 2.1rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin: 0 0 18px 0;
+      letter-spacing: 0.01em;
+    }
+    .question {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #212b4a;
+      margin-bottom: 32px;
+      margin-top: 18px;
+      min-height: 64px;
+      line-height: 1.38;
+    }
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+      margin-bottom: 14px;
+    }
+    .answer-btn {
+      background: #f4f7fb;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      font-size: 1.09rem;
+      font-weight: 500;
+      color: #243060;
+      cursor: pointer;
+      box-shadow: 0 2px 9px rgba(35,70,228,0.07);
+      transition: background 0.19s, color 0.17s, box-shadow 0.18s;
+      outline: none;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+    }
+    .answer-btn.selected {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 16px rgba(35,70,228,0.11);
+    }
+    .answer-btn:disabled {
+      opacity: 0.82;
+      cursor: default;
     }
     .next-btn {
       margin-top: 28px;
       background: var(--primary);
       color: #fff;
       border: none;
-      padding: 15px 35px;
-      font-size: 1.05rem;
-      border-radius: var(--radius);
+      padding: 15px 42px;
+      font-size: 1.07rem;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       font-weight: 600;
-      box-shadow: 0 3px 16px rgba(79,114,255,0.07);
+      box-shadow: 0 3px 18px rgba(35,70,228,0.10);
       letter-spacing: 0.01em;
-      transition: background 0.2s;
+      transition: background 0.19s;
     }
     .next-btn:active {
-      background: #3958b6;
+      background: #2238a8;
     }
     .result-overview {
-      margin-top: 20px;
-      background: #f7fafd;
-      border-radius: var(--radius);
+      margin-top: 22px;
+      background: #f6f8fc;
+      border-radius: var(--radius-sm);
       padding: 20px 10px;
+      box-shadow: 0 1px 7px rgba(35,70,228,0.06);
     }
     .result-row {
       display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 0;
-      border-bottom: 1px solid #f1f3fa;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 0 5px 0;
+      border-bottom: 1px solid #e3eafc;
+      font-size: 1rem;
     }
     .result-row:last-child {
       border-bottom: none;
     }
     .result-icon {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
+      line-height: 1.1;
+      margin-top: 1px;
+      min-width: 30px;
+      text-align: center;
     }
     .correct {
       color: var(--success);
@@ -136,26 +178,28 @@
       font-weight: 600;
     }
     .explanation {
-      margin-left: 36px;
+      margin-left: 42px;
       color: var(--gray);
-      font-size: 0.97rem;
-      margin-top: 2px;
+      font-size: 0.99rem;
+      margin-bottom: 9px;
+      margin-top: 3px;
+      padding-right: 7px;
     }
     .score {
-      font-size: 1.4rem;
+      font-size: 1.45rem;
       color: var(--primary);
-      margin-top: 10px;
+      margin-top: 13px;
       margin-bottom: 10px;
       font-weight: 700;
     }
     .restart-btn {
-      margin-top: 16px;
+      margin-top: 18px;
       background: #fff;
       border: 2px solid var(--primary);
       color: var(--primary);
-      font-size: 1.02rem;
-      padding: 11px 25px;
-      border-radius: var(--radius);
+      font-size: 1.06rem;
+      padding: 11px 26px;
+      border-radius: var(--radius-sm);
       cursor: pointer;
       font-weight: 500;
       transition: background 0.2s, color 0.2s;
@@ -165,27 +209,31 @@
       color: #fff;
     }
     @media (max-width: 620px) {
-      .quiz-container {padding: 18px 5vw;}
-      .progress-container {right: 5vw;}
+      .quiz-container {padding: 18px 2vw;}
+      .progress-bar-outer {right: 2vw; min-width: 100px; padding: 9px 8px;}
+      .progress-bar-bg {width: 80px;}
     }
-    @media (max-width: 400px) {
-      h1 {font-size: 1.1rem;}
-      .question {font-size: 0.97rem;}
+    @media (max-width: 410px) {
+      h1 {font-size: 1.09rem;}
+      .question {font-size: 0.98rem;}
       .answer-btn, .next-btn, .restart-btn {font-size: 0.92rem;}
+      .progress-label {font-size: 0.85rem;}
     }
   </style>
 </head>
 <body>
-  <div class="quiz-container">
-    <div class="progress-container">
-      <div id="progress-text">Frage 1 von 10</div>
-      <div class="progress-bar-bg">
-        <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+  <div class="main-outer">
+    <div class="quiz-container">
+      <div class="progress-bar-outer">
+        <div class="progress-label" id="progress-label">Frage 1 von 10</div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+        </div>
       </div>
-    </div>
-    <h1>Betriebsverfassungsrecht-Quiz</h1>
-    <div id="quiz">
-      <!-- Quiz-Frage wird hier eingefügt -->
+      <h1>Betriebsverfassungsrecht-Quiz</h1>
+      <div id="quiz">
+        <!-- Quiz-Frage wird hier eingefügt -->
+      </div>
     </div>
   </div>
 <script>
@@ -305,12 +353,12 @@ const quizData = [
 let currentQ = 0;
 let userAnswers = [];
 const quizDiv = document.getElementById("quiz");
-const progressText = document.getElementById("progress-text");
+const progressLabel = document.getElementById("progress-label");
 const progressBar = document.getElementById("progress-bar");
 
 function renderQuestion(idx) {
   const data = quizData[idx];
-  progressText.textContent = `Frage ${idx+1} von ${quizData.length}`;
+  progressLabel.textContent = `Frage ${idx+1} von ${quizData.length}`;
   progressBar.style.width = `${((idx+1)/quizData.length)*100}%`;
   quizDiv.innerHTML = `
     <div class="question">${data.question}</div>
@@ -334,10 +382,10 @@ window.selectAnswer = function(i) {
     } else {
       showResults();
     }
-  }, 500);
+  }, 450);
 }
 function showResults() {
-  progressText.textContent = "Ergebnis";
+  progressLabel.textContent = "Ergebnis";
   progressBar.style.width = "100%";
   let score = 0;
   quizDiv.innerHTML = `
