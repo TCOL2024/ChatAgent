@@ -192,7 +192,7 @@
       margin-bottom: 10px;
       font-weight: 700;
     }
-    .restart-btn {
+    .restart-btn, .certificate-btn {
       margin-top: 18px;
       background: #fff;
       border: 2px solid var(--primary);
@@ -203,10 +203,65 @@
       cursor: pointer;
       font-weight: 500;
       transition: background 0.2s, color 0.2s;
+      margin-right: 15px;
     }
-    .restart-btn:hover {
+    .restart-btn:hover, .certificate-btn:hover {
       background: var(--primary);
       color: #fff;
+    }
+    /* Dialog für Name */
+    .overlay {
+      position: fixed;
+      z-index: 999;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(33,48,96,0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .name-dialog {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(35,70,228,0.13);
+      padding: 30px 24px 20px 24px;
+      max-width: 95vw;
+      min-width: 290px;
+      text-align: center;
+    }
+    .name-dialog h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      margin-top: 0;
+      font-size: 1.18rem;
+    }
+    .name-dialog input {
+      padding: 10px 15px;
+      border: 1.5px solid #b8c3ea;
+      border-radius: 10px;
+      width: 80%;
+      font-size: 1.02rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border 0.17s;
+    }
+    .name-dialog input:focus {
+      border-color: var(--primary);
+    }
+    .name-dialog button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .name-error {
+      color: var(--error);
+      font-size: 0.99rem;
+      margin-bottom: 5px;
     }
     @media (max-width: 620px) {
       .quiz-container {padding: 18px 2vw;}
@@ -216,7 +271,7 @@
     @media (max-width: 410px) {
       h1 {font-size: 1.09rem;}
       .question {font-size: 0.98rem;}
-      .answer-btn, .next-btn, .restart-btn {font-size: 0.92rem;}
+      .answer-btn, .next-btn, .restart-btn, .certificate-btn {font-size: 0.92rem;}
       .progress-label {font-size: 0.85rem;}
     }
   </style>
@@ -236,6 +291,19 @@
       </div>
     </div>
   </div>
+
+  <!-- Dialog für Nameingabe, erscheint dynamisch -->
+  <div id="overlay" style="display:none;">
+    <div class="overlay">
+      <form class="name-dialog" id="nameForm" autocomplete="off" onsubmit="return false;">
+        <h2>Name für das Zertifikat eingeben</h2>
+        <input type="text" id="username" placeholder="Vor- und Nachname" maxlength="60" required>
+        <div id="name-error" class="name-error" style="display:none;"></div>
+        <button type="button" onclick="submitName()">Zertifikat anzeigen</button>
+      </form>
+    </div>
+  </div>
+
 <script>
 const quizData = [
   {
@@ -355,6 +423,7 @@ let userAnswers = [];
 const quizDiv = document.getElementById("quiz");
 const progressLabel = document.getElementById("progress-label");
 const progressBar = document.getElementById("progress-bar");
+let scoreGlobal = 0;
 
 function renderQuestion(idx) {
   const data = quizData[idx];
@@ -378,44 +447,3 @@ window.selectAnswer = function(i) {
   setTimeout(()=>{
     if(currentQ < quizData.length - 1){
       currentQ++;
-      renderQuestion(currentQ);
-    } else {
-      showResults();
-    }
-  }, 450);
-}
-function showResults() {
-  progressLabel.textContent = "Ergebnis";
-  progressBar.style.width = "100%";
-  let score = 0;
-  quizDiv.innerHTML = `
-    <div class="score">Dein Ergebnis: ${
-      quizData.filter((q,idx)=>userAnswers[idx]===q.correct).length
-    } / ${quizData.length} richtig</div>
-    <div class="result-overview">
-      ${quizData.map((q,idx)=>{
-        const right = userAnswers[idx] === q.correct;
-        return `
-          <div class="result-row">
-            <span class="result-icon">${right ? "✅" : "❌"}</span>
-            <span class="${right?"correct":"incorrect"}">Frage ${idx+1}</span>
-            <span>${q.question}</span>
-          </div>
-          ${!right ? `<div class="explanation">
-            Richtige Antwort: <strong>${q.answers[q.correct]}</strong><br>${q.explanation}
-          </div>` : ""}
-        `;
-      }).join("")}
-    </div>
-    <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
-  `;
-}
-window.restartQuiz = function() {
-  currentQ = 0;
-  userAnswers = [];
-  renderQuestion(currentQ);
-}
-renderQuestion(currentQ);
-</script>
-</body>
-</html>
