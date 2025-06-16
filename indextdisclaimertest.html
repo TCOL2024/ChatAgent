@@ -34,17 +34,93 @@
             background: linear-gradient(120deg,#f5f9fe 0,#eaf1fa 100%);
             color: #1d2736;
         }
-        .center-area {
-            min-height: 90vh;
+        .main-layout {
+            display: flex;
             width: 100vw;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 90vh;
+        }
+        .sidebar {
+            width: 230px;
+            min-width: 170px;
+            max-width: 260px;
+            background: #f7fafd;
+            border-radius: 22px 0 0 22px;
+            box-shadow: 0 8px 32px 0 rgba(0,89,179,0.08);
+            border: 1.5px solid #e3eefa;
+            margin: 48px 0 24px 0;
+            padding: 18px 10px 10px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 13px;
+            height: 570px;
+            max-height: 95vh;
+        }
+        .sidebar-title {
+            font-weight: 700;
+            font-size: 1.13rem;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            margin-left: 8px;
+        }
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            padding-bottom: 14px;
+        }
+        .chat-list-item {
             display: flex;
             align-items: center;
-            justify-content: center;
-            flex: 1 1 auto;
+            background: #fff;
+            border-radius: 15px;
+            padding: 10px 13px;
+            margin-bottom: 7px;
+            cursor: pointer;
+            border: 1.1px solid #e3eefa;
+            transition: background 0.15s, border 0.13s;
+            font-size: 1.03rem;
+            gap: 9px;
+        }
+        .chat-list-item.active {
+            border: 2px solid var(--primary);
+            background: #eaf1fa;
+        }
+        .chat-list-item:hover:not(.active) {
+            background: #f2f7fd;
+        }
+        .chat-list-item .fa-trash {
+            margin-left: auto;
+            color: #d0b29f;
+            font-size: 0.96em;
+            opacity: 0.7;
+        }
+        .chat-list-item .fa-trash:hover {
+            color: #c93030;
+            opacity: 1;
+        }
+        .sidebar-btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            border-radius: 19px;
+            font-size: 1.02rem;
+            padding: 8px 18px 8px 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 1px 6px 0 rgba(0,89,179,0.06);
+            transition: background .15s;
+            margin: 4px 0 0 0;
+        }
+        .sidebar-btn:hover {
+            background: var(--primary-dark);
         }
         .chatbox-outer {
             background: var(--chat-bg);
-            border-radius: var(--radius);
+            border-radius: 0 var(--radius) var(--radius) 0;
             box-shadow: var(--chat-shadow);
             width: 100%;
             max-width: 450px;
@@ -54,6 +130,7 @@
             flex-direction: column;
             overflow: hidden;
             border: 1.5px solid #e3eefa;
+            border-left: none;
             margin: 48px 0 24px 0;
         }
         .chat-header {
@@ -88,7 +165,6 @@
             font-weight: 400;
             color: #d8e8f8;
         }
-        /* Neuer Chat Button */
         .new-chat-btn {
             position: absolute;
             top: 18px;
@@ -301,14 +377,22 @@
             color: var(--primary-dark);
         }
         /* Responsiveness */
+        @media (max-width: 950px) {
+            .main-layout { flex-direction: column; }
+            .sidebar, .chatbox-outer { margin: 20px auto; border-radius: 22px;}
+            .chatbox-outer { border-left: 1.5px solid #e3eefa;}
+            .sidebar { border-right: none;}
+        }
         @media (max-width: 600px) {
-            .chatbox-outer { max-width: 99vw; min-width:0; }
+            .main-layout { flex-direction: column; }
+            .sidebar {width: 99vw; min-width:0; max-width: 100vw; border-radius: 0; margin: 0;}
+            .chatbox-outer {max-width: 99vw; min-width:0; border-radius: 0;}
         }
         @media (max-width: 410px) {
             .chat-header {padding-left: 65px;}
             .chat-header .bot-avatar {left:10px;}
-            .chatbox-outer {margin: 9vw 0 10vw 0;}
-            .new-chat-btn {right: 10px;}
+            .chatbox-outer {margin: 0;}
+            .sidebar {margin: 0;}
         }
     </style>
 </head>
@@ -327,7 +411,7 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn accept" onclick="acceptPrivacy()">Zustimmen</button>
+                <button class="modal-btn accept" id="acceptPrivacy">Zustimmen</button>
                 <button class="modal-btn decline" onclick="window.location.reload()">Ablehnen</button>
             </div>
         </div>
@@ -344,13 +428,20 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button class="modal-btn accept" onclick="acceptDisclaimer()">Einverstanden</button>
+                <button class="modal-btn accept" id="acceptDisclaimer">Einverstanden</button>
                 <button class="modal-btn decline" onclick="window.location.reload()">Ablehnen</button>
             </div>
         </div>
     </div>
-    <!-- Chatbot Oberfläche -->
-    <div class="center-area">
+    <!-- Hauptbereich mit Sidebar und Chatbox -->
+    <div class="main-layout" id="mainLayout" style="display:none;">
+        <!-- Sidebar: Chatverlauf -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-title">Chats</div>
+            <div class="chat-list" id="chatList"></div>
+            <button class="sidebar-btn" id="startNewChat"><i class="fa-solid fa-plus"></i> Neuer Chat</button>
+        </aside>
+        <!-- Chatbox -->
         <div class="chatbox-outer">
             <div class="chat-header">
                 <div class="bot-avatar"><i class="fa-solid fa-robot"></i></div>
@@ -360,14 +451,7 @@
                 </button>
                 <div class="subtitle">Stelle deine Frage rund ums Personalmanagement</div>
             </div>
-            <div class="messages-area" id="messages">
-                <div class="bubble-row bot">
-                    <div class="avatar"><i class="fa-solid fa-robot"></i></div>
-                    <div class="bubble bot">
-                        Hallo! Ich bin dein KI-Assistent. Stelle mir deine Frage zu Personal, Ausbildung oder Prüfungsvorbereitung.
-                    </div>
-                </div>
-            </div>
+            <div class="messages-area" id="messages"></div>
             <form class="inputbar-area" onsubmit="event.preventDefault();sendMessage();">
                 <textarea id="userInput" placeholder="Nachricht eingeben..." rows="1" autocomplete="off"></textarea>
                 <button type="submit" class="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
@@ -375,20 +459,132 @@
         </div>
     </div>
     <script>
-        // MODAL FLOW: Erst Datenschutz, dann Disclaimer!
-        function acceptPrivacy() {
+        // --- Modals Steuerung (jetzt garantiert schließbar) ---
+        document.getElementById('acceptPrivacy').onclick = function() {
             document.getElementById('privacy-modal').style.display = 'none';
             document.getElementById('disclaimer-modal').style.display = 'flex';
-        }
-        function acceptDisclaimer() {
+        };
+        document.getElementById('acceptDisclaimer').onclick = function() {
             document.getElementById('disclaimer-modal').style.display = 'none';
-        }
-        // Chatbot-Logik mit Make-Webhook & formatierten Bot-Antworten
-        const messagesDiv = document.getElementById('messages');
-        const userInput = document.getElementById('userInput');
-        const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // anpassen!
+            document.getElementById('mainLayout').style.display = 'flex';
+            // Nach Modal Chat initialisieren
+            initChatUI();
+        };
 
+        // --- Chat-Verwaltung im Local Storage ---
+        const STORAGE_KEY = "chatgpt-jens-chats";
+        let chats = []; // Alle Chats
+        let activeChatId = null;
+
+        // Begrüßungsnachricht
+        const introMsg = {
+            sender: 'bot',
+            text: 'Hallo! Ich bin dein KI-Assistent. Stelle mir deine Frage zu Personal, Ausbildung oder Prüfungsvorbereitung.'
+        };
+
+        // Hilfsfunktion: Neue eindeutige Chat-ID
+        function makeId() {
+            return 'chat_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+        }
+
+        // Lade alle Chats aus dem Local Storage
+        function loadChats() {
+            try {
+                chats = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+            } catch(e) { chats = []; }
+        }
+
+        // Speichere alle Chats in den Local Storage
+        function saveChats() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(chats));
+        }
+
+        // Füge neuen Chat an (und mache ihn aktiv)
+        function newChat() {
+            const name = "Neuer Chat " + (chats.length + 1);
+            const chat = {
+                id: makeId(),
+                name: name,
+                created: new Date().toISOString(),
+                messages: [introMsg]
+            };
+            chats.unshift(chat); // Neueste oben
+            activeChatId = chat.id;
+            saveChats();
+            renderChatList();
+            loadChatIntoUI(chat);
+        }
+
+        // Aktuellen Chatverlauf speichern (z.B. nach neuer Nachricht)
+        function updateActiveChat(messages) {
+            const idx = chats.findIndex(c => c.id === activeChatId);
+            if(idx !== -1) {
+                chats[idx].messages = messages;
+                // Optional: ersten User-Text als Titel übernehmen
+                const firstUser = messages.find(m => m.sender === 'user');
+                if(firstUser && chats[idx].name.startsWith("Neuer Chat"))
+                    chats[idx].name = firstUser.text.substring(0, 32) || chats[idx].name;
+                saveChats();
+                renderChatList();
+            }
+        }
+
+        // Chatliste rendern (Sidebar)
+        function renderChatList() {
+            const list = document.getElementById('chatList');
+            list.innerHTML = '';
+            chats.forEach(chat => {
+                const div = document.createElement('div');
+                div.className = 'chat-list-item' + (chat.id === activeChatId ? ' active' : '');
+                div.title = chat.name;
+                div.innerHTML = '<i class="fa-solid fa-comments"></i> ' + (chat.name || 'Chat') +
+                    '<i class="fa-solid fa-trash" title="Löschen"></i>';
+                // Chat laden bei Klick
+                div.onclick = function(e) {
+                    if (e.target.classList.contains('fa-trash')) {
+                        e.stopPropagation();
+                        deleteChat(chat.id);
+                    } else {
+                        activeChatId = chat.id;
+                        loadChatIntoUI(chat);
+                        renderChatList();
+                    }
+                };
+                list.appendChild(div);
+            });
+        }
+
+        // Chat löschen
+        function deleteChat(id) {
+            if(confirm('Diesen Chat wirklich löschen?')) {
+                const idx = chats.findIndex(c => c.id === id);
+                if(idx !== -1) {
+                    chats.splice(idx,1);
+                    // Nach dem Löschen ggf. nächsten Chat aktivieren
+                    if(activeChatId === id) {
+                        if(chats.length) {
+                            activeChatId = chats[0].id;
+                            loadChatIntoUI(chats[0]);
+                        } else {
+                            newChat();
+                        }
+                    }
+                    saveChats();
+                    renderChatList();
+                }
+            }
+        }
+
+        // Chat in Chatfenster laden
+        function loadChatIntoUI(chat) {
+            const messagesDiv = document.getElementById('messages');
+            messagesDiv.innerHTML = '';
+            (chat.messages || []).forEach(msg => addMessage(msg.sender, msg.text));
+        }
+
+        // Add message to UI
         function addMessage(sender, text) {
+            const messagesDiv = document.getElementById('messages');
             const row = document.createElement('div');
             row.className = 'bubble-row ' + sender;
             const avatar = document.createElement('div');
@@ -396,11 +592,8 @@
             avatar.innerHTML = sender === 'user'
                 ? '<i class="fa-solid fa-user"></i>'
                 : '<i class="fa-solid fa-robot"></i>';
-
-            // Bot-Antworten als Markdown/HTML rendern
             const bubble = document.createElement('div');
             bubble.className = 'bubble ' + sender;
-
             if(sender === 'bot') {
                 bubble.innerHTML = renderBotAnswer(text);
             } else {
@@ -412,14 +605,100 @@
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
         }
 
-        // Markdown-ähnliche Formatierung für bessere Bot-Antworten
+        // Markdown-artige Bot-Formatierung
         function renderBotAnswer(text) {
             let html = text
-                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")                           
-                .replace(/\*(.*?)\*/g, "<em>$1</em>")                             
-                .replace(/`([^`]+)`/g, "<code>$1</code>")                         
-                .replace(/$begin:math:display$([^$end:math:display$]+)\]$begin:math:text$([^$end:math:text$]+)\)/g, '<a href="$2" target="_blank">$1</a>') 
-                .replace(/\n{2,}/g, '<br>')                                       
-                .replace(/^- (.*)$/gm, '<li>$1</li>');                            
+                .replace(/\*\*(.*?)\*\*/g, "<b>$1</b>")
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                .replace(/`([^`]+)`/g, "<code>$1</code>")
+                .replace(/\n{2,}/g, '<br>')
+                .replace(/^- (.*)$/gm, '<li>$1</li>');
             html = html.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
-            html = html.replace(/(
+            html = html.replace(/(Quellen?:|Hinweis:)([\s\S]*)$/i, function(_, start, rest) {
+                return `<div class="meta"><b>${start}</b>${rest}</div>`;
+            });
+            return html;
+        }
+
+        // --- Message Handling & Make.com-API ---
+        async function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const text = userInput.value.trim();
+            if (!text) return;
+            addMessage('user', text);
+            userInput.value = '';
+            userInput.focus();
+            addMessage('bot', '⏳ Einen Moment bitte ...');
+
+            // Update im Speicher
+            const messagesDiv = document.getElementById('messages');
+            let currMsgs = [];
+            Array.from(messagesDiv.children).forEach(row => {
+                const sender = row.classList.contains('user') ? 'user' : 'bot';
+                const bubble = row.querySelector('.bubble');
+                currMsgs.push({sender: sender, text: sender === 'bot' ? bubble.innerText : bubble.textContent});
+            });
+            updateActiveChat(currMsgs);
+
+            // Make.com-Webhook
+            const webhookUrl = "https://hook.us2.make.com/crk4yctny91n557tnx34f7tjtx9ycudp"; // anpassen!
+            try {
+                const response = await fetch(webhookUrl, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ question: text })
+                });
+                let reply = await response.text();
+                // Ersetze "Einen Moment bitte..." durch echte Antwort:
+                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = renderBotAnswer(reply);
+                // Jetzt nochmal alle Nachrichten (inkl. Bot) abspeichern
+                currMsgs = [];
+                Array.from(messagesDiv.children).forEach(row => {
+                    const sender = row.classList.contains('user') ? 'user' : 'bot';
+                    const bubble = row.querySelector('.bubble');
+                    currMsgs.push({sender: sender, text: sender === 'bot' ? bubble.innerText : bubble.textContent});
+                });
+                updateActiveChat(currMsgs);
+            } catch (err) {
+                messagesDiv.lastElementChild.querySelector('.bubble.bot').innerHTML = "❌ Es ist ein Fehler aufgetreten.";
+            }
+        }
+
+        // --- Chat-UI Initialisierung und Steuerung ---
+        function initChatUI() {
+            loadChats();
+            // Wenn keine Chats, neuen anlegen:
+            if(chats.length === 0) {
+                newChat();
+            } else {
+                activeChatId = chats[0].id;
+                loadChatIntoUI(chats[0]);
+            }
+            renderChatList();
+
+            // "Neuer Chat"-Button oben und in Sidebar:
+            document.getElementById('newChatBtn').onclick = function() { newChat(); };
+            document.getElementById('startNewChat').onclick = function() { newChat(); };
+
+            // Textarea wächst dynamisch:
+            const userInput = document.getElementById('userInput');
+            userInput.addEventListener('input', function(){
+                this.style.height = "auto";
+                this.style.height = (this.scrollHeight+2) + "px";
+            });
+            // Enter sendet, Shift+Enter neue Zeile:
+            userInput.addEventListener('keydown', function(e){
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+        }
+
+        // --- Modals beim Laden anzeigen
+        window.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('privacy-modal').style.display = 'flex';
+        });
+    </script>
+</body>
+</html>
