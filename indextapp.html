@@ -517,6 +517,21 @@
 
         // Füge neuen Chat an (und mache ihn aktiv)
         function newChat() {
+    const topic = prompt("Welchem Thema möchtest du diesen Chat zuordnen? (z. B. AEVO, SGB XI, Führung, Kommunikation)");
+    const name = (topic ? topic + " – " : "") + "Neuer Chat " + (chats.length + 1);
+    const chat = {
+        id: makeId(),
+        name: name,
+        topic: topic || "Allgemein",
+        created: new Date().toISOString(),
+        messages: [introMsg]
+    };
+    chats.unshift(chat);
+    activeChatId = chat.id;
+    saveChats();
+    renderChatList();
+    loadChatIntoUI(chat);
+}function newChat() {
             const name = "Neuer Chat " + (chats.length + 1);
             const chat = {
                 id: makeId(),
