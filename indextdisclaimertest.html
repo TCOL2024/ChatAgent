@@ -661,7 +661,10 @@
                 const response = await fetch(webhookUrl, {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ question: text })
+                    body: JSON.stringify({
+  question: text,
+  history: currMsgs // oder messages: currMsgs
+})
                 });
                 let reply = await response.text();
                 // Ersetze "Einen Moment bitte..." durch echte Antwort:
