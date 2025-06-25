@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Projekt- und Leistungserfassung im SAP-Stil mit Speicher & Export</title>
+<style>
+  body {
+    font-family: "72", "72 Bold", Arial, sans-serif;
+    background-color: #f3f6f9;
+    margin: 0;
+    padding: 20px;
+    color: #32363a;
+  }
+  h1 {
+    color: #0a6ed1;
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+  .container {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+  }
+  label {
+    display: block;
+    margin: 10px 0 5px 0;
+    font-weight: 600;
+  }
+  input[type="text"], input[type="number"], select, textarea, input[type="date"] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #a6a6a6;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+  button {
+    background-color: #0a6ed1;
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-top: 15px;
+  }
+  button:hover {
+    background-color: #0859b7;
+  }
+  .projects-list {
+    margin-top: 30px;
+  }
+  .project {
+    border: 1px solid #cbd2d9;
+    border-radius: 5px;
+    padding: 15px;
+    margin-bottom: 20px;
+    background-color: #f9fbff;
+  }
+  .project h2 {
+    margin: 0 0 10px 0;
+    color: #0a6ed1;
+  }
+  .leistungen {
+    margin-top: 10px;
+  }
+  .leistung {
+    background-color: #e6f0ff;
+    padding: 8px;
+    border-radius: 3px;
+    margin-bottom: 5px;
+    font-size: 14px;
+  }
+  .form-inline {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
+  .form-inline > div {
+    flex: 1;
+    min-width: 120px;
+  }
+  @media (max-width: 600px) {
+    .form-inline {
+      flex-direction: column;
+      align-items: stretch;
+    }
+  }
+  .search-container {
+    margin-bottom: 20px;
+  }
+  .search-container input[type="text"] {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 15px;
+    border: 1px solid #a6a6a6;
+    border-radius: 4px;
+  }
+  .export-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>Projekt- und Leistungserfassung</h1>
+
+    <!-- Suchfeld -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Suche Projekte oder Leistungen..." />
+    </div>
+
+    <!-- Formular zum Projekt anlegen -->
+    <form id="projektForm">
+      <label for="projektName">Projektname</label>
+      <input type="text" id="projektName" required placeholder="Name des Projekts" />
+
+      <label for="projektBeschreibung">Projektbeschreibung</label>
+      <textarea id="projektBeschreibung" rows="3" placeholder="Beschreibung"></textarea>
+
+      <label for="projektDatum">Startdatum</label>
+      <input type="date" id="projektDatum" />
+
+      <label for="projektStatus">Status</label>
+      <select id="projektStatus" required>
+        <option value="Offen">Offen</option>
+        <option value="In Bearbeitung">In Bearbeitung</option>
+        <option value="Abgeschlossen">Abgeschlossen</option>
+      </select>
+
+      <label for="projektVerantwortlicher">Verantwortlicher</label>
+      <input type="text" id="projektVerantwortlicher" placeholder="Name Verantwortlicher" />
+
+      <button type="submit">Projekt anlegen</button>
+    </form>
+
+    <!-- Bereich Leistung erfassen -->
+    <div id="leistungErfassung" style="display:none; margin-top:40px;">
+      <h2>Leistung erfassen für Projekt: <span id="aktuellesProjektName"></span></h2>
+
+      <form id="leistungForm" class="form-inline">
+        <div>
+          <label for="leistungName">Leistungsbeschreibung</label>
+          <input type="text" id="leistungName" required placeholder="Leistung" />
+        </div>
+        <div>
+          <label for="leistungMenge">Menge</label>
+          <input type="number" id="leistungMenge" required min="1" value="1" />
+        </div>
+        <div>
+          <label for="leistungEinheit">Einheit</label>
+          <select id="leistungEinheit" required>
+            <option value="" disabled selected>Einheit wählen</option>
+            <option value="Stunde">Stunde</option>
+            <option value="Tag">Tag</option>
+            <option value="Stück">Stück</option>
+            <option value="Pauschale">Pauschale</option>
+          </select>
+        </div>
+        <div>
+          <label for="leistungDatum">Datum</label>
+          <input type="date" id="leistungDatum" />
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button type="submit">Leistung hinzufügen</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Export Buttons -->
+    <div class="export-buttons">
+      <button id="exportCSVBtn">Export CSV</button>
+      <button id="exportPDFBtn">Export PDF</button>
+    </div>
+
+    <!-- Liste der Projekte und Leistungen -->
+    <div class="projects-list" id="projectsList"></div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+  const projektForm = document.getElementById('projektForm');
+  const leistungForm = document.getElementById('leistungForm');
+  const leistungErfassung = document.getElementById('leistungErfassung');
+  const aktuellesProjektName = document.getElementById('aktuellesProjektName');
+  const projectsList = document.getElementById('projectsList');
+  const searchInput = document.getElementById('searchInput');
+  const exportCSVBtn = document.getElementById('exportCSVBtn');
+  const exportPDFBtn = document.getElementById('exportPDFBtn');
+
+  let projects = [];
+  let aktuellesProjektIndex = null;
+
+  // Daten aus localStorage laden
+  function loadProjects() {
+    const data = localStorage.getItem('sapProjects');
+    if (data) {
+      projects = JSON.parse(data);
+    } else {
+      projects = [];
+    }
+  }
+
+  // Daten in localStorage speichern
+  function saveProjects() {
+    localStorage.setItem('sapProjects', JSON.stringify(projects));
+  }
+
+  // Neues Projekt anlegen
+  projektForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = document.getElementById('projektName').value.trim();
+    const beschreibung = document.getElementById('projektBeschreibung').value.trim();
+    const datum = document.getElementById('projektDatum').value;
+    const status = document.getElementById('projektStatus').value;
+    const verantwortlicher = document.getElementById('projektVerantwortlicher').value.trim();
+
+    if (!name) return;
+
+    projects.push({
+      name,
+      beschreibung,
+      datum,
+      status,
+      verantwortlicher,
+      leistungen: []
+    });
+
+    aktuellesProjektIndex = projects.length - 1;
+
+    projektForm.reset();
+    leistungErfassung.style.display = 'block';
+    aktuellesProjektName.textContent = name;
+
+    saveProjects();
+    renderProjects();
+  });
+
+  // Leistung hinzufügen
+  leistungForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if (aktuellesProjektIndex === null) return;
+
+    const leistungName = document.getElementById('leistungName').value.trim();
+    const menge = parseFloat(document.getElementById('leistungMenge').value);
+    const einheit = document.getElementById('leistungEinheit').value;
+    const datum = document.getElementById('leistungDatum').value;
+
+    if (!leistungName || menge <= 0 || !einheit) return;
+
+    projects[aktuellesProjektIndex].leistungen.push({
+      beschreibung: leistungName,
+      menge,
+      einheit,
+      datum
+    });
+
+    leistungForm.reset();
+    saveProjects();
+    renderProjects();
+  });
+
+  // Alle Projekte rendern mit Filter
+  function renderProjects() {
+    const filter = searchInput.value.toLowerCase();
+    projectsList.innerHTML = '';
+
+    projects.forEach((projekt, index) => {
+      // Filter prüfen: Projektname oder Leistung enthält Suchstring
+      const matchProjekt = projekt.name.toLowerCase().includes(filter);
+      const matchLeistung = projekt.leistungen.some(l =>
+        l.beschreibung.toLowerCase().includes(filter)
+      );
+
+      if (!filter || matchProjekt || matchLeistung) {
+        const projektDiv = document.createElement('div');
+        projektDiv.classList.add('project');
+
+        projektDiv.innerHTML = `
+          <h2>${projekt.name}</h2>
+          <p><b>Beschreibung:</b> ${projekt.beschreibung || '<i>Keine Beschreibung</i>'}</p>
+          <p><b>Startdatum:</b> ${projekt.datum || '-'}</p>
+          <p><b>Status:</b> ${projekt.status}</p>
+          <p><b>Verantwortlicher:</b> ${projekt.verantwortlicher || '-'}</p>
+          <h3>Leistungen:</h3>
+          <div class="leistungen">
+            ${
+              projekt.leistungen.length > 0
+                ? projekt.leistungen
+                    .map(
+                      l =>
+                        `<div class="leistung">${l.beschreibung} - ${l.menge} ${l.einheit} ${
+                          l.datum ? '| Datum: ' + l.datum : ''
+                        }</div>`
+                    )
+                    .join('')
+                : '<i>Keine Leistungen erfasst</i>'
+            }
+          </div>
+          <button onclick="setAktuellesProjekt(${index})" style="margin-top:10px;">Für Leistungserfassung auswählen</button>
+        `;
+
+        projectsList.appendChild(projektDiv);
+      }
+    });
+  }
+
+  // Projekt zum Erfassen auswählen
+  function setAktuellesProjekt(index) {
+    aktuellesProjektIndex = index;
+    aktuellesProjektName.textContent = projects[index].name;
+    leistungErfassung.style.display = 'block';
+  }
+
+  // Sucheingabe live
+  searchInput.addEventListener('input', () => {
+    renderProjects();
+  });
+
+  // CSV Export
+  function exportCSV() {
+    if (projects.length === 0) {
+      alert('Keine Projekte zum Exportieren vorhanden.');
+      return;
+    }
+    let csv = 'Projektname,Projektbeschreibung,Startdatum,Status,Verantwortlicher,Leistung,Beschreibung Menge,Einheit,Leistungsdatum\n';
+    projects.forEach(projekt => {
+      if (projekt.leistungen.length === 0) {
+        csv += `"${projekt.name}","${projekt.beschreibung}","${projekt.datum}","${projekt.status}","${projekt.verantwortlicher}","-","-","-","-"\n`;
+      } else {
+        projekt.leistungen.forEach(l => {
+          csv += `"${projekt.name}","${projekt.beschreibung}","${projekt.datum}","${projekt.status}","${projekt.verantwortlicher}","${l.beschreibung}","${l.menge}","${l.einheit}","${l.datum || ''}"\n`;
+        });
+      }
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'projekte_und_leistungen.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // PDF Export mit jsPDF
+  async function exportPDF() {
+    if (projects.length === 0) {
+      alert('Keine Projekte zum Exportieren vorhanden.');
+      return;
+    }
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    let y = 10;
+    doc.setFontSize(16);
+    doc.text('Projekt- und Leistungserfassung', 10, y);
+    y += 10;
+
+    doc.setFontSize(12);
+    projects.forEach((projekt, i) => {
+      if (y > 270) {
+        doc.addPage();
+        y = 10;
+      }
+      doc.setTextColor('#0a6ed1');
+      doc.text(projekt.name, 10, y);
+      y += 6;
+
+      doc.setTextColor(0, 0, 0);
+      doc.text(`Beschreibung: ${projekt.beschreibung || '-'}`, 12, y);
+      y += 6;
+      doc.text(`Startdatum: ${projekt.datum || '-'}`, 12, y);
+      y += 6;
+      doc.text(`Status: ${projekt.status}`, 12, y);
+      y += 6;
+      doc.text(`Verantwortlicher: ${projekt.verantwortlicher || '-'}`, 12, y);
+      y += 8;
+
+      doc.text('Leistungen:', 12, y);
+      y += 6;
+
+      if (projekt.leistungen.length === 0) {
+        doc.text('Keine Leistungen erfasst', 14, y);
+        y += 8;
+      } else {
+        projekt.leistungen.forEach(l => {
+          if (y > 270) {
+            doc.addPage();
+            y = 10;
+          }
+          const text = `- ${l.beschreibung}, Menge: ${l.menge} ${l.einheit}${l.datum ? ', Datum: ' + l.datum : ''}`;
+          doc.text(text, 14, y);
+          y += 6;
+        });
+        y += 4;
+      }
+      y += 6;
+    });
+
+    doc.save('projekte_und_leistungen.pdf');
+  }
+
+  // Eventlistener Export
+  exportCSVBtn.addEventListener('click', exportCSV);
+  exportPDFBtn.addEventListener('click', exportPDF);
+
+  // Initial laden
+  loadProjects();
+  renderProjects();
+
+  // Hinweis zu SharePoint Integration:
+  /*
+    Eine direkte Integration in SharePoint (z.B. Schreiben/Lesen von Listen) erfordert
+    eine Backend-API oder Zugriff per Microsoft Graph API mit OAuth-Authentifizierung.
+
+    JavaScript im Browser allein kann aus Sicherheitsgründen keine direkten Schreibzugriffe auf SharePoint-Listen durchführen.
+
+    Für Integration im produktiven Umfeld empfehle ich:
+    - Azure Functions oder ein kleines Backend mit SharePoint-API-Anbindung
+    - Nutzung von Microsoft Power Automate / Make.com für Workflow-Automatisierung
+
+    Bei Interesse kann ich dir Beispielcode oder Architekturvorschläge liefern.
+  */
+</script>
+</body>
+</html>
