@@ -2,187 +2,75 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8"/>
-  <title>Chatbot – Wie kann ich Dir helfen?</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet"/>
+  <title>Einfacher Bot</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <style>
-    body {
-      margin: 0;
-      font-family: 'Inter', Arial, sans-serif;
-      background: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      color: #222;
-    }
-    .centered-title {
-      margin-top: 10vh;
-      font-size: 2.5rem;
-      font-weight: 600;
-    }
-    .chat-container {
-      margin-top: 3rem;
-      background: #f7fafd;
-      border-radius: 2rem;
-      box-shadow: 0 2px 32px rgba(0,0,0,0.08);
-      padding: 2rem;
-      width: 90%;
-      max-width: 500px;
-    }
-    .chatbox {
-      min-height: 120px;
-      max-height: 50vh;
-      overflow-y: auto;
-      margin-bottom: 1rem;
-      font-size: 1.15rem;
-      line-height: 1.4;
-    }
-    .chatbox .user { color: #1e6cff; font-weight: 600; }
-    .chatbox .bot  { color: #005bac; font-weight: 600; }
-    .input-row {
-      display: flex;
-      border-radius: 2rem;
-      background: #fff;
-      border: 1px solid #e3eefa;
-      overflow: hidden;
-    }
-    .input-row input {
-      flex: 1;
-      border: none;
-      padding: 1rem 1.5rem;
-      font-size: 1.1rem;
-      outline: none;
-    }
-    .input-row button {
-      background: #005bac;
-      color: #fff;
-      border: none;
-      width: 3rem;
-      cursor: pointer;
-      transition: background .2s;
-      font-size: 1.3rem;
-    }
-    .input-row button:hover { background: #003e7e; }
-    .hint-long {
-      margin-top: 1rem;
-      font-style: italic;
-      color: #d97706;
-      display: none;
-    }
-    .error-msg {
-      margin-top: 1rem;
-      color: #e11d48;
-      display: none;
-      font-weight: 500;
-    }
-    @media (max-width: 600px) {
-      .centered-title { font-size: 1.8rem; }
-      .chat-container { padding: 1rem; }
-    }
+    body { font-family: sans-serif; background: #f0f4f8; padding: 2rem; }
+    #chat { background: #fff; padding: 1rem; border-radius: 8px; max-width: 500px; margin: auto; }
+    .line { margin-bottom: .5rem; }
+    .user { color: #1e6cff; font-weight: bold; }
+    .bot  { color: #008000; font-weight: bold; }
+    #form { display: flex; margin-top: 1rem; }
+    #q { flex:1; padding:.5rem; font-size:1rem; }
+    #btn { padding: .5rem 1rem; }
   </style>
 </head>
 <body>
-  <div class="centered-title">Wie kann ich Dir helfen?</div>
-  <div class="chat-container">
-    <div class="chatbox" id="chatbox">
-      <div><span class="bot">Bot:</span> Hallo! Wie kann ich Dir heute helfen?</div>
-    </div>
-    <form id="chat-form" class="input-row" autocomplete="off">
-      <input id="user-input" type="text" placeholder="Stelle irgendeine Frage" required/>
-      <button type="submit" title="Senden">&#10148;</button>
-    </form>
-    <div id="hint-long" class="hint-long">
-      ⏳ Es dauert heute leider etwas länger als gewöhnlich ...
-    </div>
-    <div id="error-msg" class="error-msg"></div>
+  <div id="chat">
+    <div class="line bot">Bot: Hallo! Wie kann ich Dir helfen?</div>
   </div>
-  
+  <form id="form">
+    <input id="q" type="text" placeholder="Deine Frage…" required />
+    <button id="btn">Senden</button>
+  </form>
+
   <script>
-    const webhookUrl = "https://hook.us2.make.com/pkdx4lpoadncdgd9fdwvd2jlgnwfsgx6";
-    const chatbox   = document.getElementById('chatbox');
-    const form      = document.getElementById('chat-form');
-    const input     = document.getElementById('user-input');
-    const hintLong  = document.getElementById('hint-long');
-    const errorMsg  = document.getElementById('error-msg');
+    const webhook = "https://hook.us2.make.com/pkdx4lpoadncdgd9fdwvd2jlgnwfsgx6";
+    const proxy   = "https://api.allorigins.win/raw?url=";
+    const chat    = document.getElementById("chat");
+    const form    = document.getElementById("form");
+    const q       = document.getElementById("q");
 
-    form.addEventListener('submit', async e => {
+    form.addEventListener("submit", async e => {
       e.preventDefault();
-      errorMsg.style.display = 'none';
-      hintLong.style.display = 'none';
-
-      const frage = input.value.trim();
+      const frage = q.value.trim();
       if (!frage) return;
-      append('Du', frage, 'user');
-      append('Bot', 'Antwort wird geladen …', 'bot');
-      scroll();
-
-      input.value = '';
-      const hintTimeout = setTimeout(() => hintLong.style.display = 'block', 25000);
-      const abortController = new AbortController();
-      const maxTimeout = setTimeout(() => abortController.abort(), 60000);
+      append("Du", frage, "user");
+      append("Bot", "…warte", "bot");
+      q.value = "";
 
       try {
-        const res = await fetch(webhookUrl, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          mode: 'cors',
-          body: JSON.stringify({ message: frage }),
-          signal: abortController.signal
+        const res = await fetch(proxy + encodeURIComponent(webhook), {
+          method: "POST",
+          headers: { "Content-Type":"application/json" },
+          body: JSON.stringify({ message: frage })
         });
-        clearTimeout(hintTimeout);
-        clearTimeout(maxTimeout);
-        hintLong.style.display = 'none';
-
         const text = await res.text();
         let data;
         try {
           data = JSON.parse(text);
         } catch {
-          // Fallback: reiner Text
-          data = { reply: text.trim() };
+          data = { reply: text };
         }
-
-        const reply = data.reply || data.antwort || '';
-        if (!reply) throw new Error('Keine Antwort gefunden.');
-
-        updateBot(reply);
-        speak(reply);
-
+        const reply = data.reply || data.antwort || text;
+        updateLastBot(reply);
       } catch (err) {
-        updateBot('Entschuldigung, es ist ein Fehler aufgetreten.');
-        errorMsg.textContent = err.message;
-        errorMsg.style.display = 'block';
+        updateLastBot("Fehler beim Laden");
       }
-      scroll();
     });
 
-    function append(sender, text, cls) {
-      const line = document.createElement('div');
-      line.innerHTML = `<span class="${cls}">${sender}:</span> ${escape(text)}`;
-      chatbox.appendChild(line);
+    function append(who, msg, cls) {
+      const d = document.createElement("div");
+      d.className = "line "+cls;
+      d.textContent = who + ": " + msg;
+      chat.appendChild(d);
+      chat.scrollTop = chat.scrollHeight;
     }
-    function updateBot(text) {
-      const lines = chatbox.querySelectorAll('div');
+    function updateLastBot(msg) {
+      const lines = chat.querySelectorAll(".line.bot");
       const last  = lines[lines.length-1];
-      last.innerHTML = `<span class="bot">Bot:</span> ${escape(text)}`;
-    }
-    function scroll() {
-      chatbox.scrollTop = chatbox.scrollHeight;
-    }
-    function speak(txt) {
-      if (!('speechSynthesis' in window) || !txt) return;
-      const u = new SpeechSynthesisUtterance(txt);
-      u.lang = 'de-DE';
-      window.speechSynthesis.speak(u);
-    }
-    function escape(str) {
-      return str
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
+      last.textContent = "Bot: " + msg;
+      chat.scrollTop = chat.scrollHeight;
     }
   </script>
 </body>
