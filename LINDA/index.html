@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <title>Chatbot – Wie kann ich Dir helfen?</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet"/>
   <style>
     body {
@@ -89,7 +89,7 @@
       <div><span class="bot">Bot:</span> Hallo! Wie kann ich Dir heute helfen?</div>
     </div>
     <form id="chat-form" class="input-row" autocomplete="off">
-      <input id="user-input" type="text" placeholder="Stelle irgendeine Frage" required />
+      <input id="user-input" type="text" placeholder="Stelle irgendeine Frage" required/>
       <button type="submit" title="Senden">&#10148;</button>
     </form>
     <div id="hint-long" class="hint-long">
@@ -97,94 +97,92 @@
     </div>
     <div id="error-msg" class="error-msg"></div>
   </div>
-
+  
   <script>
     const webhookUrl = "https://hook.us2.make.com/pkdx4lpoadncdgd9fdwvd2jlgnwfsgx6";
-    const chatbox = document.getElementById('chatbox');
-    const chatForm = document.getElementById('chat-form');
-    const userInput = document.getElementById('user-input');
-    const hintLong = document.getElementById('hint-long');
-    const errorMsg = document.getElementById('error-msg');
+    const chatbox   = document.getElementById('chatbox');
+    const form      = document.getElementById('chat-form');
+    const input     = document.getElementById('user-input');
+    const hintLong  = document.getElementById('hint-long');
+    const errorMsg  = document.getElementById('error-msg');
 
-    chatForm.addEventListener('submit', async (e) => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       errorMsg.style.display = 'none';
       hintLong.style.display = 'none';
 
-      const frage = userInput.value.trim();
+      const frage = input.value.trim();
       if (!frage) return;
-      appendMessage('Du', frage, 'user');
-      appendMessage('Bot', 'Antwort wird geladen …', 'bot');
+      append('Du', frage, 'user');
+      append('Bot', 'Antwort wird geladen …', 'bot');
+      scroll();
 
-      userInput.value = '';
-      scrollToBottom();
-
-      // Hinweis nach 25s
-      const hintTimeout = setTimeout(() => {
-        hintLong.style.display = 'block';
-      }, 25000);
+      input.value = '';
+      const hintTimeout = setTimeout(() => hintLong.style.display = 'block', 25000);
+      const abortController = new AbortController();
+      const maxTimeout = setTimeout(() => abortController.abort(), 60000);
 
       try {
-        const controller = new AbortController();
-        const timeoutMax = setTimeout(() => controller.abort(), 60000);
-
         const res = await fetch(webhookUrl, {
           method: 'POST',
-          mode: 'cors',
           headers: { 'Content-Type': 'application/json' },
-          signal: controller.signal,
-          body: JSON.stringify({ message: frage })
+          mode: 'cors',
+          body: JSON.stringify({ message: frage }),
+          signal: abortController.signal
         });
-
         clearTimeout(hintTimeout);
-        clearTimeout(timeoutMax);
+        clearTimeout(maxTimeout);
         hintLong.style.display = 'none';
 
         const text = await res.text();
         let data;
         try {
           data = JSON.parse(text);
-        } catch (err) {
-          throw new Error('Antwort ist kein gültiges JSON:\n' + text);
+        } catch {
+          // Fallback: reiner Text
+          data = { reply: text.trim() };
         }
 
-        const reply = data.reply || data.antwort;
-        if (!reply) throw new Error('Im JSON wurde kein Feld „reply“ oder „antwort“ gefunden.');
+        const reply = data.reply || data.antwort || '';
+        if (!reply) throw new Error('Keine Antwort gefunden.');
 
-        updateLastBotMessage(reply);
-        tts(reply);
+        updateBot(reply);
+        speak(reply);
 
       } catch (err) {
-        updateLastBotMessage('Entschuldigung, es ist ein Fehler aufgetreten.');
+        updateBot('Entschuldigung, es ist ein Fehler aufgetreten.');
         errorMsg.textContent = err.message;
         errorMsg.style.display = 'block';
       }
-      scrollToBottom();
+      scroll();
     });
 
-    function appendMessage(sender, text, cls) {
-      const div = document.createElement('div');
-      div.innerHTML = `<span class="${cls}">${sender}:</span> ${escapeHTML(text)}`;
-      chatbox.appendChild(div);
+    function append(sender, text, cls) {
+      const line = document.createElement('div');
+      line.innerHTML = `<span class="${cls}">${sender}:</span> ${escape(text)}`;
+      chatbox.appendChild(line);
     }
-    function updateLastBotMessage(text) {
-      const items = chatbox.querySelectorAll('div');
-      const last = items[items.length - 1];
-      last.innerHTML = `<span class="bot">Bot:</span> ${escapeHTML(text)}`;
+    function updateBot(text) {
+      const lines = chatbox.querySelectorAll('div');
+      const last  = lines[lines.length-1];
+      last.innerHTML = `<span class="bot">Bot:</span> ${escape(text)}`;
     }
-    function scrollToBottom() {
+    function scroll() {
       chatbox.scrollTop = chatbox.scrollHeight;
     }
-    function tts(text) {
-      if (!('speechSynthesis' in window) || !text) return;
-      const u = new SpeechSynthesisUtterance(text);
+    function speak(txt) {
+      if (!('speechSynthesis' in window) || !txt) return;
+      const u = new SpeechSynthesisUtterance(txt);
       u.lang = 'de-DE';
       window.speechSynthesis.speak(u);
     }
-    function escapeHTML(str) {
-      return str.replace(/[&<>"']/g, m => 
-        ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])
-      );
+    function escape(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
     }
   </script>
 </body>
