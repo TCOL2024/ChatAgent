@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>15-Minuten Lernmodul: Strategie-Grundlagen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 20px;
+      --radius-sm: 10px;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--primary-light);
+      color: #222; min-height: 100vh;
+    }
+    .container {
+      max-width: 700px; margin: 0 auto; padding: 20px;
+    }
+    h1 {
+      color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem;
+    }
+    p.intro {
+      background: var(--secondary);
+      padding: 15px; border-radius: var(--radius-sm);
+      box-shadow: var(--shadow); margin-bottom: 2rem;
+    }
+    section {
+      background: var(--secondary);
+      padding: 20px; margin-bottom: 2rem;
+      border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    section h2 {
+      color: var(--primary); margin-top: 0;
+    }
+    section p {
+      line-height: 1.5; margin-bottom: 1.5rem;
+    }
+    .question {
+      margin-bottom: 1.5rem;
+    }
+    .question p {
+      font-weight: 600; margin-bottom: 0.5rem;
+    }
+    .answers {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .answer-btn {
+      background: #f4f7fb; border: none;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      cursor: pointer; text-align: left;
+      transition: background 0.2s;
+    }
+    .answer-btn:hover:not(:disabled) {
+      background: #e1e7fd;
+    }
+    .answer-btn.selected {
+      background: var(--primary); color: #fff;
+    }
+    .answer-btn:disabled {
+      opacity: 0.7; cursor: default;
+    }
+    .feedback {
+      margin-top: 8px; font-size: 0.95rem;
+    }
+    .feedback.correct { color: var(--success); }
+    .feedback.incorrect { color: var(--error); }
+    @media (max-width: 600px) {
+      .answers { gap: 6px; }
+      .answer-btn { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>15-Minuten Lernmodul: Strategie-Grundlagen</h1>
+    <p class="intro">
+      Nimm dir etwa 15 Minuten Zeit und arbeite die vier Themenblöcke mit den dazugehörigen Fragen durch. 
+      Danach bist du optimal vorbereitet für die Vorlesung zur strategischen Unternehmensführung.
+    </p>
+
+    <!-- Block 1 -->
+    <section id="block1">
+      <h2>1. Strategische Planung: Definition &amp; Bedeutung</h2>
+      <p>
+        Strategische Planung gibt Antwort auf die Frage, was das Unternehmen langfristig, 
+        also in mehr- bis langjähriger Frist, erreichen soll. 
+        Sie beinhaltet grundlegende Entscheidungen, die die Zukunft des Unternehmens prägen.
+      </p>
+      <div class="question">
+        <p>1.1 Was beantwortet die strategische Planung?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Strategische Planung legt langfristige Unternehmensziele fest.')">Langfristige Unternehmensziele</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Das ist operativ: tägliche Abläufe.')">Tägliche Abläufe</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Das wäre Controlling.')">Planabweichungen verhindern</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Das ist HR-Planung.')">Personalplanung</button>
+        </div>
+      </div>
+      <div class="question">
+        <p>1.2 Welchen Zeithorizont hat strategische Planung?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Mehr- bis langjährige Frist.')">Mehr- bis langjährige Frist</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Operativ ist kurzfristig.')">Kurzfristige Frist</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Das ist kein Planungsbegriff.')">Mittelfristige Frist</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Das betrifft Budgetierung.')">Budgetzyklus</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 2 -->
+    <section id="block2">
+      <h2>2. Kernentscheidungen der Strategie</h2>
+      <p>
+        Zu den wesentlichen Entscheidungen der strategischen Planung gehören:
+        <ul>
+          <li>Das Zielsystem des Unternehmens</li>
+          <li>Die Aufbauorganisation (organisatorische Gefüge)</li>
+          <li>Die Art der Aufgabenerfüllung (Arbeitsteilung &amp; Ablauforganisation)</li>
+        </ul>
+      </p>
+      <div class="question">
+        <p>2.1 Was gehört NICHT zu den Kernentscheidungen?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Operative Ablaufplanung ist Teil des Controllings.')">Operative Ablaufplanung</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Teil des Zielsystems.')">Zielsystem</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Teil der Aufbauorganisation.')">Aufbauorganisation</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Teil der strategischen Planung.')">Arbeitsteilung</button>
+        </div>
+      </div>
+      <div class="question">
+        <p>2.2 Was versteht man unter Ablauforganisation?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Gestaltung und Ablauf von Prozessen.')">Gestaltung von Prozessen</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Festlegen der Produkte.')">Produktprogramm</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Ein Finanzkennzahl.')">Liquidität</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Ein Controlling-Instrument.')">Kennzahlensystem</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 3 -->
+    <section id="block3">
+      <h2>3. Betriebscontrolling &amp; Strategieumsetzung</h2>
+      <p>
+        Mit Hilfe des betrieblichen Controllings werden strategische Ziele nachgehalten. 
+        Planabweichungen werden frühzeitig erkannt, verhindert oder korrigiert. 
+        Die Strategie wird von der Unternehmensspitze vorgegeben und kaskadiert über alle Hierarchieebenen.
+      </p>
+      <div class="question">
+        <p>3.1 Wozu dient das Controlling im Strategieprozess?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Abweichungen erkennen und korrigieren.')">Abweichungen korrigieren</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Langfristige Standortwahl.')">Standortwahl</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Festlegen der Produktpalette.')">Produktprogramm</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Durchführung von Teambesprechungen.')">Teambesprechungen</button>
+        </div>
+      </div>
+      <div class="question">
+        <p>3.2 Was bedeutet „kaskadieren“ der Strategie?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Weitergabe über Hierarchieebenen.')">Über Hierarchieebenen weitergeben</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'In Einzelpläne auflösen.')">In Einzelpläne auflösen</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Strategie verwerfen.')">Strategie verwerfen</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Finanzieren der Planung.')">Plan finanzieren</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Block 4 -->
+    <section id="block4">
+      <h2>4. Strategische vs. Operative Planung</h2>
+      <p>
+        Unterschiede anhand von drei Kriterien:
+        <ol>
+          <li>Fristigkeit (langfristig vs. kurzfristig)</li>
+          <li>Abstraktionsniveau (global vs. detailliert)</li>
+          <li>Vollständigkeit (unvollständig vs. vollständig)</li>
+        </ol>
+        Strategische Planung befasst sich mit globalen Zielen (z.B. Standort, SGF), 
+        operative Planung mit kurzfristiger Erfolgsrealisierung (Liquidität &amp; Erfolg).
+      </p>
+      <div class="question">
+        <p>4.1 Welches Kriterium gehört zur Abgrenzung?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Abstraktionsniveau')">Abstraktionsniveau</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Budgethöhe')">Budgethöhe</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Personalplanung')">Personalplanung</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Controlling')">Controlling</button>
+        </div>
+      </div>
+      <div class="question">
+        <p>4.2 Was ist ein operatives Planungsziel?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true" onclick="checkAnswer(this, 'Liquidität sichern')">Liquidität sichern</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Standortwahl')">Standortwahl</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'SGF definieren')">SGF definieren</button>
+          <button class="answer-btn" data-correct="false" onclick="checkAnswer(this, 'Zielsystem aufbauen')">Zielsystem aufbauen</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function checkAnswer(btn, explanation) {
+      const correct = btn.dataset.correct === 'true';
+      // disable all siblings
+      const container = btn.closest('.answers');
+      container.querySelectorAll('button').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.correct === 'true') b.classList.add('selected');
+      });
+      // feedback
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+      fb.textContent = (correct ? '✅ Richtig! ' : '❌ Falsch! ') + explanation;
+      container.parentElement.appendChild(fb);
+    }
+  </script>
+</body>
+</html>
