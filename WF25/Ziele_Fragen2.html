@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz: Strategische Analyse & Ziele</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 30px;
+      --radius-sm: 14px;
+    }
+    html, body {
+      background: var(--primary-light);
+      margin: 0; padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh; color: #222;
+    }
+    .main-outer {
+      min-height: 100vh;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 42px 0;
+    }
+    .quiz-container {
+      background: var(--secondary);
+      max-width: 600px; width: 95vw;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 44px 36px 36px 36px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .quiz-header-flex {
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 16px;
+      margin-bottom: 18px;
+    }
+    .progress-bar-outer {
+      min-width: 150px;
+      background: rgba(255,255,255,0.88);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 8px rgba(35,70,228,0.07);
+      padding: 9px 18px 7px 18px;
+      text-align: right; display: flex;
+      flex-direction: column; align-items: flex-end;
+    }
+    .progress-label {
+      font-size: 0.97rem; color: var(--gray);
+      font-weight: 500; margin-bottom: 3px;
+    }
+    .progress-bar-bg {
+      width: 120px; height: 8px;
+      background: #e3eafc; border-radius: 8px;
+      overflow: hidden; margin-bottom: 1px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 70%, #57c8fa 100%);
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(.59,.13,.29,1.12);
+    }
+    h1 {
+      font-size: 2.1rem; color: var(--primary);
+      font-weight: 700; margin: 0;
+      letter-spacing: 0.01em;
+      flex: 1 1 auto; min-width: 210px;
+    }
+    .question {
+      font-size: 1.25rem; font-weight: 600;
+      color: #212b4a; margin: 18px 0 32px 0;
+      min-height: 64px; line-height: 1.38;
+    }
+    .answers {
+      display: flex; flex-direction: column; gap: 19px;
+      margin-bottom: 14px;
+    }
+    .answer-btn {
+      background: #f4f7fb; border: none;
+      border-radius: var(--radius-sm);
+      padding: 20px 24px; font-size: 1.09rem;
+      font-weight: 500; color: #243060;
+      cursor: pointer;
+      box-shadow: 0 2px 9px rgba(35,70,228,0.07);
+      transition: background 0.19s, color 0.17s, box-shadow 0.18s;
+      text-align: left; outline: none; position: relative;
+    }
+    .answer-btn.selected {
+      background: var(--primary); color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 16px rgba(35,70,228,0.11);
+    }
+    .answer-btn:disabled {
+      opacity: 0.82; cursor: default;
+    }
+    .next-btn {
+      margin-top: 28px;
+      background: var(--primary); color: #fff; border: none;
+      padding: 15px 42px; font-size: 1.07rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer; font-weight: 600;
+      box-shadow: 0 3px 18px rgba(35,70,228,0.10);
+      letter-spacing: 0.01em;
+      transition: background 0.19s;
+    }
+    .next-btn:active { background: #2238a8; }
+    .result-overview {
+      margin-top: 22px; background: #f6f8fc;
+      border-radius: var(--radius-sm);
+      padding: 20px 10px;
+      box-shadow: 0 1px 7px rgba(35,70,228,0.06);
+    }
+    .result-row {
+      display: flex; align-items: flex-start;
+      gap: 14px; padding: 13px 0 5px 0;
+      border-bottom: 1px solid #e3eafc; font-size: 1rem;
+    }
+    .result-row:last-child { border-bottom: none; }
+    .result-icon {
+      font-size: 1.6rem; line-height: 1.1;
+      margin-top: 1px; min-width: 30px; text-align: center;
+    }
+    .correct { color: var(--success); font-weight: 600; }
+    .incorrect { color: var(--error); font-weight: 600; }
+    .explanation {
+      margin-left: 42px; color: var(--gray);
+      font-size: 0.99rem; margin: 3px 0 9px 0;
+      padding-right: 7px;
+    }
+    .score {
+      font-size: 1.45rem; color: var(--primary);
+      margin: 13px 0 10px 0;
+      font-weight: 700;
+    }
+    .restart-btn, .certificate-btn {
+      margin-top: 18px; background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 1.06rem; padding: 11px 26px;
+      border-radius: var(--radius-sm);
+      cursor: pointer; font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      margin-right: 15px;
+    }
+    .restart-btn:hover, .certificate-btn:hover {
+      background: var(--primary); color: #fff;
+    }
+    .overlay {
+      position: fixed; top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(33,48,96,0.08);
+      display: flex; justify-content: center; align-items: center;
+      z-index: 999;
+    }
+    .name-dialog {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(35,70,228,0.13);
+      padding: 30px 24px 20px 24px;
+      max-width: 95vw; min-width: 290px; text-align: center;
+    }
+    .name-dialog h2 {
+      color: var(--primary); margin: 0 0 20px 0;
+      font-size: 1.18rem;
+    }
+    .name-dialog input {
+      padding: 10px 15px; border: 1.5px solid #b8c3ea;
+      border-radius: 10px; width: 80%;
+      font-size: 1.02rem; margin-bottom: 16px;
+      outline: none; transition: border 0.17s;
+    }
+    .name-dialog input:focus { border-color: var(--primary); }
+    .name-dialog button {
+      background: var(--primary); color: #fff; border: none;
+      border-radius: 9px; padding: 10px 24px;
+      font-size: 1rem; font-weight: 600; cursor: pointer;
+    }
+    .name-error {
+      color: var(--error); font-size: 0.99rem;
+      margin-bottom: 5px;
+    }
+    @media (max-width: 620px) {
+      .quiz-container { padding: 18px 2vw; }
+      .progress-bar-outer { min-width: 90px; padding: 7px 6px; }
+      .progress-bar-bg { width: 60px; }
+      .quiz-header-flex { gap: 8px; }
+      h1 { font-size: 1.28rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-outer">
+    <div class="quiz-container">
+      <div class="quiz-header-flex">
+        <h1>Quiz: Strategische Analyse &amp; Ziele</h1>
+        <div class="progress-bar-outer">
+          <div class="progress-label" id="progress-label">Frage 1 von 8</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar" style="width:12.5%"></div>
+          </div>
+        </div>
+      </div>
+      <div id="quiz"></div>
+    </div>
+  </div>
+
+  <div id="overlay" style="display:none;">
+    <div class="overlay">
+      <form class="name-dialog" autocomplete="off" onsubmit="return false;">
+        <h2>Name für das Zertifikat eingeben</h2>
+        <input type="text" id="username" placeholder="Vor- und Nachname" maxlength="60" required>
+        <div id="name-error" class="name-error" style="display:none;"></div>
+        <button type="button" onclick="submitName()">Zertifikat anzeigen</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const quizData = [
+      {
+        question: "Welches der folgenden Beispiele ist ein strategisches Ziel?",
+        answers: [
+          "Unser Unternehmen ist unter den TOP3 der Branche in drei Jahren",
+          "Monatliche Gehaltsabrechnungen termingerecht erstellen",
+          "Tägliche Teambesprechungen organisieren",
+          "Wöchentliche Lagerbestände prüfen"
+        ],
+        correct: 0,
+        explanation: "Strategische Ziele haben einen langfristigen Zeithorizont, z.B. TOP-3-Platzierung in drei Jahren."
+      },
+      {
+        question: "Welches der folgenden gehört zu den strategischen Geschäftsfeldern?",
+        answers: [
+          "Nutzfahrzeuge",
+          "Privatkunden",
+          "Mittelstand",
+          "Einkauf"
+        ],
+        correct: 0,
+        explanation: "Geschäftsfelder sind z.B. Nutzfahrzeuge oder Finanzdienstleistung; Privatkunden und Mittelstand sind Geschäftseinheiten."
+      },
+      {
+        question: "Woraus ergibt sich die SWOT-Analyse?",
+        answers: [
+          "Aus der Kombination von Chancen-Risiken-Profil und Stärken-Schwächen-Profil",
+          "Aus der Analyse der Marketing- und Finanzdaten",
+          "Aus der Zusammenfassung aller Unternehmensziele",
+          "Aus der Überwachung operativer Kennzahlen"
+        ],
+        correct: 0,
+        explanation: "Die SWOT-Analyse entsteht durch Verknüpfung der externen Chancen-Risiken-Analyse und der internen Stärken-Schwächen-Analyse."
+      },
+      {
+        question: "Wofür wird die Stärken-Schwächen-Analyse eingesetzt?",
+        answers: [
+          "Zur Betrachtung der Unternehmensleistung und Herausarbeitung interner Stärken und Schwächen",
+          "Zur Festlegung der Quartalsplanung",
+          "Zur Kontrolle der Monatsabschlüsse",
+          "Zur Bewertung externer Marktchancen"
+        ],
+        correct: 0,
+        explanation: "Die S-W-Analyse untersucht interne Faktoren wie Produkt-, Absatz-, Kultur- und Organisationsaspekte."
+      },
+      {
+        question: "Was charakterisiert die Chancen-Risiken-Analyse?",
+        answers: [
+          "Behandlung externer Einflussfaktoren, die das Unternehmen kaum beeinflussen kann",
+          "Bewertung interner Prozesse",
+          "Festlegung von Personalentwicklungsmaßnahmen",
+          "Analyse der Lagerbestände"
+        ],
+        correct: 0,
+        explanation: "Die Chancen-Risiken-Analyse betrachtet externe Gegebenheiten, die außerhalb der direkten Kontrolle liegen."
+      },
+      {
+        question: "Welcher Schritt folgt im Management-Regelkreis nach der SWOT-Analyse?",
+        answers: [
+          "Planung",
+          "Durchführung",
+          "Kontrolle",
+          "Organisation"
+        ],
+        correct: 0,
+        explanation: "Nach der Analyse (SWOT) erfolgt die Planung im Management-Regelkreis."
+      },
+      {
+        question: "Bei der Stärken-Schwächen-Analyse werden Schwächen auch unter anderem in welchem Bereich untersucht?",
+        answers: [
+          "Unternehmensorganisation",
+          "Tagesgeschäftsplanung",
+          "Lieferkettenmanagement",
+          "Rechnungswesen"
+        ],
+        correct: 0,
+        explanation: "Neben Produkt- und Absatzbezogenem werden Schwächen z.B. in Kultur und Organisation betrachtet."
+      },
+      {
+        question: "Welches der folgenden ist KEIN Beispiel für ein strategisches Ziel?",
+        answers: [
+          "Erhöhung der Mitarbeiterzahl innerhalb einer Woche",
+          "Kosten in der Produktion in fünf Jahren unter Marktdurchschnitt senken",
+          "Kundendienst in drei Jahren effizienter und kundenorientierter aufstellen",
+          "Unternehmen unter den TOP3 der Branche in drei Jahren positionieren"
+        ],
+        correct: 0,
+        explanation: "Strategische Ziele haben lange Zeithorizonte; die Erhöhung der Mitarbeiterzahl in einer Woche ist kurzfristig."
+      }
+    ];
+
+    let currentQ = 0;
+    let userAnswers = [];
+    const quizDiv = document.getElementById("quiz");
+    const progressLabel = document.getElementById("progress-label");
+    const progressBar = document.getElementById("progress-bar");
+    let scoreGlobal = 0;
+
+    function renderQuestion(idx) {
+      const data = quizData[idx];
+      progressLabel.textContent = `Frage ${idx+1} von ${quizData.length}`;
+      progressBar.style.width = `${((idx+1)/quizData.length)*100}%`;
+      quizDiv.innerHTML = `
+        <div class="question">${data.question}</div>
+        <div class="answers">
+          ${data.answers.map((a,i)=>`<button class="answer-btn" onclick="selectAnswer(${i})">${a}</button>`).join("")}
+        </div>
+      `;
+    }
+
+    window.selectAnswer = function(i) {
+      userAnswers[currentQ] = i;
+      document.querySelectorAll(".answer-btn").forEach((btn, idx)=>{
+        btn.classList.toggle("selected", idx===i);
+        btn.disabled = true;
+      });
+      setTimeout(()=>{
+        if (currentQ < quizData.length - 1) {
+          currentQ++;
+          renderQuestion(currentQ);
+        } else {
+          showResults();
+        }
+      }, 450);
+    };
+
+    function showResults() {
+      progressLabel.textContent = "Ergebnis";
+      progressBar.style.width = "100%";
+      scoreGlobal = quizData.filter((q,idx)=> userAnswers[idx] === q.correct).length;
+      quizDiv.innerHTML = `
+        <div class="score">Dein Ergebnis: ${scoreGlobal} / ${quizData.length} richtig</div>
+        <div class="result-overview">
+          ${quizData.map((q,idx)=>{
+            const right = userAnswers[idx] === q.correct;
+            return `
+              <div class="result-row">
+                <span class="result-icon">${right?"✅":"❌"}</span>
+                <span class="${right?"correct":"incorrect"}">Frage ${idx+1}</span>
+                <span>${q.question}</span>
+              </div>
+              ${!right?`<div class="explanation">
+                Richtige Antwort: <strong>${q.answers[q.correct]}</strong><br>${q.explanation}
+              </div>`:""}
+            `;
+          }).join("")}
+        </div>
+        <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
+        <button class="certificate-btn" onclick="showNameDialog()">Zertifikat drucken</button>
+      `;
+    }
+
+    window.restartQuiz = function() {
+      currentQ = 0; userAnswers = [];
+      renderQuestion(currentQ);
+    };
+
+    window.showNameDialog = function() {
+      document.getElementById("overlay").style.display = "block";
+      document.getElementById("username").value = "";
+      document.getElementById("name-error").style.display = "none";
+      document.getElementById("username").focus();
+    };
+
+    window.submitName = function() {
+      const name = document.getElementById("username").value.trim();
+      if (!name || name.length<2) {
+        document.getElementById("name-error").textContent = "Bitte gib deinen vollständigen Namen ein.";
+        document.getElementById("name-error").style.display = "block";
+        return;
+      }
+      document.getElementById("overlay").style.display = "none";
+      showCertificate(name, scoreGlobal, quizData.length);
+    };
+
+    function showCertificate(name, score, total) {
+      const certWindow = window.open("", "_blank", "width=700,height=900");
+      const dateStr = new Date().toLocaleDateString("de-DE");
+      certWindow.document.write(`
+        <!DOCTYPE html>
+        <html lang="de">
+        <head><meta charset="UTF-8"><title>Zertifikat</title>
+        <style>
+          body { font-family: 'Inter', Arial, sans-serif; background: #f7faff; color: #222; margin:0; padding:0; }
+          .cert-container {
+            max-width:520px; margin:48px auto; background:#fff;
+            border-radius:26px; box-shadow:0 8px 32px rgba(35,70,228,0.13);
+            padding:44px 30px; text-align:center;
+          }
+          .cert-title { font-size:2.1rem; color:#2346e4; font-weight:700; margin-bottom:16px; }
+          .cert-line { width:60px; height:4px; background:#2346e4; border-radius:3px; margin:0 auto 22px; }
+          .cert-name { font-size:1.28rem; color:#212b4a; margin:24px 0 12px; font-weight:600; }
+          .cert-score { font-size:1.12rem; color:#2346e4; font-weight:600; margin-bottom:18px; }
+          .cert-date { color:#7d8597; font-size:1.01rem; margin-top:22px; }
+          .cert-footer { margin-top:38px; font-size:0.98rem; color:#7d8597; }
+          .cert-print-btn {
+            margin-top:30px; background:#2346e4; color:#fff; border:none;
+            padding:13px 38px; font-size:1.11rem; border-radius:12px;
+            cursor:pointer; font-weight:600; box-shadow:0 3px 18px rgba(35,70,228,0.10);
+          }
+          @media print {
+            .cert-print-btn { display:none!important; }
+            body { background:#fff; }
+          }
+        </style>
+        </head>
+        <body>
+          <div class="cert-container">
+            <div class="cert-title">Zertifikat</div>
+            <div class="cert-line"></div>
+            <div>Hiermit wird bestätigt, dass</div>
+            <div class="cert-name">${name}</div>
+            <div>das Quiz „Strategische Analyse &amp; Ziele“ erfolgreich absolviert hat.</div>
+            <div class="cert-score">Ergebnis: <b>${score} von ${total} Punkten</b></div>
+            <div class="cert-date">Datum: ${dateStr}</div>
+            <button class="cert-print-btn" onclick="window.print()">Zertifikat drucken</button>
+            <div class="cert-footer">Online-Quiz – Management IHK</div>
+          </div>
+        </body>
+        </html>
+      `);
+    }
+
+    // Quiz starten
+    renderQuestion(currentQ);
+  </script>
+</body>
+</html>
