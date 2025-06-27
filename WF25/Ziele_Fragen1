@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz zu Unternehmenszielen</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+    .question {
+      margin-bottom: 15px;
+    }
+    #results {
+      margin-top: 20px;
+    }
+    #certificate {
+      display: none;
+      border: 2px solid #000;
+      padding: 20px;
+      margin-top: 20px;
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 5px;
+    }
+    input[type="text"] {
+      margin-right: 10px;
+    }
+    button {
+      margin-top: 10px;
+    }
+    hr {
+      margin: 30px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>Quiz: Unternehmensziele</h1>
+  <form id="quiz-form">
+    <div class="question">
+      <p>1. Was versteht man unter einem Zielsystem in Unternehmen?</p>
+      <label><input type="radio" name="q1" value="A"> A. Bündelung von Zielen aus verschiedenen Bereichen.</label>
+      <label><input type="radio" name="q1" value="B"> B. Festlegung eines einzelnen Hauptziels.</label>
+      <label><input type="radio" name="q1" value="C"> C. Kontrolle der Zielerreichung.</label>
+      <label><input type="radio" name="q1" value="D"> D. Eliminierung von Zielkonflikten.</label>
+    </div>
+    <div class="question">
+      <p>2. Was bezeichnet im Zielbildungsprozess die „Zielsuche“?</p>
+      <label><input type="radio" name="q2" value="A"> A. Auswahl und Priorisierung von Oberzielen.</label>
+      <label><input type="radio" name="q2" value="B"> B. Festlegung der Maßnahmen zur Zielerreichung.</label>
+      <label><input type="radio" name="q2" value="C"> C. Analyse, welche Ziele verfolgt werden sollen und können.</label>
+      <label><input type="radio" name="q2" value="D"> D. Überwachung der Zielerreichung.</label>
+    </div>
+    <div class="question">
+      <p>3. Welche Zielbeziehung liegt vor, wenn Ziele sich gegenseitig ergänzen?</p>
+      <label><input type="radio" name="q3" value="A"> A. Komplementäre Ziele.</label>
+      <label><input type="radio" name="q3" value="B"> B. Konkurrierende Ziele.</label>
+      <label><input type="radio" name="q3" value="C"> C. Indifferente Ziele.</label>
+      <label><input type="radio" name="q3" value="D"> D. Antagonistische Ziele.</label>
+    </div>
+    <div class="question">
+      <p>4. Beispiel: Budget für Neueinstellung im Vertrieb wird erhöht, gleichzeitig wird Umsatzziel erhöht. Welche Beziehung liegt vor?</p>
+      <label><input type="radio" name="q4" value="A"> A. Komplementär.</label>
+      <label><input type="radio" name="q4" value="B"> B. Konkurrierend.</label>
+      <label><input type="radio" name="q4" value="C"> C. Indifferent.</label>
+      <label><input type="radio" name="q4" value="D"> D. Symmetrisch.</label>
+    </div>
+    <div class="question">
+      <p>5. Welches Umfeld umfasst Gesetzesvorhaben und politische Stabilität?</p>
+      <label><input type="radio" name="q5" value="A"> A. Soziales Umfeld.</label>
+      <label><input type="radio" name="q5" value="B"> B. Politisches Umfeld.</label>
+      <label><input type="radio" name="q5" value="C"> C. Technisches Umfeld.</label>
+      <label><input type="radio" name="q5" value="D"> D. Umweltbereich.</label>
+    </div>
+    <div class="question">
+      <p>6. Welcher Faktor gehört nicht zu den äußeren Einflüssen auf Unternehmensziele?</p>
+      <label><input type="radio" name="q6" value="A"> A. Lieferantenpreise.</label>
+      <label><input type="radio" name="q6" value="B"> B. Konjunkturelle Lage.</label>
+      <label><input type="radio" name="q6" value="C"> C. Unternehmensmission.</label>
+      <label><input type="radio" name="q6" value="D"> D. Kundenverhalten.</label>
+    </div>
+    <div class="question">
+      <p>7. Bei welchen Zielbeziehungen stehen Ziele zueinander in Konkurrenz?</p>
+      <label><input type="radio" name="q7" value="A"> A. Indifferente Ziele.</label>
+      <label><input type="radio" name="q7" value="B"> B. Konkurrierende Ziele.</label>
+      <label><input type="radio" name="q7" value="C"> C. Komplementäre Ziele.</label>
+      <label><input type="radio" name="q7" value="D"> D. Neutrale Ziele.</label>
+    </div>
+    <div class="question">
+      <p>8. Beispiel für indifferente Ziele: Budget für Marketing wird gesenkt und Qualität des Ausbildungspersonals erhöht. Welche Beziehung liegt vor?</p>
+      <label><input type="radio" name="q8" value="A"> A. Komplementär.</label>
+      <label><input type="radio" name="q8" value="B"> B. Konkurrierend.</label>
+      <label><input type="radio" name="q8" value="C"> C. Indifferent.</label>
+      <label><input type="radio" name="q8" value="D"> D. Unabhängig.</label>
+    </div>
+    <div class="question">
+      <p>9. Aus welcher Grundlage erfolgt laut Zielbildungsprozess die Ableitung der Unternehmensziele?</p>
+      <label><input type="radio" name="q9" value="A"> A. Finanzplanung.</label>
+      <label><input type="radio" name="q9" value="B"> B. Unternehmensgrundsatzplanung.</label>
+      <label><input type="radio" name="q9" value="C"> C. Marktanalyse.</label>
+      <label><input type="radio" name="q9" value="D"> D. Personalplanung.</label>
+    </div>
+    <div class="question">
+      <p>10. Welche Ziele werden als erste im Aufbau des Zielsystems ausgewählt und priorisiert?</p>
+      <label><input type="radio" name="q10" value="A"> A. Oberziele.</label>
+      <label><input type="radio" name="q10" value="B"> B. Unterziele.</label>
+      <label><input type="radio" name="q10" value="C"> C. Teilziele.</label>
+      <label><input type="radio" name="q10" value="D"> D. Einzelziele.</label>
+    </div>
+  </form>
+  <button onclick="showResults()">Quiz auswerten</button>
+  <div id="results"></div>
+  <hr/>
+  <h2>Zertifikat</h2>
+  <label for="firstname">Vorname:</label>
+  <input type="text" id="firstname" placeholder="Vorname" />
+  <label for="lastname">Nachname:</label>
+  <input type="text" id="lastname" placeholder="Nachname" />
+  <button onclick="generateCertificate()">Zertifikat anzeigen</button>
+  <div id="certificate"></div>
+  <button onclick="printCertificate()">Zertifikat drucken</button>
+
+  <script>
+    function showResults() {
+      var answers = {
+        q1: 'A', q2: 'C', q3: 'A', q4: 'A', q5: 'B',
+        q6: 'C', q7: 'B', q8: 'C', q9: 'B', q10: 'A'
+      };
+      var form = document.getElementById('quiz-form');
+      var resultDiv = document.getElementById('results');
+      resultDiv.innerHTML = '<h2>Auflösung</h2><ol>';
+      for (var key in answers) {
+        var num = key.substring(1);
+        var selected = form.elements[key].value || '—';
+        var correct = answers[key];
+        resultDiv.innerHTML += '<li>Frage ' + num + ': Richtige Antwort: ' + correct +
+          ' (Ihre Antwort: ' + selected + ')</li>';
+      }
+      resultDiv.innerHTML += '</ol>';
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function generateCertificate() {
+      var firstname = document.getElementById('firstname').value.trim();
+      var lastname = document.getElementById('lastname').value.trim();
+      if (!firstname || !lastname) {
+        alert('Bitte Vor- und Nachname eingeben.');
+        return;
+      }
+      var today = new Date();
+      var dd = String(today.getDate()).padStart(2, '0');
+      var mm = String(today.getMonth() + 1).padStart(2, '0');
+      var yyyy = today.getFullYear();
+      var dateStr = dd + '.' + mm + '.' + yyyy;
+      var cert = document.getElementById('certificate');
+      cert.innerHTML = 
+        '<h1>Zertifikat</h1>' +
+        '<p>Hiermit wird bescheinigt, dass</p>' +
+        '<h2>' + firstname + ' ' + lastname + '</h2>' +
+        '<p>erfolgreich am Quiz zu Unternehmenszielen am ' + dateStr + ' teilgenommen hat.</p>';
+      cert.style.display = 'block';
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    function printCertificate() {
+      window.print();
+    }
+  </script>
+</body>
+</html>
