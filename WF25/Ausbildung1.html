@@ -44,21 +44,21 @@
     <div class="q-block">
       <h2>Frage 1 (MC)</h2>
       <div class="q">
-        <p>In welcher Situation ist ein Tarifvertrag im Ausbildungsvertrag anzuwenden? (§§ zur Tarifbindung)</p>
+        <p>In welcher Situation ist ein Tarifvertrag im Ausbildungsvertrag anzuwenden?</p>
       </div>
       <div class="answers">
         <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Tarifbindung liegt nicht vor wenn nur Arbeitgeberbindung besteht.')">Nur wenn der Arbeitgeber tarifgebunden ist.</button>
         <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Arbeitnehmer allein reicht nicht.')">Nur wenn der Azubi Mitglied der Gewerkschaft ist.</button>
-        <button class="answer-btn" data-correct="true" onclick="checkMC(this,'Beide tarifgebunden oder Einzelvereinbarung.')">Wenn beide tarifgebunden sind oder es ausdrücklich vereinbart wurde.</button>
+        <button class="answer-btn" data-correct="true" onclick="checkMC(this,'Wenn beide tarifgebunden sind oder es ausdrücklich vereinbart wurde.')">Wenn beide tariffgebunden sind oder es ausdrücklich vereinbart wurde.</button>
         <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Günstigkeitsprinzip ist anderes Thema.')">Wenn Abweichungen nur zugunsten des Betriebes sind.</button>
       </div>
     </div>
 
     <!-- 2 -->
     <div class="q-block">
-      <h2>Frage 2 (Free Text)</h2>
+      <h2>Frage 2 (Freitext)</h2>
       <div class="q">
-        <p>Nennen Sie die drei Fälle der Tarifbindung:</p>
+        <p>Nennen Sie die drei Fälle der Tarifbindung.</p>
       </div>
       <input type="text" id="ft2" class="free-input" placeholder="Antwort hier eingeben..." />
       <button class="check-btn" onclick="checkFT('ft2',['Arbeitgeberverband','Gewerkschaft','ausdrücklich vereinbart'],this)">Antwort prüfen</button>
@@ -72,9 +72,9 @@
       </div>
       <div class="answers">
         <button class="answer-btn" data-correct="true" onclick="checkMC(this,'Abweichungen müssen zugunsten der Beschäftigten sein.')">Abweichungen nur zugunsten der Beschäftigten erlaubt.</button>
-        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Nur wenn erlaubt.')">Abweichungen nur wenn der Arbeitgeber zustimmt.</button>
-        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Arbeitgeberbestimmung ist anders.')">Abweichungen nur nach unten möglich.</button>
-        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Freie Vereinbarung wird anders geregelt.')">Abweichungen beliebig.</button>
+        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Nur wenn Arbeitgeber zustimmt.')">Abweichungen nur wenn der Arbeitgeber zustimmt.</button>
+        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Abweichungen nur nach unten möglich.')">Abweichungen nur nach unten möglich.</button>
+        <button class="answer-btn" data-correct="false" onclick="checkMC(this,'Abweichungen beliebig.')">Abweichungen beliebig.</button>
       </div>
     </div>
 
@@ -94,34 +94,42 @@
 
     <!-- 5 -->
     <div class="q-block">
-      <h2>Frage 5 (Free Text)</h2>
+      <h2>Frage 5 (Freitext)</h2>
       <div class="q">
         <p>Wie hoch ist die Mindestausbildungsvergütung im 2. Ausbildungsjahr für Auszubildende, die am 1.1.2023 begonnen haben?</p>
       </div>
       <input type="text" id="ft5" class="free-input" placeholder="z.B. 731,60 EUR" />
-      <button class="check-btn" onclick="checkFT('ft5',['731,60'],this)">Antwort prüfen</button>
+      <button class="check-btn" onclick="checkFT('ft5',['731,60','EUR'],this)">Antwort prüfen</button>
     </div>
 
-    <!-- Repeat blocks to reach 20 questions -->
-    <!-- ... additional MC and Free Text blocks up to 20 ... -->
+    <!-- ... bis Frage 20 analog ... -->
 
   </div>
 
   <script>
     function checkMC(btn, explanation) {
-      const correct = btn.dataset.correct==='true';
+      const correct = btn.dataset.correct === 'true';
       const parent = btn.closest('.answers');
-      parent.querySelectorAll('button').forEach(b=>{ b.disabled=true; if(b.dataset.correct==='true') b.classList.add('selected'); });
-      const fb=document.createElement('div'); fb.className='feedback '+(correct?'correct':'incorrect');
-      fb.textContent=(correct?'✅ Richtig! ':'❌ Falsch! ')+explanation;
+      parent.querySelectorAll('button').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.correct === 'true') b.classList.add('selected');
+      });
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+      fb.textContent = (correct ? '✅ Richtig! ' : '❌ Falsch! ') + explanation;
       parent.parentElement.appendChild(fb);
     }
     function checkFT(id, keywords, btn) {
-      const input=document.getElementById(id).value.toLowerCase();
-      const all=keywords.every(k=>input.includes(k.toLowerCase()));
-      btn.disabled=true;
-      const fb=document.createElement('div'); fb.className='feedback '+(all?'correct':'incorrect');
-      fb.textContent=(all?'✅ Inhalt korrekt.':'❌ Bitte prüfen Sie Ihre Antwort.');
+      const input = document.getElementById(id).value.trim().toLowerCase();
+      const all = keywords.every(k => input.includes(k.toLowerCase()));
+      btn.disabled = true;
+      const fb = document.createElement('div');
+      fb.className = 'feedback ' + (all ? 'correct' : 'incorrect');
+      if (all) {
+        fb.textContent = '✅ Inhalt korrekt.';
+      } else {
+        fb.textContent = '❌ Falsch! Richtige Antwort(en): ' + keywords.join(', ');
+      }
       btn.parentElement.appendChild(fb);
     }
   </script>
