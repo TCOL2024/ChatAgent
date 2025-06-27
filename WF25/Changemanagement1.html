@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prüfungsfragen Change Management – Wirtschaftsfachwirt</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 12px;
+      --radius-sm: 6px;
+    }
+    html, body {
+      margin: 0; padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--primary-light);
+      color: #222; min-height: 100vh;
+    }
+    .container {
+      max-width: 800px; margin: 20px auto; padding: 0 20px;
+    }
+    h1 {
+      color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .question-block {
+      background: var(--secondary);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 20px; margin-bottom: 20px;
+    }
+    .question-block h2 {
+      font-size: 1.25rem; margin-top: 0; color: var(--primary);
+    }
+    .question {
+      margin: 16px 0;
+    }
+    .question p {
+      font-weight: 600; margin-bottom: 8px;
+    }
+    .answers {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .answer-btn {
+      background: #f4f7fb; border: none;
+      padding: 12px 16px; border-radius: var(--radius-sm);
+      text-align: left; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .answer-btn:hover:not(:disabled) { background: #e1e7fd; }
+    .answer-btn.selected { background: var(--primary); color: #fff; }
+    .answer-btn:disabled { opacity: 0.7; cursor: default; }
+    .feedback {
+      margin-top: 10px; font-size: 0.95rem;
+    }
+    .feedback.correct { color: var(--success); }
+    .feedback.incorrect { color: var(--error); }
+    @media (max-width: 600px) {
+      .answers { gap: 6px; }
+      .answer-btn { padding: 10px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Prüfungsfragen: Change Management</h1>
+
+    <!-- Frage 1 -->
+    <div class="question-block">
+      <h2>Frage 1</h2>
+      <p>Gemäß dem PDF „Change Management umfasst alle geplanten, gesteuerten, organisierten und kontrollierten Maßnahmen zur Organisationsentwicklung…“:  
+      Formulieren Sie in Ihrer Rolle als Change-Manager ein konkretes Ziel für die Unfreeze-Phase in einem digitalisierungsorientierten Projekt.</p>
+      <div class="question">
+        <p>Welche der folgenden Formulierungen entspricht am ehesten einem SMART-Ziel für Unfreezing?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das ist kein SMART-Ziel (unpräzise).')">
+            „Wir informieren irgendwann alle Mitarbeiter über die bevorstehende Digitalisierung.“</button>
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Präzise: Wann, wer, was erreicht werden soll.')">
+            „Bis zum 30.09.2025 haben 100 % der Abteilungsleiter an zwei Workshops teilgenommen, um Akzeptanz für die neue ERP-Software aufzubauen.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das beschreibt ein operatives Ziel.')">
+            „Wir führen nächste Woche ein neues Ticketsystem ein.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Dies ist ein generisches Ziel.')">
+            „Mitarbeiter sind aufgeschlossen gegenüber Veränderungen.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frage 2 -->
+    <div class="question-block">
+      <h2>Frage 2</h2>
+      <p>Lewins Drei-Phasen-Modell beschreibt Unfreezing, Moving und Refreezing.  
+      Nennen Sie für das Refreezing zwei konkrete Maßnahmen, mit denen Sie als Projektleiter nachhaltige Verhaltensänderungen festigen.</p>
+      <div class="question">
+        <p>Welche Kombination stellt passende Refreezing-Maßnahmen dar?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Nur eine Maßnahme ist korrekt.')">
+            „Einrichten eines zentralen Wikis und Durchführung monatlicher Retrospektiven.“</button>
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Bewährte Instrumente zur Verankerung.')">
+            „Einführung eines Belohnungssystems für Best-Practices und Quartalsweise Auditierung neuer Prozesse.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Dies ist eher Unfreezing/Mobilisierung.')">
+            „Kick-off-Event und Stakeholder-Analyse.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Zu vage und allgemein gehalten.')">
+            „Sicherstellung, dass alle mitmachen.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frage 3 -->
+    <div class="question-block">
+      <h2>Frage 3</h2>
+      <p>Das PDF zeigt einen schematischen Ablauf: Organisationsentwicklung aktivieren → Workshops/Dialoge → Implementierung → Refreeze → Review/Evaluation.  
+      Sie sollen als Wirtschaftsfachwirt im Review-Meeting den nächsten Schritt einleiten.</p>
+      <div class="question">
+        <p>Welche Handlungsempfehlung sollten Sie dem Vorstand im Review-Meeting vorschlagen?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das verwechselt Evaluation mit Unfreezing.')">
+            „Organisieren Sie sofort neue Workshops mit allen Betroffenen.“</button>
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Gezielt Verbesserungspotenziale ableiten.')">
+            „Analysieren Sie anhand der Kennzahlen die Abweichungen und leiten Sie verbindliche nächste Maßnahmen mit klaren Verantwortlichkeiten ab.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Zu operativ für Review-Ebene.')">
+            „Setzen Sie die IT-Abteilung unter Druck für schnellere Releases.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das gehört zur Refreezing-Phase.')">
+            „Feiern Sie die Erfolge in einer großen Gala.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frage 4 -->
+    <div class="question-block">
+      <h2>Frage 4</h2>
+      <p>Elisabeth Kübler-Ross’ 7-Phasen-Modell zeigt, dass Mitarbeiter zunächst Angst, dann Akzeptanz durchlaufen.  
+      Sie leiten gerade die Unfreezing-Phase. </p>
+      <div class="question">
+        <p>Wie würden Sie in der Phase „Angst“ als Führungskraft konkret vorgehen?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Zuhören und Ängste abbauen.')">
+            „Individuelle Gespräche führen, Ängste thematisieren und durch transparente Informationen Unsicherheiten reduzieren.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das ist Refreezing, nicht Unfreezing.')">
+            „Erfolge groß feiern und Boni auszahlen.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Eher Planungsmaßnahme, nicht Angstphase.')">
+            „Projektpläne für das nächste Quartal finalisieren.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Operational, nicht emotional.')">
+            „Neue Kennzahlensysteme einführen.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frage 5 -->
+    <div class="question-block">
+      <h2>Frage 5</h2>
+      <p>Change-Manager sollen „Betroffene zu Beteiligten machen“.  
+      Formulieren Sie eine konkrete Interventions-Maßnahme, um Mitarbeiter aktiv in die Moving-Phase einzubeziehen.</p>
+      <div class="question">
+        <p>Welche Maßnahme ist am wirkungsvollsten?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Das ist reine Information.')">
+            „Newsletter mit Status-Updates versenden.“</button>
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Partizipation sicherstellen.')">
+            „Interaktive Workshops mit Simulationen neuer Prozesse durchführen und Multiplikatoren-Teams aus allen Abteilungen installieren.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Zu hierarchisch, nicht partizipativ.')">
+            „Top-Down-Anweisung zur Software- Nutzung erlassen.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Zu unspezifisch und passiv.')">
+            „Abteilungsleiter sprechen mit ihren Teams.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frage 6 -->
+    <div class="question-block">
+      <h2>Frage 6</h2>
+      <p>Das PDF nennt als Erfolgsfaktoren: Kommunikation, Erreichbarkeit, Motivation, Unsicherheitsmanagement.  
+      Planen Sie eine Maßnahme, die mindestens drei dieser Erfolgsfaktoren gleichzeitig anspricht.</p>
+      <div class="question">
+        <p>Welche Maßnahme erreicht dieses Ziel am besten?</p>
+        <div class="answers">
+          <button class="answer-btn" data-correct="true"
+            onclick="checkAnswer(this,'Kombiniert Dialog, Motivation, Erreichbarkeit.')">
+            „Wöchentliche offene Sprechstunden der Projektleitung mit Live-Q&A, gepaart mit monatlichem Lob- und Feedback-Newsletter.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Kein direkter Kommunikationsdialog.')">
+            „Einmalige Online-Umfrage zum Projektstatus durchführen.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Rein operativ und nicht motivational.')">
+            „Neue Handbücher versenden.“</button>
+          <button class="answer-btn" data-correct="false"
+            onclick="checkAnswer(this,'Zu selektiv und nicht transparent.')">
+            „Geheime Workshops mit Führungskräften.“</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript for answer handling -->
+    <script>
+      function checkAnswer(btn, explanation) {
+        const correct = btn.dataset.correct === 'true';
+        const answers = btn.closest('.answers');
+        answers.querySelectorAll('button').forEach(b => {
+          b.disabled = true;
+          if (b.dataset.correct === 'true') b.classList.add('selected');
+        });
+        const fb = document.createElement('div');
+        fb.className = 'feedback ' + (correct ? 'correct' : 'incorrect');
+        fb.textContent = (correct ? '✅ Richtig! ' : '❌ Falsch! ') + explanation;
+        answers.parentElement.appendChild(fb);
+      }
+    </script>
+
+  </div>
+</body>
+</html>
