@@ -2,173 +2,561 @@
 <html lang="de">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quiz zu Unternehmenszielen</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: auto;
-      padding: 20px;
+    :root {
+      --primary: #2346e4;
+      --primary-light: #eef3fe;
+      --secondary: #ffffff;
+      --success: #28b779;
+      --error: #ed4c5c;
+      --gray: #7d8597;
+      --shadow: 0 8px 32px rgba(35,70,228,0.10);
+      --radius: 30px;
+      --radius-sm: 14px;
+    }
+    html, body {
+      background: var(--primary-light);
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', Arial, sans-serif;
+      min-height: 100vh;
+      color: #222;
+    }
+    .main-outer {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 42px 0;
+    }
+    .quiz-container {
+      background: var(--secondary);
+      max-width: 600px;
+      width: 95vw;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 44px 36px 36px 36px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .quiz-header-flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .progress-bar-outer {
+      min-width: 150px;
+      background: rgba(255,255,255,0.88);
+      border-radius: var(--radius-sm);
+      box-shadow: 0 2px 8px rgba(35,70,228,0.07);
+      padding: 9px 18px 7px 18px;
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .progress-label {
+      font-size: 0.97rem;
+      color: var(--gray);
+      font-weight: 500;
+      margin-bottom: 3px;
+    }
+    .progress-bar-bg {
+      width: 120px;
+      height: 8px;
+      background: #e3eafc;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1px;
+    }
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary) 70%, #57c8fa 100%);
+      border-radius: 8px;
+      transition: width 0.4s cubic-bezier(.59,.13,.29,1.12);
+    }
+    h1 {
+      font-size: 2.1rem;
+      color: var(--primary);
+      font-weight: 700;
+      margin: 0;
+      letter-spacing: 0.01em;
+      flex: 1 1 auto;
+      min-width: 210px;
     }
     .question {
-      margin-bottom: 15px;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #212b4a;
+      margin-bottom: 32px;
+      margin-top: 18px;
+      min-height: 64px;
+      line-height: 1.38;
     }
-    #results {
-      margin-top: 20px;
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 19px;
+      margin-bottom: 14px;
     }
-    #certificate {
-      display: none;
-      border: 2px solid #000;
-      padding: 20px;
-      margin-top: 20px;
+    .answer-btn {
+      background: #f4f7fb;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 20px 24px;
+      font-size: 1.09rem;
+      font-weight: 500;
+      color: #243060;
+      cursor: pointer;
+      box-shadow: 0 2px 9px rgba(35,70,228,0.07);
+      transition: background 0.19s, color 0.17s, box-shadow 0.18s;
+      outline: none;
+      text-align: left;
+      position: relative;
+      z-index: 1;
+    }
+    .answer-btn.selected {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      box-shadow: 0 2px 16px rgba(35,70,228,0.11);
+    }
+    .answer-btn:disabled {
+      opacity: 0.82;
+      cursor: default;
+    }
+    .next-btn {
+      margin-top: 28px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 15px 42px;
+      font-size: 1.07rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 600;
+      box-shadow: 0 3px 18px rgba(35,70,228,0.10);
+      letter-spacing: 0.01em;
+      transition: background 0.19s;
+    }
+    .next-btn:active {
+      background: #2238a8;
+    }
+    .result-overview {
+      margin-top: 22px;
+      background: #f6f8fc;
+      border-radius: var(--radius-sm);
+      padding: 20px 10px;
+      box-shadow: 0 1px 7px rgba(35,70,228,0.06);
+    }
+    .result-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 13px 0 5px 0;
+      border-bottom: 1px solid #e3eafc;
+      font-size: 1rem;
+    }
+    .result-row:last-child {
+      border-bottom: none;
+    }
+    .result-icon {
+      font-size: 1.6rem;
+      line-height: 1.1;
+      margin-top: 1px;
+      min-width: 30px;
       text-align: center;
     }
-    label {
-      display: block;
-      margin-top: 5px;
+    .correct {
+      color: var(--success);
+      font-weight: 600;
     }
-    input[type="text"] {
-      margin-right: 10px;
+    .incorrect {
+      color: var(--error);
+      font-weight: 600;
     }
-    button {
-      margin-top: 10px;
+    .explanation {
+      margin-left: 42px;
+      color: var(--gray);
+      font-size: 0.99rem;
+      margin-bottom: 9px;
+      margin-top: 3px;
+      padding-right: 7px;
     }
-    hr {
-      margin: 30px 0;
+    .score {
+      font-size: 1.45rem;
+      color: var(--primary);
+      margin-top: 13px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    .restart-btn, .certificate-btn {
+      margin-top: 18px;
+      background: #fff;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+      font-size: 1.06rem;
+      padding: 11px 26px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+      margin-right: 15px;
+    }
+    .restart-btn:hover, .certificate-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+    .overlay {
+      position: fixed;
+      z-index: 999;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(33,48,96,0.08);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .name-dialog {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(35,70,228,0.13);
+      padding: 30px 24px 20px 24px;
+      max-width: 95vw;
+      min-width: 290px;
+      text-align: center;
+    }
+    .name-dialog h2 {
+      color: var(--primary);
+      margin-bottom: 20px;
+      margin-top: 0;
+      font-size: 1.18rem;
+    }
+    .name-dialog input {
+      padding: 10px 15px;
+      border: 1.5px solid #b8c3ea;
+      border-radius: 10px;
+      width: 80%;
+      font-size: 1.02rem;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border 0.17s;
+    }
+    .name-dialog input:focus {
+      border-color: var(--primary);
+    }
+    .name-dialog button {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 9px;
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .name-error {
+      color: var(--error);
+      font-size: 0.99rem;
+      margin-bottom: 5px;
+    }
+    @media (max-width: 620px) {
+      .quiz-container {padding: 18px 2vw;}
+      .progress-bar-outer {min-width: 90px; padding: 7px 6px;}
+      .progress-bar-bg {width: 60px;}
+      .quiz-header-flex {gap:8px;}
+      h1 {font-size: 1.28rem;}
     }
   </style>
 </head>
 <body>
-  <h1>Quiz: Unternehmensziele</h1>
-  <form id="quiz-form">
-    <div class="question">
-      <p>1. Was versteht man unter einem Zielsystem in Unternehmen?</p>
-      <label><input type="radio" name="q1" value="A"> A. Bündelung von Zielen aus verschiedenen Bereichen.</label>
-      <label><input type="radio" name="q1" value="B"> B. Festlegung eines einzelnen Hauptziels.</label>
-      <label><input type="radio" name="q1" value="C"> C. Kontrolle der Zielerreichung.</label>
-      <label><input type="radio" name="q1" value="D"> D. Eliminierung von Zielkonflikten.</label>
+  <div class="main-outer">
+    <div class="quiz-container">
+      <div class="quiz-header-flex">
+        <h1>Quiz: Unternehmensziele</h1>
+        <div class="progress-bar-outer">
+          <div class="progress-label" id="progress-label">Frage 1 von 10</div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="progress-bar" style="width:10%"></div>
+          </div>
+        </div>
+      </div>
+      <div id="quiz">
+        <!-- Quiz-Frage wird hier eingefügt -->
+      </div>
     </div>
-    <div class="question">
-      <p>2. Was bezeichnet im Zielbildungsprozess die „Zielsuche“?</p>
-      <label><input type="radio" name="q2" value="A"> A. Auswahl und Priorisierung von Oberzielen.</label>
-      <label><input type="radio" name="q2" value="B"> B. Festlegung der Maßnahmen zur Zielerreichung.</label>
-      <label><input type="radio" name="q2" value="C"> C. Analyse, welche Ziele verfolgt werden sollen und können.</label>
-      <label><input type="radio" name="q2" value="D"> D. Überwachung der Zielerreichung.</label>
-    </div>
-    <div class="question">
-      <p>3. Welche Zielbeziehung liegt vor, wenn Ziele sich gegenseitig ergänzen?</p>
-      <label><input type="radio" name="q3" value="A"> A. Komplementäre Ziele.</label>
-      <label><input type="radio" name="q3" value="B"> B. Konkurrierende Ziele.</label>
-      <label><input type="radio" name="q3" value="C"> C. Indifferente Ziele.</label>
-      <label><input type="radio" name="q3" value="D"> D. Antagonistische Ziele.</label>
-    </div>
-    <div class="question">
-      <p>4. Beispiel: Budget für Neueinstellung im Vertrieb wird erhöht, gleichzeitig wird Umsatzziel erhöht. Welche Beziehung liegt vor?</p>
-      <label><input type="radio" name="q4" value="A"> A. Komplementär.</label>
-      <label><input type="radio" name="q4" value="B"> B. Konkurrierend.</label>
-      <label><input type="radio" name="q4" value="C"> C. Indifferent.</label>
-      <label><input type="radio" name="q4" value="D"> D. Symmetrisch.</label>
-    </div>
-    <div class="question">
-      <p>5. Welches Umfeld umfasst Gesetzesvorhaben und politische Stabilität?</p>
-      <label><input type="radio" name="q5" value="A"> A. Soziales Umfeld.</label>
-      <label><input type="radio" name="q5" value="B"> B. Politisches Umfeld.</label>
-      <label><input type="radio" name="q5" value="C"> C. Technisches Umfeld.</label>
-      <label><input type="radio" name="q5" value="D"> D. Umweltbereich.</label>
-    </div>
-    <div class="question">
-      <p>6. Welcher Faktor gehört nicht zu den äußeren Einflüssen auf Unternehmensziele?</p>
-      <label><input type="radio" name="q6" value="A"> A. Lieferantenpreise.</label>
-      <label><input type="radio" name="q6" value="B"> B. Konjunkturelle Lage.</label>
-      <label><input type="radio" name="q6" value="C"> C. Unternehmensmission.</label>
-      <label><input type="radio" name="q6" value="D"> D. Kundenverhalten.</label>
-    </div>
-    <div class="question">
-      <p>7. Bei welchen Zielbeziehungen stehen Ziele zueinander in Konkurrenz?</p>
-      <label><input type="radio" name="q7" value="A"> A. Indifferente Ziele.</label>
-      <label><input type="radio" name="q7" value="B"> B. Konkurrierende Ziele.</label>
-      <label><input type="radio" name="q7" value="C"> C. Komplementäre Ziele.</label>
-      <label><input type="radio" name="q7" value="D"> D. Neutrale Ziele.</label>
-    </div>
-    <div class="question">
-      <p>8. Beispiel für indifferente Ziele: Budget für Marketing wird gesenkt und Qualität des Ausbildungspersonals erhöht. Welche Beziehung liegt vor?</p>
-      <label><input type="radio" name="q8" value="A"> A. Komplementär.</label>
-      <label><input type="radio" name="q8" value="B"> B. Konkurrierend.</label>
-      <label><input type="radio" name="q8" value="C"> C. Indifferent.</label>
-      <label><input type="radio" name="q8" value="D"> D. Unabhängig.</label>
-    </div>
-    <div class="question">
-      <p>9. Aus welcher Grundlage erfolgt laut Zielbildungsprozess die Ableitung der Unternehmensziele?</p>
-      <label><input type="radio" name="q9" value="A"> A. Finanzplanung.</label>
-      <label><input type="radio" name="q9" value="B"> B. Unternehmensgrundsatzplanung.</label>
-      <label><input type="radio" name="q9" value="C"> C. Marktanalyse.</label>
-      <label><input type="radio" name="q9" value="D"> D. Personalplanung.</label>
-    </div>
-    <div class="question">
-      <p>10. Welche Ziele werden als erste im Aufbau des Zielsystems ausgewählt und priorisiert?</p>
-      <label><input type="radio" name="q10" value="A"> A. Oberziele.</label>
-      <label><input type="radio" name="q10" value="B"> B. Unterziele.</label>
-      <label><input type="radio" name="q10" value="C"> C. Teilziele.</label>
-      <label><input type="radio" name="q10" value="D"> D. Einzelziele.</label>
-    </div>
-  </form>
-  <button onclick="showResults()">Quiz auswerten</button>
-  <div id="results"></div>
-  <hr/>
-  <h2>Zertifikat</h2>
-  <label for="firstname">Vorname:</label>
-  <input type="text" id="firstname" placeholder="Vorname" />
-  <label for="lastname">Nachname:</label>
-  <input type="text" id="lastname" placeholder="Nachname" />
-  <button onclick="generateCertificate()">Zertifikat anzeigen</button>
-  <div id="certificate"></div>
-  <button onclick="printCertificate()">Zertifikat drucken</button>
+  </div>
 
-  <script>
-    function showResults() {
-      var answers = {
-        q1: 'A', q2: 'C', q3: 'A', q4: 'A', q5: 'B',
-        q6: 'C', q7: 'B', q8: 'C', q9: 'B', q10: 'A'
-      };
-      var form = document.getElementById('quiz-form');
-      var resultDiv = document.getElementById('results');
-      resultDiv.innerHTML = '<h2>Auflösung</h2><ol>';
-      for (var key in answers) {
-        var num = key.substring(1);
-        var selected = form.elements[key].value || '—';
-        var correct = answers[key];
-        resultDiv.innerHTML += '<li>Frage ' + num + ': Richtige Antwort: ' + correct +
-          ' (Ihre Antwort: ' + selected + ')</li>';
-      }
-      resultDiv.innerHTML += '</ol>';
-      window.scrollTo(0, document.body.scrollHeight);
-    }
+  <div id="overlay" style="display:none;">
+    <div class="overlay">
+      <form class="name-dialog" id="nameForm" autocomplete="off" onsubmit="return false;">
+        <h2>Name für das Zertifikat eingeben</h2>
+        <input type="text" id="username" placeholder="Vor- und Nachname" maxlength="60" required>
+        <div id="name-error" class="name-error" style="display:none;"></div>
+        <button type="button" onclick="submitName()">Zertifikat anzeigen</button>
+      </form>
+    </div>
+  </div>
 
-    function generateCertificate() {
-      var firstname = document.getElementById('firstname').value.trim();
-      var lastname = document.getElementById('lastname').value.trim();
-      if (!firstname || !lastname) {
-        alert('Bitte Vor- und Nachname eingeben.');
-        return;
-      }
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, '0');
-      var mm = String(today.getMonth() + 1).padStart(2, '0');
-      var yyyy = today.getFullYear();
-      var dateStr = dd + '.' + mm + '.' + yyyy;
-      var cert = document.getElementById('certificate');
-      cert.innerHTML = 
-        '<h1>Zertifikat</h1>' +
-        '<p>Hiermit wird bescheinigt, dass</p>' +
-        '<h2>' + firstname + ' ' + lastname + '</h2>' +
-        '<p>erfolgreich am Quiz zu Unternehmenszielen am ' + dateStr + ' teilgenommen hat.</p>';
-      cert.style.display = 'block';
-      window.scrollTo(0, document.body.scrollHeight);
-    }
+<script>
+const quizData = [
+  {
+    question: "Was versteht man unter einem Zielsystem in Unternehmen?",
+    answers: [
+      "Bündelung von Zielen aus verschiedenen Bereichen",
+      "Festlegung eines einzelnen Hauptziels",
+      "Kontrolle der Zielerreichung",
+      "Eliminierung von Zielkonflikten"
+    ],
+    correct: 0,
+    explanation: "Ein Zielsystem fasst verschiedene Einzelziele systematisch zusammen."
+  },
+  {
+    question: "Was bezeichnet im Zielbildungsprozess die „Zielsuche\"?",
+    answers: [
+      "Auswahl und Priorisierung von Oberzielen",
+      "Festlegung der Maßnahmen zur Zielerreichung",
+      "Analyse, welche Ziele verfolgt werden sollen und können",
+      "Überwachung der Zielerreichung"
+    ],
+    correct: 2,
+    explanation: "Die Zielsuche umfasst die Identifikation und Analyse möglicher Ziele."
+  },
+  {
+    question: "Welche Zielbeziehung liegt vor, wenn Ziele sich gegenseitig ergänzen?",
+    answers: [
+      "Komplementäre Ziele",
+      "Konkurrierende Ziele",
+      "Indifferente Ziele",
+      "Antagonistische Ziele"
+    ],
+    correct: 0,
+    explanation: "Komplementäre Ziele unterstützen und verstärken sich gegenseitig."
+  },
+  {
+    question: "Budget für Neueinstellung im Vertrieb ↑ und Umsatzziel ↑ – welche Beziehung?",
+    answers: [
+      "Komplementär",
+      "Konkurrierend",
+      "Indifferent",
+      "Symmetrisch"
+    ],
+    correct: 0,
+    explanation: "Beide Maßnahmen ergänzen sich und fördern das gemeinsame Ziel."
+  },
+  {
+    question: "Welches Umfeld umfasst Gesetzesvorhaben und politische Stabilität?",
+    answers: [
+      "Soziales Umfeld",
+      "Politisches Umfeld",
+      "Technisches Umfeld",
+      "Umweltbereich"
+    ],
+    correct: 1,
+    explanation: "Politisches Umfeld beinhaltet rechtliche und staatliche Rahmenbedingungen."
+  },
+  {
+    question: "Welcher Faktor gehört nicht zu den äußeren Einflüssen auf Unternehmensziele?",
+    answers: [
+      "Lieferantenpreise",
+      "Konjunkturelle Lage",
+      "Unternehmensmission",
+      "Kundenverhalten"
+    ],
+    correct: 2,
+    explanation: "Die Unternehmensmission ist eine interne Leitlinie, kein externer Faktor."
+  },
+  {
+    question: "Bei welchen Zielbeziehungen stehen Ziele zueinander in Konkurrenz?",
+    answers: [
+      "Indifferente Ziele",
+      "Konkurrierende Ziele",
+      "Komplementäre Ziele",
+      "Neutrale Ziele"
+    ],
+    correct: 1,
+    explanation: "Konkurrierende Ziele führen zu Konflikten, da sie sich gegenseitig behindern."
+  },
+  {
+    question: "Beispiel für indifferente Ziele: Marketingbudget ↓ und Ausbildungspersonal-Qualität ↑ – welche Beziehung?",
+    answers: [
+      "Komplementär",
+      "Konkurrierend",
+      "Indifferent",
+      "Unabhängig"
+    ],
+    correct: 2,
+    explanation: "Die Änderungen beeinflussen sich nicht direkt."
+  },
+  {
+    question: "Aus welcher Grundlage erfolgt laut Zielbildungsprozess die Ableitung der Unternehmensziele?",
+    answers: [
+      "Finanzplanung",
+      "Unternehmensgrundsatzplanung",
+      "Marktanalyse",
+      "Personalplanung"
+    ],
+    correct: 1,
+    explanation: "Die Unternehmensgrundsatzplanung bildet die Basis für Zielableitungen."
+  },
+  {
+    question: "Welche Ziele werden als erste im Aufbau des Zielsystems ausgewählt und priorisiert?",
+    answers: [
+      "Oberziele",
+      "Unterziele",
+      "Teilziele",
+      "Einzelziele"
+    ],
+    correct: 0,
+    explanation: "Zuerst legt man Oberziele fest, um das System aufzubauen."
+  }
+];
 
-    function printCertificate() {
-      window.print();
+let currentQ = 0;
+let userAnswers = [];
+const quizDiv = document.getElementById("quiz");
+const progressLabel = document.getElementById("progress-label");
+const progressBar = document.getElementById("progress-bar");
+let scoreGlobal = 0;
+
+function renderQuestion(idx) {
+  const data = quizData[idx];
+  progressLabel.textContent = \`Frage \${idx+1} von \${quizData.length}\`;
+  progressBar.style.width = \`\${((idx+1)/quizData.length)*100}%\`;
+  quizDiv.innerHTML = \`
+    <div class="question">\${data.question}</div>
+    <div class="answers">
+      \${data.answers.map((a,i)=>
+        \`<button class="answer-btn" onclick="selectAnswer(\${i})">\${a}</button>\`
+      ).join("")}
+    </div>
+  \`;
+}
+
+window.selectAnswer = function(i) {
+  userAnswers[currentQ] = i;
+  Array.from(document.querySelectorAll(".answer-btn")).forEach((btn, idx)=>{
+    btn.classList.toggle('selected', idx===i);
+    btn.disabled = true;
+  });
+  setTimeout(()=>{
+    if (currentQ < quizData.length - 1) {
+      currentQ++;
+      renderQuestion(currentQ);
+    } else {
+      showResults();
     }
-  </script>
+  }, 450);
+};
+
+function showResults() {
+  progressLabel.textContent = "Ergebnis";
+  progressBar.style.width = "100%";
+  scoreGlobal = quizData.filter((q,idx)=> userAnswers[idx] === q.correct).length;
+  quizDiv.innerHTML = \`
+    <div class="score">Dein Ergebnis: \${scoreGlobal} / \${quizData.length} richtig</div>
+    <div class="result-overview">
+      \${quizData.map((q,idx)=>{
+        const right = userAnswers[idx] === q.correct;
+        return \`
+          <div class="result-row">
+            <span class="result-icon">\${right ? "✅" : "❌"}</span>
+            <span class="\${right?"correct":"incorrect"}">Frage \${idx+1}</span>
+            <span>\${q.question}</span>
+          </div>
+          \${!right ? \`<div class="explanation">
+            Richtige Antwort: <strong>\${q.answers[q.correct]}</strong><br>\${q.explanation}
+          </div>\` : ""}
+        \`;
+      }).join("")}
+    </div>
+    <button class="restart-btn" onclick="restartQuiz()">Quiz erneut starten</button>
+    <button class="certificate-btn" onclick="showNameDialog()">Zertifikat drucken</button>
+  \`;
+}
+
+window.restartQuiz = function() {
+  currentQ = 0;
+  userAnswers = [];
+  renderQuestion(currentQ);
+};
+
+// Zertifikat-Dialog und -Fenster
+window.showNameDialog = function() {
+  document.getElementById('overlay').style.display = 'block';
+  document.getElementById('username').focus();
+  document.getElementById('name-error').style.display = 'none';
+};
+
+window.submitName = function() {
+  const name = document.getElementById('username').value.trim();
+  if (!name || name.length < 2) {
+    document.getElementById('name-error').textContent = "Bitte gib deinen vollständigen Namen ein.";
+    document.getElementById('name-error').style.display = 'block';
+    return;
+  }
+  document.getElementById('overlay').style.display = 'none';
+  showCertificate(name, scoreGlobal, quizData.length);
+};
+
+function showCertificate(name, score, total) {
+  const certWindow = window.open('', '_blank', 'width=700,height=900');
+  const dateStr = new Date().toLocaleDateString('de-DE');
+  certWindow.document.write(\`
+    <!DOCTYPE html>
+    <html lang="de">
+    <head>
+      <meta charset="UTF-8">
+      <title>Zertifikat Unternehmensziele</title>
+      <style>
+        body { font-family: 'Inter', Arial, sans-serif; background: #f7faff; color: #222; margin: 0; padding: 0; }
+        .cert-container {
+          max-width: 520px; margin: 48px auto 0; background: #fff; border-radius: 26px;
+          box-shadow: 0 8px 32px rgba(35,70,228,0.13); padding: 44px 30px; text-align: center;
+        }
+        .cert-title { font-size: 2.1rem; color: #2346e4; font-weight: 700; margin-bottom: 16px; }
+        .cert-line { width: 60px; height: 4px; background: #2346e4; border-radius: 3px; margin: 0 auto 22px; }
+        .cert-name { font-size: 1.28rem; color: #212b4a; margin: 24px 0 12px; font-weight: 600; }
+        .cert-score { font-size: 1.12rem; color: #2346e4; font-weight: 600; margin-bottom: 18px; }
+        .cert-date { color: #7d8597; font-size: 1.01rem; margin-top: 22px; }
+        .cert-footer { margin-top: 38px; font-size: 0.98rem; color: #7d8597; }
+        .cert-print-btn {
+          margin-top: 30px; background: #2346e4; color: #fff; border: none;
+          padding: 13px 38px; font-size: 1.11rem; border-radius: 12px; cursor: pointer;
+          font-weight: 600; box-shadow: 0 3px 18px rgba(35,70,228,0.10); letter-spacing: 0.01em;
+        }
+        @media print {
+          .cert-print-btn { display: none !important; }
+          body { background: #fff; }
+        }
+      </style>
+    </head>
+    <body>
+      <div class="cert-container">
+        <div class="cert-title">Zertifikat</div>
+        <div class="cert-line"></div>
+        <div>Hiermit wird bestätigt, dass</div>
+        <div class="cert-name">\${name}</div>
+        <div>das Quiz „Unternehmensziele“ erfolgreich absolviert hat.</div>
+        <div class="cert-score">Ergebnis: <b>\${score} von \${total} Punkten</b></div>
+        <div class="cert-date">Datum: \${dateStr}</div>
+        <button class="cert-print-btn" onclick="window.print()">Zertifikat drucken</button>
+        <div class="cert-footer">Unternehmensziele – Online-Quiz</div>
+      </div>
+    </body>
+    </html>
+  \`);
+}
+
+renderQuestion(currentQ);
+</script>
 </body>
 </html>
